@@ -2,6 +2,8 @@ import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { currentYear, developedBy } from '@/context/constants';
 import logoDark from '@/images/logo-dark.png';
 import logo from '@/images/logo.png';
+import logoMY from '@/images/my-logo.png';
+import bgImage from '@/images/images-resources/laboratorio-textil.jpg';
 import BaseLayout from '@/layouts/BaseLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -23,12 +25,30 @@ const ConfirmPasswordPage = () => {
     return (
         <BaseLayout>
             <Head title="Confirm Password" />
-            <div className="auth-bg d-flex min-vh-100 justify-content-center align-items-center">
+              <div className="relative d-flex min-vh-100 justify-content-center align-items-center">
+                <div
+                className="position-absolute top-0 start-0 w-100 h-100"
+                style={{
+                    backgroundImage: `url(${bgImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    zIndex: 0,
+                }}
+                />
+                <div
+                className="position-absolute top-0 start-0 w-100 h-100"
+                style={{
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    backdropFilter: 'blur(3px)',
+                    zIndex: 0,
+                }}
+                />
                 <Row className="g-0 justify-content-center w-100 m-xxl-5 px-xxl-4 m-3">
                     <Col xl={4} lg={5} md={6}>
                         <Card className="overflow-hidden text-center h-100 p-xxl-4 p-3 mb-0">
                             <Link href="/" className="auth-brand mb-3">
-                                <img src={logoDark} alt="dark logo" height={24} className="logo-dark" />
+                                <img src={logoMY} alt="dark logo" height={84} className="logo-dark" />
                                 <img src={logo} alt="logo light" height={24} className="logo-light" />
                             </Link>
                             <h3 className="fw-semibold mb-2">Confirm Password</h3>
