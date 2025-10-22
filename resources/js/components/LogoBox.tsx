@@ -1,6 +1,7 @@
 import logoDark from '@/images/logo-dark.png';
 import logoSm from '@/images/logo-sm.png';
 import logo from '@/images/logo.png';
+import logoMY from '@/images/my-logo.png';
 
 import { Link } from '@inertiajs/react';
 
@@ -9,7 +10,8 @@ const LogoBox = () => {
         <Link href="/" className="logo">
             <span className="logo-light">
                 <span className="logo-lg">
-                    <img src={logo} width={73} height={20} alt="logo" />
+                    <img src={logo} width={20} height={70} alt="logo" />
+                    <img src={logoMY} alt="dark logo" height={84} className="logo-dark" />
                 </span>
                 <span className="logo-sm">
                     <img src={logoSm} width={21} height={20} alt="small logo" />

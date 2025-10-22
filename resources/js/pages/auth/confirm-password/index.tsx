@@ -48,7 +48,7 @@ const ConfirmPasswordPage = () => {
                     <Col xl={4} lg={5} md={6}>
                         <Card className="overflow-hidden text-center h-100 p-xxl-4 p-3 mb-0">
                             <Link href="/" className="auth-brand mb-3">
-                                <img src={logoDark} alt="dark logo" height={24} className="logo-dark" />
+                                <img src={logoMY} alt="dark logo" height={84} className="logo-dark" />
                                 <img src={logo} alt="logo light" height={24} className="logo-light" />
                             </Link>
                             <h3 className="fw-semibold mb-2">Confirm Password</h3>
