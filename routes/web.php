@@ -226,3 +226,8 @@ Route::get('/auth/account-deactivation', function () {
     return Inertia::render('auth/account-deactivation/index');
 });
 
+/*********************************---ROUTES TEXTILE LAB---*********************************/
+Route::middleware(['auth', 'verified'])->group(function () {
+    require base_path('routes/admin/admin.php');
+});
+
