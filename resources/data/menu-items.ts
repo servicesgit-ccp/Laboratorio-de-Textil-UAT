@@ -954,7 +954,37 @@ export const MENU_ITEMS: MenuItemType[] = [
                 parentKey: 'layouts',
             },
         ],
-    }
+    },
+    {
+        key: 'admin',
+        label: 'ADMIN',
+        isTitle: true,
+    },
+    {
+        key: 'admin',
+        label: 'Admin',
+        icon: 'tabler:settings-check',
+        children: [
+            {
+                key: 'users',
+                label: 'Usuarios',
+                url: '/admin/users',
+                parentKey: 'admin',
+            },
+            {
+                key: 'roles',
+                label: 'Roles',
+                url: '/admin/roles',
+                parentKey: 'admin',
+            },
+            {
+                key: 'permissions',
+                label: 'Permisos',
+                url: '/admin/permissions',
+                parentKey: 'admin',
+            }
+        ],
+    },
 ];
 
 export const HORIZONTAL_MENU_ITEM: MenuItemType[] = [
