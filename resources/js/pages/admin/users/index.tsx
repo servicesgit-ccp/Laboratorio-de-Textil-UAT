@@ -100,7 +100,7 @@ const UsersPage = () => {
                     <tbody>
                       {users?.data?.map((item, idx) => (
                         <tr key={item.id ?? idx}>
-                          <td><Link href={`/users/${item.id}`} className="text-dark fw-medium">{item.name}</Link></td>
+                          <td>{item.name}</td>
                           <td>{item.email}</td>
                           <td>{item.role}</td>
                           <td className="pe-3">

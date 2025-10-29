@@ -963,7 +963,7 @@ export const MENU_ITEMS: MenuItemType[] = [
     {
         key: 'admin',
         label: 'Admin',
-        icon: 'tabler:medical-cross',
+        icon: 'tabler:settings-check',
         children: [
             {
                 key: 'users',
