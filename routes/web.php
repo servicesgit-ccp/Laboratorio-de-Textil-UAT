@@ -229,5 +229,6 @@ Route::get('/auth/account-deactivation', function () {
 /*********************************---ROUTES TEXTILE LAB---*********************************/
 Route::middleware(['auth', 'verified'])->group(function () {
     require base_path('routes/admin/admin.php');
+    require base_path('routes/provider/provider.php');
 });
 

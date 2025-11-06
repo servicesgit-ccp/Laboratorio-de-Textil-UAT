@@ -985,6 +985,19 @@ export const MENU_ITEMS: MenuItemType[] = [
             }
         ],
     },
+    {
+        key: 'catalogue',
+        label: 'Catálogos',
+        icon: 'tabler:address-book',
+        children: [
+            {
+                key: 'providers',
+                label: 'Proveedores',
+                url: '/providers',
+                parentKey: 'catalogue',
+            }
+        ],
+    },
 ];
 
 export const HORIZONTAL_MENU_ITEM: MenuItemType[] = [
