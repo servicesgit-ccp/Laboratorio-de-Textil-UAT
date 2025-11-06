@@ -7,40 +7,42 @@ use App\Models\TestRequest;
 class TestRequestService
 {
 
-    protected $model;
+    protected $mTestRequest;
 
     public function __construct()
     {
-        $this->model = new TestRequest();
+        $this->mTestRequest = new TestRequest();
     }
 
-    public function getAllTestRequest($request)
+    public function getAllTestRequest(int $perPage = 10, ?string $search = null, $status = null)
     {
-        $query = $this->model
-            // ->with(['test', 'test.testResults'])
-            ->withTrashed();
+        $query = $this->mTestRequest
+            ->with(['test', 'test.results']);
 
-        switch ($request->status) {
-            case 0:
-                $query->where('status', 0);
-                break;
-            case 1:
-                $query->where('status', 1);
-                break;
-            case 2:
-                $query->where('status', 2);
-                break;
-            case 3:
-                $query->where('status', 3);
-                break;
-            case 4: // all status
-            default:
-                // No filtramos, trae todos
-                break;
+        if ($search) {
+            $query->where(function ($qq) use ($search) {
+                $qq->where('number', 'like', "%{$search}%");
+            });
         }
 
-        return $query->get();
+        if (!empty($search)) {
+            $query->where(function ($qq) use ($search) {
+                $qq->where('number', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status !== null && $status !== '' && $status != 4) {
+            $query->where('status', (int) $status);
+        }
+
+        return $query->orderByDesc('id')
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
+    public function showTestRequest($id)
+    {
+        return $this->mTestRequest::with(['test', 'test.results'])->findOrFail($id);
+    }
 
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('test_results', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('test_id');
-            $table->json('content');
+            $table->json('content')->nullable();
             $table->timestamps();
         });
     }
