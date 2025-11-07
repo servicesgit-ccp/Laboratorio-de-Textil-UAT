@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTestRequest;
 use App\Http\Services\TestRequestService;
 use App\Http\Services\TestTypeService;
-use App\Models\TestRequest;
+use App\Http\Services\UserService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,10 +14,13 @@ class TestRequestController extends Controller
     protected $sTestRequest;
     protected $sTestTypes;
 
+    protected $sUsers;
+
     public function __construct()
     {
         $this->sTestRequest = new TestRequestService();
         $this->sTestTypes = new TestTypeService();
+        $this->sUsers = new UserService();
     }
 
     public function getTestRequest(Request $request)
@@ -39,7 +43,7 @@ class TestRequestController extends Controller
     {
         $testTypes = $this->sTestTypes->getTestTypes();
         return Inertia::render('test/create', [
-            'test_types' => $testTypes
+            'test_types' => $testTypes,
         ]);
     }
 
@@ -49,6 +53,13 @@ class TestRequestController extends Controller
         return Inertia::render('test/show', [
             'testRequest' => $test,
         ]);
+    }
+
+    public function storeTestRequest(StoreTestRequest $request)
+    {
+        $data = $request->validated();
+        $this->sTestRequest->storeTest($data);
+        return back()->with('success', 'Solicitud creada');
     }
 
 }

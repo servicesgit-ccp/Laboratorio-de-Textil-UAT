@@ -41,7 +41,7 @@ class UserService
         'email'    => $data['email'],
         'password' => bcrypt($data['password']),
         ]);
-        
+
         $roleName = $data['role'] ?? null;
 
         if (!$roleName && isset($data['role_id'])) {

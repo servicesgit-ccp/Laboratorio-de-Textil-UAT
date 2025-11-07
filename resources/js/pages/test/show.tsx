@@ -3,6 +3,7 @@ import {Head, Link, usePage} from '@inertiajs/react';
 import MainLayout from '@/layouts/MainLayout';
 import PageTitle from '@/components/PageTitle';
 import ShowDetailTest from '@/components/_test/ShowDetailTest';
+import ShowDetailTestContent from '@/components/_test/ShowDetailTestContent';
 import {Button, Card, Col, Nav, Row, Tab} from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
@@ -143,17 +144,7 @@ const TestRequestShow = () => {
                                                                     <strong>
                                                                         Resultado #{r.id}
                                                                     </strong>
-                                                                    <pre className="bg-white p-2 rounded border mt-2">
-                                                                        {r.content &&
-                                                                        Array.isArray(r.content)
-                                                                            ? JSON.stringify(
-                                                                                r.content,
-                                                                                null,
-                                                                                2
-                                                                            )
-                                                                            : r.content ||
-                                                                            'Sin contenido'}
-                                                                    </pre>
+                                                                    <ShowDetailTestContent result={r} />
                                                                     <small className="text-muted">
                                                                         Creado:{' '}
                                                                         {new Date(
