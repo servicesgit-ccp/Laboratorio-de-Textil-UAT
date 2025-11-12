@@ -21,7 +21,6 @@ const VerticalLayout = ({ children }: ChildrenType) => {
                 <div className="container-fluid">
                     <Suspense fallback={<Preloader />}>{children}</Suspense>
                 </div>
-                <Footer />
             </div>
         </div>
     );

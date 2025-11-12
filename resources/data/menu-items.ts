@@ -2,6 +2,98 @@ import { MenuItemType } from '@/types/menu';
 
 export const MENU_ITEMS: MenuItemType[] = [
     {
+        key: 'admin',
+        label: 'ADMIN',
+        isTitle: true,
+    },
+    {
+        key: 'admin',
+        label: 'Admin',
+        icon: 'tabler:settings-check',
+        children: [
+            {
+                key: 'users',
+                label: 'Usuarios',
+                url: '/admin/users',
+                parentKey: 'admin',
+            },
+            {
+                key: 'roles',
+                label: 'Roles',
+                url: '/admin/roles',
+                parentKey: 'admin',
+            },
+            {
+                key: 'permissions',
+                label: 'Permisos',
+                url: '/admin/permissions',
+                parentKey: 'admin',
+            },
+        ],
+    },
+    {
+        key: 'dashboard',
+        label: 'Dashboard',
+        icon: 'tabler:dashboard',
+        url: '/dashboard/',
+    },
+    {
+        key: 'test',
+        label: 'Solicitudes de analisis',
+        icon: 'tabler:file-text',
+        children: [
+            {
+                key: 'test-request',
+                label: 'Solicitud',
+                url: '/test',
+                parentKey: 'test',
+            },
+        ],
+    },
+    {
+        key: 'sample_analysis',
+        label: 'Análisis de Muestras',
+        icon: 'tabler:microscope',
+        url: '/analysis',
+    },
+    {
+        key: 'samples',
+        label: 'Muestras',
+        icon: 'tabler:test-pipe',
+        url: '/samples',
+    },
+    {
+        key: 'clients',
+        label: 'Clientes',
+        icon: 'tabler:users',
+        url: '/clients',
+    },
+    {
+        key: 'tests',
+        label: 'Tests',
+        icon: 'tabler:flask',
+        url: '/tests',
+    },
+    {
+        key: 'reports',
+        label: 'Informes',
+        icon: 'tabler:file-analytics',
+        url: '/reports',
+    },
+    {
+        key: 'catalogue',
+        label: 'Catálogos',
+        icon: 'tabler:address-book',
+        children: [
+            {
+                key: 'providers',
+                label: 'Proveedores',
+                url: '/providers',
+                parentKey: 'catalogue',
+            },
+        ],
+    },
+    {
         key: 'dash',
         label: 'Dash',
         isTitle: true,
@@ -953,62 +1045,6 @@ export const MENU_ITEMS: MenuItemType[] = [
                 url: '/layouts/horizontal',
                 parentKey: 'layouts',
             },
-        ],
-    },
-    {
-        key: 'admin',
-        label: 'ADMIN',
-        isTitle: true,
-    },
-    {
-        key: 'admin',
-        label: 'Admin',
-        icon: 'tabler:settings-check',
-        children: [
-            {
-                key: 'users',
-                label: 'Usuarios',
-                url: '/admin/users',
-                parentKey: 'admin',
-            },
-            {
-                key: 'roles',
-                label: 'Roles',
-                url: '/admin/roles',
-                parentKey: 'admin',
-            },
-            {
-                key: 'permissions',
-                label: 'Permisos',
-                url: '/admin/permissions',
-                parentKey: 'admin',
-            }
-        ],
-    },
-    {
-        key: 'test',
-        label: 'Solicitudes de analisis',
-        icon: 'tabler:file-text',
-        children: [
-            {
-                key: 'test-request',
-                label: 'Solicitud',
-                url: '/test',
-                parentKey: 'test',
-            }
-        ],
-    },
-    {
-        key: 'catalogue',
-        label: 'Catálogos',
-        icon: 'tabler:address-book',
-        children: [
-            {
-                key: 'providers',
-                label: 'Proveedores',
-                url: '/providers',
-                parentKey: 'catalogue',
-            }
         ],
     },
 ];

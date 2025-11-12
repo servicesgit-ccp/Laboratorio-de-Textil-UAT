@@ -27,15 +27,6 @@ const VerticalNavigationBar = () => {
             <SimpleBar>
                 <Suspense fallback={<FallbackLoading />}>
                     <AppMenu menuItems={menuItems} />
-
-                    <div className="help-box text-center">
-                        <img src={coffeeImg} height={90} alt="Helper Icon Image" />
-                        <h5 className="mt-3 fw-semibold fs-16">Unlimited Access</h5>
-                        <p className="mb-3 text-muted">Upgrade to plan to get access to unlimited reports</p>
-                        <Button variant="danger" size="sm">
-                            Upgrade
-                        </Button>
-                    </div>
                     <div className="clearfix" />
                 </Suspense>
             </SimpleBar>
