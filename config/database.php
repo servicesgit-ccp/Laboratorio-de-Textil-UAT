@@ -112,6 +112,19 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'oracle' => [
+            'driver'        => 'oracle',
+            'host'          => env('DB_HOST','127.0.0.1'),
+            'port'          => env('DB_PORT','1521'),
+            'database'      => env('DB_DATABASE','XEPDB1'),
+            'service_name'  => env('DB_SERVICE_NAME','XEPDB1'),
+            'username'      => env('DB_USERNAME','app'),
+            'password'      => env('DB_PASSWORD','app123'),
+            'charset'       => 'AL32UTF8',
+            'prefix'        => '',
+            'prefix_schema' => '',
+        ],
+
     ],
 
     /*
