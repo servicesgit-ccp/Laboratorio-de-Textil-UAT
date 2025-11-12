@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('tests', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('test_request_id');
-            $table->dateTime('started_at');
-            $table->dateTime('finished_at');
+            $table->dateTime('started_at')->nullable();
+            $table->dateTime('finished_at')->nullable();
             $table->timestamps();
         });
     }

@@ -26,7 +26,7 @@ const TopNavigationBarPage = () => {
                         data-bs-target="#searchModal"
                     >
                         <IconifyIcon icon="tabler:search" className="fs-18" />
-                        <span className="me-2">Search something..</span>
+                        <span className="me-2">Buscar...</span>
                         <span className="ms-auto fw-medium">⌘K</span>
                     </div>
                     <PagesDropdown />
@@ -37,11 +37,9 @@ const TopNavigationBarPage = () => {
                             <IconifyIcon icon="tabler:search" className="fs-22" />
                         </button>
                     </div>
-                    <Country />
-                    <Suspense fallback={<FallbackLoading />}>
+                    {/* <Suspense fallback={<FallbackLoading />}>
                         <Notifications />
-                    </Suspense>
-                    <Apps />
+                    </Suspense> */}
                     <ThemeCustomizerToggle />
                     <ThemeModeToggle />
                     <ProfileDropdown />

@@ -523,9 +523,6 @@ const ThemeCustomizer = ({ open, toggle }: OffcanvasControlType) => {
                     <button type="button" className="btn w-50 btn-soft-danger" onClick={resetSettings} id="reset-layout">
                         Reset
                     </button>
-                    <button type="button" className="btn w-50 btn-soft-info" onClick={toggle}>
-                        Buy Now
-                    </button>
                 </div>
             </Offcanvas>
         </>

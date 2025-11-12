@@ -20,7 +20,6 @@ const HorizontalLayout = ({ children }: ChildrenType) => {
 
             <div className="page-content">
                 <div className="page-container">{children}</div>
-                <Footer />
             </div>
         </div>
     );
