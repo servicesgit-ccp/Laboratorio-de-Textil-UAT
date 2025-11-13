@@ -1,44 +1,72 @@
-// react
 import { useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-// bootstrap
 import { Offcanvas, Form, Button, Row, Col, InputGroup } from 'react-bootstrap';
-// components
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
-export default function UserForm({ show, onHide, roles = [], user = null }) {
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  permissions?: string[];
+}
+
+interface Permission {
+  id: number;
+  name: string;
+}
+
+export default function UserForm({
+  show,
+  onHide,
+  roles = [],
+  permissions = [],
+  user = null,
+}: {
+  show: boolean;
+  onHide: () => void;
+  roles?: any[];
+  permissions?: Permission[];
+  user?: User | null;
+}) {
   const isEdit = !!user?.id;
   const [showPwd, setShowPwd] = useState(false);
+
   const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
     name: '',
     email: '',
     password: '',
-    role: '', 
+    role: '',
+    permissions: [] as string[],
   });
 
   useEffect(() => {
     clearErrors();
-    if (isEdit) {
+
+    if (isEdit && user) {
       setData({
         name: user.name || '',
         email: user.email || '',
         password: '',
-        role: user.role || '',
+        role: user.role || normalizeRoles(roles)[0] || '',
+        permissions: user.permissions || [],
       });
     } else {
       setData({
         name: '',
         email: '',
         password: generatePassword(8),
-        role: roles?.[0] || '',
+        role: normalizeRoles(roles)[0] || '',
+        permissions: [],
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, show]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     if (isEdit) {
-      put(route('admin.users.update', user.id), {
+      put(route('admin.users.update', user!.id), {
         onSuccess: () => onHide(),
         preserveScroll: true,
       });
@@ -53,9 +81,22 @@ export default function UserForm({ show, onHide, roles = [], user = null }) {
     }
   };
 
-  const roleOptions = Array.isArray(roles)
-  ? [...new Set(roles.map((r: any) => (typeof r === 'string' ? r : r?.name).trim()).filter(Boolean))]
-  : [];
+  const roleOptions = normalizeRoles(roles);
+
+  function normalizeRoles(roles: any[]): string[] {
+    if (!Array.isArray(roles)) return [];
+    return [
+      ...new Set(
+        roles
+          .map((r: any) =>
+            typeof r === 'string'
+              ? r.trim()
+              : (r?.name ?? '').trim()
+          )
+          .filter(Boolean)
+      ),
+    ];
+  }
 
   function generatePassword(length = 8) {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#-_';
@@ -67,6 +108,15 @@ export default function UserForm({ show, onHide, roles = [], user = null }) {
     }
     return Array.from(array, (v) => chars[v % chars.length]).join('');
   }
+
+  const togglePermission = (name: string) => {
+    const exists = data.permissions.includes(name);
+    const next = exists
+      ? data.permissions.filter((p) => p !== name)
+      : [...data.permissions, name];
+
+    setData('permissions', next);
+  };
 
   return (
     <Offcanvas show={show} onHide={onHide} placement="end" scroll backdrop>
@@ -138,7 +188,6 @@ export default function UserForm({ show, onHide, roles = [], user = null }) {
               </Col>
             )}
 
-
             <Col xs={12}>
               <Form.Label>Rol</Form.Label>
               <Form.Select
@@ -153,6 +202,35 @@ export default function UserForm({ show, onHide, roles = [], user = null }) {
                 ))}
               </Form.Select>
               <Form.Control.Feedback type="invalid">{errors.role}</Form.Control.Feedback>
+            </Col>
+
+            {/* Permisos */}
+            <Col xs={12}>
+              <Form.Label>Permisos</Form.Label>
+              <div
+                className="border rounded p-2"
+                style={{ maxHeight: 260, overflowY: 'auto' }}
+              >
+                {(!permissions || permissions.length === 0) && (
+                  <div className="text-muted small">No hay permisos configurados.</div>
+                )}
+
+                {permissions.map((perm) => (
+                  <Form.Check
+                    key={perm.id ?? perm.name}
+                    type="checkbox"
+                    id={`perm-${perm.name}`}
+                    label={perm.name}
+                    checked={data.permissions.includes(perm.name)}
+                    onChange={() => togglePermission(perm.name)}
+                  />
+                ))}
+              </div>
+              {errors.permissions && (
+                <div className="invalid-feedback d-block">
+                  {errors.permissions as any}
+                </div>
+              )}
             </Col>
 
             <Col xs={12} className="d-flex gap-2 justify-content-end pt-3">

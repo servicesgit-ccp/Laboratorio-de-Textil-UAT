@@ -1,6 +1,58 @@
 import { HORIZONTAL_MENU_ITEM, MENU_ITEMS } from '@/data/menu-items';
 import { MenuItemType } from '@/types/menu';
 
+type PermissionContext = {
+    isFullAccess: boolean;
+    permissions: string[];
+};
+
+export const filterMenuByPermissions = (items: MenuItemType[], ctx: PermissionContext): MenuItemType[] => {
+    const { isFullAccess, permissions } = ctx;
+    if (isFullAccess) {
+        return items;
+    }
+
+    const canSee = (item: MenuItemType): boolean => {
+        if (!item.permission) return true;
+        return permissions.includes(item.permission);
+    };
+
+    const process = (list: MenuItemType[]): MenuItemType[] => {
+        const out: MenuItemType[] = [];
+
+        for (const item of list) {
+            const children = item.children ? process(item.children) : [];
+            const hasPermission = canSee(item);
+
+            if (item.permission) {
+                if (!hasPermission) {
+                    continue;
+                }
+
+                const normalizedChildren = children.length > 0 ? children : undefined;
+
+                out.push({
+                    ...item,
+                    children: normalizedChildren,
+                });
+            } else {
+                if (hasPermission || children.length > 0) {
+                    const normalizedChildren = children.length > 0 ? children : undefined;
+
+                    out.push({
+                        ...item,
+                        children: normalizedChildren,
+                    });
+                }
+            }
+        }
+
+        return out;
+    };
+
+    return process(items);
+};
+
 export const getMenuItems = (): MenuItemType[] => {
     return MENU_ITEMS;
 };

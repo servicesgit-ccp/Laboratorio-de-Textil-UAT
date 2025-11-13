@@ -8,6 +8,7 @@ use App\Http\Services\PermissionService;
 use Inertia\Inertia;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role as RoleModel;
 
 class RoleController extends Controller
@@ -58,7 +59,16 @@ class RoleController extends Controller
 
     public function syncPermissions(Request $request, RoleModel $role)
     {
-        $this->sRole->syncPermissions($role, $request->permissions);
+        $data = $request->validate([
+            'permissions'   => ['nullable', 'array'],
+            'permissions.*' => [
+                'string',
+                Rule::exists('permissions', 'name'),
+            ],
+        ]);
+
+        $this->sRole->syncPermissions($role, $data['permissions'] ?? []);
+
         return back()->with('success', 'Permisos del rol actualizados.');
     }
 }

@@ -18,28 +18,32 @@ class UserService
 
     public function getUsers(int $perPage = 10, ?string $search = null)
     {
-        $q = $this->mUser->query()->with('roles');
-        if ($search) {
-            $q->where(function ($qq) use ($search) {
-                $qq->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-        return $q->orderBy('name')
+        return User::query()
+            ->with(['roles:id,name', 'permissions:id,name'])
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($qq) use ($search) {
+                    $qq->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
             ->paginate($perPage)
-            ->withQueryString()
-            ->through(function ($user) {
-                $user->role = $user->roles->pluck('name')->first() ?? 'Sin rol';
-                return $user;
+            ->through(function (User $user) {
+                return [
+                    'id'          => $user->id,
+                    'name'        => $user->name,
+                    'email'       => $user->email,
+                    'role'        => $user->roles->first()->name ?? null,
+                    'permissions' => $user->permissions->pluck('name')->values()->all(),
+                ];
             });
     }
 
     public function createUser(array $data)
     {
         $user = $this->mUser->create([
-        'name'     => $data['name'],
-        'email'    => $data['email'],
-        'password' => bcrypt($data['password']),
+            'name'     => $data['name'],
+            'email'    => $data['email'],
+            'password' => bcrypt($data['password']),
         ]);
 
         $roleName = $data['role'] ?? null;
@@ -50,6 +54,8 @@ class UserService
         if ($roleName) {
             $user->syncRoles([$roleName]);
         }
+
+        $user->syncPermissions($data['permissions'] ?? []);
         return $user;
     }
 
@@ -72,6 +78,8 @@ class UserService
             if ($roleName) {
                 $user->syncRoles([$roleName]);
             }
+
+            $user->syncPermissions($data['permissions'] ?? []);
             return $user->refresh();
         });
     }
@@ -98,7 +106,7 @@ class UserService
     {
         $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$-_=+';
         return collect(range(1, $length))
-            ->map(fn () => $chars[random_int(0, strlen($chars) - 1)])
+            ->map(fn() => $chars[random_int(0, strlen($chars) - 1)])
             ->implode('');
     }
 }

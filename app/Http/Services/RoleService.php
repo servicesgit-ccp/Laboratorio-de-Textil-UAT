@@ -28,16 +28,20 @@ class RoleService
         if ($search) {
             $q->where(function ($qq) use ($search) {
                 $qq->where('name', 'like', "%{$search}%")
-                   ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
         return $q->orderBy('name')
             ->paginate($perPage)
             ->withQueryString()
-            ->through(function ($role) {
-                $role->permission_names = $role->permissions->pluck('name')->values();
-                return $role->makeHidden('permissions');
+            ->through(function (Role $role) {
+                return [
+                    'id'               => $role->id,
+                    'name'             => $role->name,
+                    'description'      => $role->description,
+                    'permission_names' => $role->permissions->pluck('name')->values()->all(),
+                ];
             });
     }
 

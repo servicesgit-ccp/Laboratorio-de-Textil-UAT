@@ -18,7 +18,7 @@ use App\Http\Controllers\MapsController;
 use App\Http\Controllers\LayoutsController;
 use Inertia\Inertia;
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -233,3 +233,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     require base_path('routes/test/test.php');
 });
 
+Route::get('/debug/oci', function () {
+    return [
+        'php_version' => PHP_VERSION,
+        'extension_loaded_oci8' => extension_loaded('oci8'),
+        'defined_OCI_DEFAULT' => defined('OCI_DEFAULT'),
+    ];
+});

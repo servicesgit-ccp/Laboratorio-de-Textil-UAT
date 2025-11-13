@@ -12,6 +12,7 @@ export type MenuItemType = {
     };
     badgeIcon?: string;
     parentKey?: string;
+    permission?: string;
     target?: HTMLAttributeAnchorTarget;
     isDisabled?: boolean;
     children?: MenuItemType[];

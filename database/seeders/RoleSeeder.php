@@ -16,12 +16,10 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        // Spatie cache (recomendado)
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
 
         Schema::disableForeignKeyConstraints();
 
-        // Limpia pivotes primero para no violar FK
         if (Schema::hasTable('role_has_permissions')) {
             DB::table('role_has_permissions')->delete();
         }
@@ -29,7 +27,6 @@ class RoleSeeder extends Seeder
             DB::table('model_has_roles')->delete();
         }
 
-        // Luego las maestras
         if (Schema::hasTable('roles')) {
             DB::table('roles')->delete();
         }
@@ -39,13 +36,11 @@ class RoleSeeder extends Seeder
 
         Schema::enableForeignKeyConstraints();
 
-        // Crea roles (guard_name por defecto 'web', ajusta si usas otro)
         $roles = ['superadmin', 'admin', 'lab_technician'];
         foreach ($roles as $role) {
-            Role::create(['name' => $role]); // ['guard_name' => 'web'] si usas otro guard, cámbialo
+            Role::create(['name' => $role]);
         }
 
-        // Asigna al user 1 si existe
         $user = User::find(1);
         if ($user) {
             $user->assignRole('superadmin');
@@ -54,5 +49,4 @@ class RoleSeeder extends Seeder
             $this->command->warn('No se encontró un usuario con ID 1, no se asignó el rol.');
         }
     }
-    
 }

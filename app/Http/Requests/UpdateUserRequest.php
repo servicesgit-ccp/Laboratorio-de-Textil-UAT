@@ -48,6 +48,11 @@ class UpdateUserRequest extends FormRequest
             'role'  => ['required_without:role_id', 'string', 'exists:roles,name'],
             'role_id' => ['required_without:role', 'integer', 'exists:roles,id'],
             'password' => ['nullable', 'string', 'min:8'],
+            'permissions'   => ['nullable', 'array'],
+            'permissions.*' => [
+                'string',
+                Rule::exists('permissions', 'name'),
+            ],
         ];
     }
 }

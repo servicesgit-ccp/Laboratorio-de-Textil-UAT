@@ -11,7 +11,7 @@ import UserForm from '@/components/_admin/forms/UserForm';
 import ConfirmModal from '@/components/_general/ConfirmModal';
 
 const UsersPage = () => {
-  const { users, roles, filters } = usePage().props;
+  const { users, roles, permissions, filters } = usePage().props;
   const [show, setShow] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -80,7 +80,7 @@ const UsersPage = () => {
                     }}
                   />
                 </div>
-                
+
                 <div>
                   <Button variant="success" className="bg-gradient" onClick={handleShowNew}>
                     <IconifyIcon icon="tabler:plus" className="me-1" /> Nuevo usuario
@@ -193,7 +193,7 @@ const UsersPage = () => {
                     })}
                   </ul>
                 </div>
-              </CardFooter> 
+              </CardFooter>
             </Card>
           </Col>
         </Row>
@@ -201,6 +201,7 @@ const UsersPage = () => {
         show={show}
         onHide={handleClose}
         roles={roles ?? []}
+        permissions={permissions ?? []}
         user={editingUser}
       />
       <ConfirmModal

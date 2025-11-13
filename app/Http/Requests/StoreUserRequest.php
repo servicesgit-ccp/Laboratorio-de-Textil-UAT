@@ -14,14 +14,14 @@ class StoreUserRequest extends FormRequest
         return true;
     }
 
-     protected function prepareForValidation(): void
+    protected function prepareForValidation(): void
     {
         $role = $this->input('role');
         if (is_array($role)) {
             $name = $role['name'] ?? null;
             $id   = $role['id']   ?? null;
             $merge = [];
-            if ($name) $merge['role'] = $name; 
+            if ($name) $merge['role'] = $name;
             if ($id && !$name) $merge['role_id'] = $id;
             $this->merge($merge);
         }
@@ -40,7 +40,11 @@ class StoreUserRequest extends FormRequest
             'password' => ['required', 'string', 'min:8'],
             'role'      => ['required_without:role_id', 'string', 'exists:roles,name'],
             'role_id'   => ['required_without:role', 'integer', 'exists:roles,id'],
+            'permissions'   => ['nullable', 'array'],
+            'permissions.*' => [
+                'string',
+                Rule::exists('permissions', 'name'),
+            ],
         ];
     }
-
 }
