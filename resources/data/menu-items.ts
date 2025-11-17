@@ -1083,7 +1083,6 @@ export const MENU_ITEMS: MenuItemType[] = [
                 permission: 'Full Access',
             },
         ],
-        permission: 'Full Access',
     },
     {
         key: 'tables',
@@ -1106,7 +1105,6 @@ export const MENU_ITEMS: MenuItemType[] = [
                 permission: 'Full Access',
             },
         ],
-        permission: 'Full Access',
     },
     {
         key: 'maps',
@@ -1129,7 +1127,6 @@ export const MENU_ITEMS: MenuItemType[] = [
                 permission: 'Full Access',
             },
         ],
-        permission: 'Full Access',
     },
     {
         key: 'more',
@@ -1204,7 +1201,6 @@ export const MENU_ITEMS: MenuItemType[] = [
                 permission: 'Full Access',
             },
         ],
-        permission: 'Full Access',
     },
 ];
 
@@ -1237,7 +1233,6 @@ export const HORIZONTAL_MENU_ITEM: MenuItemType[] = [
                 permission: 'Full Access',
             },
         ],
-        permission: 'Full Access',
     },
     {
         key: 'apps',
@@ -1364,7 +1359,6 @@ export const HORIZONTAL_MENU_ITEM: MenuItemType[] = [
                         permission: 'Full Access',
                     },
                 ],
-                permission: 'Full Access',
             },
             {
                 key: 'e-commerce',
@@ -1436,7 +1430,6 @@ export const HORIZONTAL_MENU_ITEM: MenuItemType[] = [
                         permission: 'Full Access',
                     },
                 ],
-                permission: 'Full Access',
             },
             {
                 key: 'invoice',
@@ -1466,7 +1459,6 @@ export const HORIZONTAL_MENU_ITEM: MenuItemType[] = [
                         permission: 'Full Access',
                     },
                 ],
-                permission: 'Full Access',
             },
         ],
     },
@@ -1682,7 +1674,6 @@ export const HORIZONTAL_MENU_ITEM: MenuItemType[] = [
                 permission: 'Full Access',
             },
         ],
-        permission: 'Full Access',
     },
     {
         key: 'components',

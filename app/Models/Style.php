@@ -12,6 +12,7 @@ class Style extends Model
     protected $fillable = [
         'number',
         'provider_id',
+        'description',
         'order_id',
         'department_id',
     ];

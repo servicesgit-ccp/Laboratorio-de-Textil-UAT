@@ -1,24 +1,26 @@
 // react
 import { useState } from 'react';
 import { router, Link, usePage } from '@inertiajs/react';
+import axios from 'axios';
 // bootstrap
 import { Button, Card, CardBody, CardHeader, Col, Form, Row } from 'react-bootstrap';
 // components
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 const TestForm = () => {
-    const { test_types } = usePage().props as {
+    const { test_types } = usePage().props as unknown as {
         test_types: { id: number; name_es: string }[];
     };
 
     const [form, setForm] = useState({
-        client_name: '',
-        garment_name: '',
-        test_type_ids: [] as number[], // múltiples pruebas
+        item: '',
+        test_type_ids: [] as number[],
         notes: '',
+        item_name: '',
     });
 
     const [loading, setLoading] = useState(false);
+    const [itemLoading, setItemLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -43,6 +45,49 @@ const TestForm = () => {
         });
     };
 
+    const handleItemKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return;
+
+    e.preventDefault(); // evita que envíe el form
+
+    const value = form.item.trim();
+    if (!value) return;
+
+    try {
+        setItemLoading(true);
+
+        const { data } = await axios.get(
+            route('items.show', value)
+        );
+
+        let itemName: string = '';
+        if (data.style) {
+            itemName = data.style.description;
+        } else {
+            itemName = data.description;
+        }
+
+        setForm((prev) => ({
+            ...prev,
+            item_name: itemName ?? '',
+        }));
+
+
+    } catch (error: any) {
+        // si no se encuentra, limpias el nombre o muestras algo
+        setForm((prev) => ({
+            ...prev,
+            item_name: '',
+        }));
+        // aquí podrías disparar un toast / alerta si quieres
+        console.error('Error buscando item', error?.response ?? error);
+    } finally {
+        setItemLoading(false);
+    }
+};
+
+
+
     return (
         <Row className="justify-content-center">
             <Col lg={12}>
@@ -61,13 +106,14 @@ const TestForm = () => {
                             <Row className="g-3">
                                 <Col md={6}>
                                     <Form.Group>
-                                        <Form.Label>Nombre del cliente</Form.Label>
+                                        <Form.Label>SKU o estilo</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            name="client_name"
-                                            value={form.client_name}
+                                            name="item"
+                                            value={form.item}
                                             onChange={handleChange}
-                                            placeholder="Ej. Textiles Rivera"
+                                            onKeyDown={handleItemKeyDown}
+                                            placeholder="Ej. 100577957"
                                             required
                                         />
                                     </Form.Group>
@@ -75,14 +121,16 @@ const TestForm = () => {
 
                                 <Col md={6}>
                                     <Form.Group>
-                                        <Form.Label>Nombre de la prenda</Form.Label>
+                                        <Form.Label>Nombre</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            name="garment_name"
-                                            value={form.garment_name}
-                                            onChange={handleChange}
-                                            placeholder="Ej. Camisa algodón"
-                                            required
+                                            disabled
+                                            placeholder=""
+                                            value={
+                                                itemLoading
+                                                    ? 'Buscando...'
+                                                    : form.item_name
+                                            }
                                         />
                                     </Form.Group>
                                 </Col>
