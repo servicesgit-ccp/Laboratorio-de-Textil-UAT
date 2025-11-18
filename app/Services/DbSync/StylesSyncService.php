@@ -19,7 +19,7 @@ class StylesSyncService extends BaseMysqlToOracleSync
             'ID'           => (int)$row->id,
             'NUMBER'  => (string)$row->style,
             'DESCRIPTION' => (string)$row->description,
-            'PROVIDER_ID' => (int)$row->jdaProvider,
+            'PROVIDER_ID' => (int)$row->provider_id,
             'DEPARTMENT_ID'   => $row->department_id,
             'DIVISION_ID'   => $row->division_id,
             'CREATED_AT'   => $row->created_at,
