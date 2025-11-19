@@ -11,6 +11,8 @@ const TestRequestIndex = () => {
         filters?: { q?: string; per_page?: number; status?: number };
     };
 
+    console.log(test_requests);
+
     const [searchTerm, setSearchTerm] = useState(filters?.q ?? '');
     const [statusFilter, setStatusFilter] = useState(filters?.status ?? 4);
 
@@ -35,8 +37,9 @@ const TestRequestIndex = () => {
     };
 
     // Función para asignar color y texto al estado
-    const getStatusBadge = (status: number) => {
-        switch (status) {
+    const getStatusBadge = (status: number | string) => {
+        const s = Number(status);
+        switch (s) {
             case 0:
                 return <Badge bg="secondary">Creado</Badge>;
             case 1:

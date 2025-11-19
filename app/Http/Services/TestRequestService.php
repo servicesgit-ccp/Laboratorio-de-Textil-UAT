@@ -40,12 +40,6 @@ class TestRequestService
             });
         }
 
-        if (!empty($search)) {
-            $query->where(function ($qq) use ($search) {
-                $qq->where('number', 'like', "%{$search}%");
-            });
-        }
-
         if ($status !== null && $status !== '' && $status != 4) {
             $query->where('status', (int) $status);
         }
@@ -70,7 +64,9 @@ class TestRequestService
                 'user_id' => 1,
                 'style_id' => 1,
                 'status' => 0,
+                'number' => $this->generateTestNumber(),
             ]);
+
 
             // 2️⃣ Crear Test asociado
             $test = $this->mTest->create([
@@ -119,5 +115,13 @@ class TestRequestService
         }
     }
 
+    public function generateTestNumber()
+    {
+        $max = $this->mTestRequest
+            ->selectRaw('COUNT(*) as count')
+            ->whereRaw('EXTRACT(MONTH FROM created_at) = EXTRACT(MONTH FROM SYSDATE)')
+            ->first();
+        return 'CCP0' . date('Y') . '' . date('m') . '' . ($max->count + 1);
+    }
 
 }
