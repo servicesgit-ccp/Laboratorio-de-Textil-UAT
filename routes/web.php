@@ -232,6 +232,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     require base_path('routes/provider/provider.php');
     require base_path('routes/test/test.php');
     require base_path('routes/item/item.php');
+    require base_path('routes/test-results/test-results.php');
 });
 
 Route::get('/debug/oci', function () {

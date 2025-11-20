@@ -51,10 +51,10 @@ export const MENU_ITEMS: MenuItemType[] = [
         ],
     },
     {
-        key: 'sample_analysis',
+        key: 'results',
         label: 'Análisis de Muestras',
         icon: 'tabler:microscope',
-        url: '/analysis',
+        url: '/test-results',
     },
     {
         key: 'samples',
