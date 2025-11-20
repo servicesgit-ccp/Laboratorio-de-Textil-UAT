@@ -6,7 +6,7 @@ import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import MainLayout from '@/layouts/MainLayout';
 
 const TestRequestIndex = () => {
-    const { test_requests, filters } = usePage().props as {
+    const { test_requests, stats, filters } = usePage().props as {
         test_requests?: any;
         filters?: { q?: string; per_page?: number; status?: number };
     };
@@ -60,6 +60,76 @@ const TestRequestIndex = () => {
                 subTitle="Solicitudes de Pruebas Textiles"
             />
 
+            <Row className="mb-4">
+                <Col md={3}>
+                    <Card className="shadow-sm p-3">
+                        <div className="d-flex justify-content-between">
+                            <div>
+                                <h6 className="text-muted">Total Solicitudes</h6>
+                                <h3>{stats.total}</h3>
+                                <p className="text-success mt-2">
+                                    <IconifyIcon icon="tabler:trending-up" /> {stats.total_variation}% desde el mes pasado
+                                </p>
+                            </div>
+                            <div className="bg-primary-subtle p-3 rounded">
+                                <IconifyIcon icon="tabler:clipboard" className="fs-2 text-primary" />
+                            </div>
+                        </div>
+                    </Card>
+                </Col>
+
+                <Col md={3}>
+                    <Card className="shadow-sm p-3">
+                        <div className="d-flex justify-content-between">
+                            <div>
+                                <h6 className="text-muted">Pendientes</h6>
+                                <h3>{stats.pending}</h3>
+                                <p className="text-danger mt-2">
+                                    <IconifyIcon icon="tabler:trending-down" /> {stats.pending_variation}% desde la semana pasada
+                                </p>
+                            </div>
+                            <div className="bg-warning-subtle p-3 rounded">
+                                <IconifyIcon icon="tabler:box" className="fs-2 text-warning" />
+                            </div>
+                        </div>
+                    </Card>
+                </Col>
+
+                <Col md={3}>
+                    <Card className="shadow-sm p-3">
+                        <div className="d-flex justify-content-between">
+                            <div>
+                                <h6 className="text-muted">Enviadas</h6>
+                                <h3>{stats.send}</h3>
+                                <p className="text-success mt-2">
+                                    <IconifyIcon icon="tabler:trending-up" /> {stats.send_variation}% desde el mes pasado
+                                </p>
+                            </div>
+                            <div className="bg-purple-100 p-3 rounded">
+                                <IconifyIcon icon="tabler:send" className="fs-2 text-purple" />
+                            </div>
+                        </div>
+                    </Card>
+                </Col>
+
+                <Col md={3}>
+                    <Card className="shadow-sm p-3">
+                        <div className="d-flex justify-content-between">
+                            <div>
+                                <h6 className="text-muted">Finalizadas</h6>
+                                <h3>{stats.finished}</h3>
+                                <p className="text-success mt-2">
+                                    <IconifyIcon icon="tabler:trending-up" /> {stats.finished_variation}% desde el mes pasado
+                                </p>
+                            </div>
+                            <div className="bg-success-subtle p-3 rounded">
+                                <IconifyIcon icon="tabler:users-group" className="fs-2 text-success" />
+                            </div>
+                        </div>
+                    </Card>
+                </Col>
+            </Row>
+
             <Row>
                 <Col xs={12}>
                     <Card>
@@ -104,10 +174,13 @@ const TestRequestIndex = () => {
                             <table className="table table-nowrap mb-0 align-middle">
                                 <thead className="bg-light-subtle">
                                 <tr>
-                                    <th>ID</th>
                                     <th>Folio</th>
-                                    <th>Estilo</th>
-                                    <th>Fecha creación</th>
+                                    <th>Fecha Ingreso</th>
+                                    <th>Fecha Salida</th>
+                                    <th>SKU</th>
+                                    <th>Descripción</th>
+                                    <th>Proveedor</th>
+                                    <th>Pruebas</th>
                                     <th>Status</th>
                                     <th className="text-center" style={{ width: 120 }}>Acción</th>
                                 </tr>
@@ -117,10 +190,22 @@ const TestRequestIndex = () => {
                                     test_requests.data.map((item: any, idx: number) => {
                                         return (
                                             <tr key={item.id ?? idx}>
-                                                <td>{item.id}</td>
                                                 <td>{item.number}</td>
-                                                <td>{item.style_id}</td>
-                                                <td>{item.created_at}</td>
+                                                <td>
+                                                    {item.test[0]?.started_at
+                                                        ? new Date(item.test[0].started_at).toLocaleString()
+                                                        : 'Sin fecha'}
+                                                </td>
+
+                                                <td>
+                                                    {item.test[0]?.finished_at
+                                                        ? new Date(item.test[0].finished_at).toLocaleString()
+                                                        : 'Sin fecha'}
+                                                </td>
+                                                {item.style?.number.length > 0 ? <td>{item.style?.number}</td> : <td>{item.item}</td>}
+                                                <td>{item.style?.description ?? 'S/N'}</td>
+                                                <td>{item.style?.provider.name ?? 'S/N'}</td>
+                                                <td>{Object.keys(item.test[0].results[0].content).length}</td>
                                                 <td>{getStatusBadge(item.status)}</td>
                                                 <td className="pe-3 text-center">
                                                     <div className="hstack gap-1 justify-content-center">

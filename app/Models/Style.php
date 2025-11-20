@@ -32,8 +32,4 @@ class Style extends Model
         return $this->belongsTo(Department::class);
     }
 
-    public function skus()
-    {
-        return $this->hasMany(Sku::class);
-    }
 }
