@@ -28,9 +28,11 @@ class TestRequestController extends Controller
         $perPage = (int) $request->input('per_page', 10);
         $status = $request->input('status', null);
         $search  = $request->input('q');
+        $stats = $this->sTestRequest->getTestRequestStats();
         $testRequest = $this->sTestRequest->getAllTestRequest($perPage, $search, $status);
         return Inertia::render('test/index', [
             'test_requests' => $testRequest,
+            'stats' => $stats,
             'filters' => [
                 'q' => $search,
                 'per_page' => $perPage,
@@ -59,7 +61,7 @@ class TestRequestController extends Controller
     {
         $data = $request->validated();
         $this->sTestRequest->storeTest($data);
-        return back()->with('success', 'Solicitud creada');
+        return redirect()->route('test.request.index')->with('success', 'Solicitud creada');
     }
 
 }

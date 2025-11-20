@@ -41,14 +41,7 @@ export const MENU_ITEMS: MenuItemType[] = [
         key: 'test',
         label: 'Solicitudes de analisis',
         icon: 'tabler:file-text',
-        children: [
-            {
-                key: 'test-request',
-                label: 'Solicitud',
-                url: '/test',
-                parentKey: 'test',
-            },
-        ],
+        url: '/test',
     },
     {
         key: 'sample_analysis',

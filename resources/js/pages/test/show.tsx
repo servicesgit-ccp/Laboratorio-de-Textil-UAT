@@ -19,7 +19,7 @@ const TestRequestShow = () => {
             <Head title={`Solicitud #${testRequest.number}`} />
 
             <PageTitle
-                title={`Solicitud de Prueba #${testRequest.number}`}
+                title={`Solicitud de Prueba`}
                 subTitle="Detalle de pruebas asociadas"
             />
 
@@ -37,32 +37,21 @@ const TestRequestShow = () => {
                         description={
                             <>
                                 <span className="d-block">
-                                    <strong>ID:</strong> {testRequest.id}
+                                    {console.log(testRequest)}
+                                    {testRequest.style?.number.length > 0 ? (
+                                        <>
+                                            <strong>Estilo:</strong> {testRequest.style.number}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <strong>SKU:</strong> {testRequest.item}
+                                        </>
+                                    )}
                                 </span>
                                 <span className="d-block">
-                                    <strong>Usuario:</strong> {testRequest.user_id}
+                                    <strong>Departamento:</strong> {testRequest.style?.department.description ?? ''}
                                 </span>
-                                <span className="d-block">
-                                    <strong>Estilo:</strong> {testRequest.style_id}
-                                </span>
-                                <span className="d-block">
-                                    <strong>Estatus:</strong>{' '}
-                                    <span
-                                        className={`badge bg-${
-                                            testRequest.status === 0
-                                                ? 'success'
-                                                : testRequest.status === 1
-                                                    ? 'warning'
-                                                    : 'secondary'
-                                        }`}
-                                    >
-                                        {testRequest.status === 0
-                                            ? 'Completado'
-                                            : testRequest.status === 1
-                                                ? 'Pendiente'
-                                                : 'Cancelado'}
-                                    </span>
-                                </span>
+
                                 <span className="d-block">
                                     <strong>Creado:</strong>{' '}
                                     {new Date(testRequest.created_at).toLocaleString()}
@@ -119,9 +108,6 @@ const TestRequestShow = () => {
                                                                 ).toLocaleString()
                                                                 : 'No finalizado'}
                                                         </Col>
-                                                        <Col md={4}>
-                                                            <strong>ID Test:</strong> {t.id}
-                                                        </Col>
                                                     </Row>
 
                                                     <hr />
@@ -145,12 +131,6 @@ const TestRequestShow = () => {
                                                                         Resultado #{r.id}
                                                                     </strong>
                                                                     <ShowDetailTestContent result={r} />
-                                                                    <small className="text-muted">
-                                                                        Creado:{' '}
-                                                                        {new Date(
-                                                                            r.created_at
-                                                                        ).toLocaleString()}
-                                                                    </small>
                                                                 </div>
                                                             ))}
                                                         </div>
