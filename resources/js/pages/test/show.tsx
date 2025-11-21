@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import {Head, Link, usePage} from '@inertiajs/react';
 import MainLayout from '@/layouts/MainLayout';
 import PageTitle from '@/components/PageTitle';
-import ShowDetailTest from '@/components/_test/ShowDetailTest';
-import ShowDetailTestContent from '@/components/_test/ShowDetailTestContent';
+import TestRequestShowDetail from '@/components/_test/TestRequestShowDetail';
+import TestRequestShowDetailContent from '@/components/_test/TestRequestShowDetailContent';
 import {Button, Card, Col, Nav, Row, Tab} from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
@@ -32,7 +32,7 @@ const TestRequestShow = () => {
                             </Button>
                         </Link>
                     </div>
-                    <ShowDetailTest
+                    <TestRequestShowDetail
                         title={`Solicitud #${testRequest.number}`}
                         description={
                             <>
@@ -130,7 +130,7 @@ const TestRequestShow = () => {
                                                                     <strong>
                                                                         Resultado #{r.id}
                                                                     </strong>
-                                                                    <ShowDetailTestContent result={r} />
+                                                                    <TestRequestShowDetailContent result={r} />
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -148,7 +148,7 @@ const TestRequestShow = () => {
                         ) : (
                             <div className="text-muted">No hay pruebas asociadas.</div>
                         )}
-                    </ShowDetailTest>
+                    </TestRequestShowDetail>
                 </Col>
             </Row>
         </MainLayout>

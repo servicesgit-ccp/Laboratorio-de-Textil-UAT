@@ -7,7 +7,7 @@ import { Button, Card, CardBody, CardHeader, Col, Form, Row } from 'react-bootst
 // components
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
-const TestForm = () => {
+const TestRequestForm = () => {
     const { test_types } = usePage().props as unknown as {
         test_types: { id: number; name_es: string }[];
     };
@@ -203,4 +203,4 @@ const TestForm = () => {
     );
 };
 
-export default TestForm;
+export default TestRequestForm;
