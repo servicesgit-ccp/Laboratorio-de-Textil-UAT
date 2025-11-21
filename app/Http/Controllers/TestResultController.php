@@ -35,9 +35,26 @@ class TestResultController extends Controller
     public function getTestDetail($test)
     {
         $testResult = $this->sTestResult->getTestDetail($test);
-        
+
         return Inertia::render('test-results/detail', [
             'testResult' => $testResult
+        ]);
+    }
+
+    public function startInitial($testId)
+    {
+        $testResult = $this->sTestResult->startInitialSection($testId);
+        $result = $testResult->results->first();
+        $initialSection = $result?->content['Inicial'] ?? [];
+        return Inertia::render('test-results/initial', [
+            'test' => [
+                'id'        => $testResult->id,
+                'number'    => $testResult->testRequest->number,
+                'item'      => $testResult->testRequest->item,
+                'notes'     => $testResult->testRequest->notes,
+                'requested_by' => $testResult->testRequest->user->name,
+            ],
+            'initialSection' => $initialSection,
         ]);
     }
 }

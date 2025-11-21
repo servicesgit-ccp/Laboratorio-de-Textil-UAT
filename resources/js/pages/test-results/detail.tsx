@@ -7,6 +7,7 @@ import PageTitle from '@/components/PageTitle';
 import TestResultInfoCard from '@/components/_test-results/TestResultInfoCard';
 import TestStatusChips from '@/components/_test-results/TestStatusChips';
 import TestSectionTabs from '@/components/_test-results/TestSectionTabs';
+import InitialSectionContent from '@/components/_test-results/contents/InitialSectionContent';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -106,6 +107,22 @@ const TestResultDetailPage: React.FC = () => {
             setActiveSectionData(sectionData);
           }}
         />
+        {/* Secciones de las tabs */}
+        <div className="mt-4">
+          {activeSection === 'Inicial' && (
+            <InitialSectionContent 
+              data={activeSectionData}
+              testId={testResult.id}
+            />
+          )}
+
+          {activeSection !== 'Inicial' && (
+            <div className="text-muted small">
+              Aquí va el contenido de la prueba: {activeSection}
+            </div>
+          )}
+
+        </div>
       </div>
     </MainLayout>
   );

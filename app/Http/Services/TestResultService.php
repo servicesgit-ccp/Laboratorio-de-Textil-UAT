@@ -89,5 +89,26 @@ class TestResultService
         ];
     }
 
+    public function startInitialSection($testId)
+    {
+        $user = Auth::user();
+        $test = $this->mTest
+            ->with(['testRequest.user', 'results'])
+            ->findOrFail($testId);
+        $result = $test->results->first();
+
+        if ($result) {
+            $content = $result->content ?? [];
+            if (isset($content['Inicial'])) {
+                $content['Inicial']['status'] = 1;
+                $content['Inicial']['user_id'] = $user->id;
+                $content['Inicial']['user_name'] = $user->name;
+
+                $result->content = $content;
+                $result->save();
+            }
+        }
+        return $test->fresh(['testRequest.user', 'results']);
+    }
 
 }
