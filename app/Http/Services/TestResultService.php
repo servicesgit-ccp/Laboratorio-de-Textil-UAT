@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Models\Test;
+use Illuminate\Support\Facades\Auth;
 
 class TestResultService
 {
@@ -20,7 +21,7 @@ class TestResultService
     {
         $perPage = $request->input('per_page', 10);
 
-        $query = $this->mTest->with(['testRequest', 'results']);
+        $query = $this->mTest->with(['testRequest.user', 'results']);
 
         if ($request->filled('q')) {
             $q = $request->input('q');
@@ -35,9 +36,58 @@ class TestResultService
                     ->withQueryString();
     }
 
+    /**
+     * Obtener el detalle de un test para analisis
+     */
     public function getTestDetail($id)
     {
-        return $this->mTest->with(['testRequest', 'results'])->findOrFail($id);
+        return $this->mTest->with(['testRequest.user', 'results'])->findOrFail($id);
     }
+
+    /**
+     * Obtener todos los test para stats
+     */
+    public function getStats(): array
+    {
+        $userId = Auth::id();
+        $tests = $this->mTest->with('results')->get();
+        $inAnalysis = $tests->count();
+        $pending = 0;
+        $inProcess = 0;
+        $completed = 0;
+
+        foreach ($tests as $test) {
+            foreach ($test->results as $result) {
+                $content = $result->content ?? [];
+                foreach ($content as $sectionKey => $section) {
+                    if (!is_array($section)) {
+                        continue;
+                    }
+                    if (!array_key_exists('status', $section)) {
+                        continue;
+                    }
+                    $status = (int) $section['status'];
+                    $sectionUserId = $section['user_id'] ?? null;
+                    if ($status === 0) {
+                        $pending++;
+                    }
+                    if ($sectionUserId && (int) $sectionUserId === $userId) {
+                        if ($status === 1) {
+                            $inProcess++;
+                        } elseif ($status === 2) {
+                            $completed++;
+                        }
+                    }
+                }
+            }
+        }
+        return [
+            'inAnalysis' => $inAnalysis,
+            'pending'    => $pending,
+            'inProcess'  => $inProcess,
+            'completed'  => $completed,
+        ];
+    }
+
 
 }

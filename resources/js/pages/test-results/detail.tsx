@@ -18,28 +18,56 @@ const formatDate = (iso: string | null) => {
 };
 
 const TestResultDetailPage: React.FC = () => {
-  const { testResult } = usePage().props as {
-    testResult: any;
-  };
+  const testResult = usePage().props.testResult as any;
+
+  // Contar secciones con status
+  let totalSectionsWithStatus = 0;
+  let pendingSections = 0; // status 0 o 1
+
+  (testResult.results ?? []).forEach((result: any) => {
+    const content = result.content ?? {};
+
+    Object.values(content).forEach((section: any) => {
+      if (section && typeof section === 'object') {
+        if ('status' in section) {
+          totalSectionsWithStatus++;
+
+          const statusValue = Number(section.status);
+          if (statusValue === 0 || statusValue === 1) {
+            pendingSections++;
+          }
+        }
+      }
+    });
+  });
   const firstResult = testResult.results?.[0];
   const content = firstResult?.content ?? {};
-  const sectionKeys: string[] = Object.keys(content); // ['Inicial', 'AATCC150', 'ASTMD5034', ...]
 
-  const [activeSection, setActiveSection] = useState<string>(
-    sectionKeys[0] ?? ''
+  // [{ key: 'Inicial', data: {...} }, { key: 'Apariencia', data: {...} }, ...]
+  const sectionEntries = Object.entries(content).map(([key, value]) => ({
+    key,
+    data: value,
+  }));
+
+  const [activeSection, setActiveSection] = useState(
+    sectionEntries[0]?.key ?? ''
   );
-
+  const [activeSectionData, setActiveSectionData] = useState<any>(
+    sectionEntries[0]?.data ?? null
+  );
 
   // === ADAPTAMOS el objeto del backend ===
   const adapted = {
     folio: testResult.test_request?.number ?? '',
     estilo: testResult.test_request?.style_id ?? '',
-    sku: '', 
-    descripcion: '',
-    solicitado: '',
+    sku: testResult.test_request?.item ?? '',
+    notes: testResult.test_request?.notes ?? '',
+    solicitado: testResult.test_request?.user?.name ?? '',
     fechaIngreso: formatDate(testResult.created_at),
     fechaSalida: formatDate(testResult.finished_at),
-    pruebasPendientes: '',
+    pruebasPendientes: totalSectionsWithStatus
+      ? `${pendingSections}/${totalSectionsWithStatus}`
+      : '--',
   };
 
   return (
@@ -71,9 +99,12 @@ const TestResultDetailPage: React.FC = () => {
         <TestResultInfoCard data={adapted} />
         <TestStatusChips results={testResult.results ?? []} />
         <TestSectionTabs
-          sections={sectionKeys}
+          sections={sectionEntries}
           activeKey={activeSection}
-          onChange={setActiveSection}
+          onChange={(key, sectionData) => {
+            setActiveSection(key);
+            setActiveSectionData(sectionData);
+          }}
         />
       </div>
     </MainLayout>

@@ -6,7 +6,7 @@ type Props = {
     folio: string;
     estilo: string;
     sku: string;
-    descripcion: string;
+    notes: string;
     solicitado: string;
     fechaIngreso: string;
     fechaSalida: string;
@@ -25,18 +25,13 @@ const TestResultInfoCard: React.FC<Props> = ({ data }) => {
           </Col>
 
           <Col md={3}>
-            <div className="text-muted small mb-1">Estilo:</div>
-            <div className="fw-semibold">{data.estilo}</div>
-          </Col>
-
-          <Col md={3}>
             <div className="text-muted small mb-1">SKU/ESTILO:</div>
             <div className="fw-semibold">{data.sku}</div>
           </Col>
 
           <Col md={3}>
             <div className="text-muted small mb-1">Descripción:</div>
-            <div className="fw-semibold">{data.descripcion}</div>
+            <div className="fw-semibold">{data.notes}</div>
           </Col>
 
           <Col md={3}>
@@ -47,11 +42,6 @@ const TestResultInfoCard: React.FC<Props> = ({ data }) => {
           <Col md={3}>
             <div className="text-muted small mb-1">Fecha Ingreso:</div>
             <div className="fw-semibold">{data.fechaIngreso}</div>
-          </Col>
-
-          <Col md={3}>
-            <div className="text-muted small mb-1">Fecha Salida:</div>
-            <div className="fw-semibold">{data.fechaSalida}</div>
           </Col>
 
           <Col md={3}>

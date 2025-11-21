@@ -20,9 +20,11 @@ class TestResultController extends Controller
     public function getTest(Request $request)
     {
         $testResults = $this->sTestResult->getAllTest($request);
+        $stats       = $this->sTestResult->getStats();
 
         return Inertia::render('test-results/index', [
             'testResults' => $testResults,
+            'stats'       => $stats,
             'filters'     => $request->only('q', 'per_page'),
         ]);
     }
@@ -33,7 +35,7 @@ class TestResultController extends Controller
     public function getTestDetail($test)
     {
         $testResult = $this->sTestResult->getTestDetail($test);
-
+        
         return Inertia::render('test-results/detail', [
             'testResult' => $testResult
         ]);

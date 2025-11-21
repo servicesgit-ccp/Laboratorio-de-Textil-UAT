@@ -25,7 +25,10 @@ class StoreTestRequest extends FormRequest
             //'number' => 'required|string|max:255|unique:test_requests,number',
             //'user_id' => 'required|exists:users,id',
             //'style_id' => 'required|exists:styles,id',
+            'item' => 'required|string|max:255',
+            'notes' => 'string|max:255',
             'test_type_ids' => 'required|array|min:1',
-            'test_type_ids.*' => 'exists:test_types,id',        ];
+            'test_type_ids.*' => 'exists:test_types,id',
+            ];
     }
 }

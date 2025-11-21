@@ -38,35 +38,59 @@ const TestResultsPage = () => {
     }[];
   };
 
-  const { testResults, filters } = usePage().props as {
+  const { testResults, filters, stats } = usePage().props as {
     testResults: Paginated<TestResult>;
     filters?: {
       q?: string;
       per_page?: number | string;
     };
+    stats: {
+      inAnalysis: number;
+      pending: number;
+      inProcess: number;
+      completed: number;
+    };
   };
+
 
   const [search, setSearch] = useState(filters?.q ?? '');
   const perPage = Number(filters?.per_page ?? 10);
+  console.log(testResults);
 
-  // Si viene paginado, los registros están en testResults.data
-  const rows = (testResults.data ?? []).map((item) => ({
-    id: item.id,
-    folio: item.test_request?.number ?? '',
-    fechaIngreso: formatDate(item.created_at),
-    fechaSalida: formatDate(item.finished_at),
-    descripcion: item.test_request?.style_id ?? '',
-    sku: '',
-    analista: '',
-    pruebasPendientes: '',
-  }));
-  
-  const statsMock = {
-    inAnalysis: 3,
-    pending: 26,
-    inProcess: 2,
-    completed: 3,
-  };
+  const rows = (testResults.data ?? []).map((item: any) => {
+    const analystSet = new Set<string>();
+    let totalSectionsWithStatus = 0;
+    let pendingSections = 0;
+    (item.results ?? []).forEach((result: any) => {
+      const content = result.content ?? {};
+
+      Object.values(content).forEach((section: any) => {
+        if (section && typeof section === 'object') {
+          if ('user_name' in section && section.user_name) {
+            analystSet.add(section.user_name as string);
+          }
+          if ('status' in section) {
+            totalSectionsWithStatus++;
+            const statusValue = Number(section.status);
+            if (statusValue === 0 || statusValue === 1) {
+              pendingSections++;
+            }
+          }
+        }
+      });
+    });
+    const analystNames = Array.from(analystSet);
+    return {
+      id: item.id,
+      folio: item.test_request?.number ?? '',
+      fechaIngreso: formatDate(item.created_at),
+      fechaSalida: item.finished_at ? formatDate(item.finished_at) : '--',
+      sku: item.test_request?.item ?? 'DESCONOCIDO',
+      analista: analystNames,
+      pruebasPendientes: pendingSections,
+      totalPruebas: totalSectionsWithStatus
+    };
+  });
 
   const handleSearch = () => {
     router.get(
@@ -109,7 +133,7 @@ const TestResultsPage = () => {
           Gestiona y registra los resultados de las pruebas de laboratorio.
         </p>
         <br />
-        <TestResultsSummary stats={statsMock} />
+        <TestResultsSummary stats={stats} />
       </div>
       <Row className="mt-4">
         <Col xs={12}>
@@ -158,10 +182,9 @@ const TestResultsPage = () => {
                     <th>Fecha Ingreso</th>
                     <th>Fecha Salida</th>
                     <th>SKU/ ESTILO</th>
-                    <th>Descripción</th>
                     <th>Analista</th>
                     <th>Pruebas Pendientes</th>
-                    <th className="text-end">Acciones</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -171,22 +194,74 @@ const TestResultsPage = () => {
                       <td>{req.fechaIngreso}</td>
                       <td>{req.fechaSalida}</td>
                       <td>
-                        <span className="badge bg-light text-muted border rounded-pill">
+                        <span
+                          className="badge bg-light text-muted border rounded-pill"
+                          style={{ fontSize: '12px' }}
+                        >
                           {req.sku}
                         </span>
                       </td>
-                      <td>{req.descripcion}</td>
-                      <td>{req.analista}</td>
-                      <td>{req.pruebasPendientes}</td>
-                      <td className="text-end">
-                        <button
-                          type="button"
-                          className="btn btn-link p-0 d-inline-flex align-items-center gap-1 text-decoration-none"
-                          onClick={() => router.get(route('test-results.detail', { test: req.id }))}
-                        >
-                          <IconifyIcon icon="tabler:eye" className="fs-5" />
-                          <span>Ver Análisis</span>
-                        </button>
+                      <td>
+                        {(!req.analista || req.analista.length === 0) ? (
+                          <span className="text-muted">--</span>
+                        ) : (
+                          <div className="d-flex align-items-center gap-1">
+                            {req.analista.map((name: string, index: number) => {
+                              const parts = name.trim().split(' ');
+                              const first = parts[0] ?? '';
+                              const last = parts.length > 1 ? parts[parts.length - 1] : '';
+                              const initials = `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+
+                              return (
+                                <div
+                                  key={index}
+                                  className="rounded-circle d-flex align-items-center justify-content-center"
+                                  style={{
+                                    width: 28,
+                                    height: 28,
+                                    backgroundColor: '#0d6efd20',
+                                    border: '1px solid #0d6efd55',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 600,
+                                    textTransform: 'uppercase',
+                                    cursor: 'default',
+                                  }}
+                                  title={name}
+                                >
+                                  {initials || '?'}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        {(!req.totalPruebas || req.totalPruebas === 0) ? (
+                          <span className="text-muted">--</span>
+                        ) : (
+                          <span
+                            className={[
+                              'badge rounded-pill',
+                              req.pruebasPendientes > 0
+                                ? 'bg-warning-subtle text-warning-emphasis'
+                                : 'bg-success-subtle text-success-emphasis'
+                            ].join(' ')}
+                            style={{ fontSize: '0.8rem' }}
+                          >
+                            {req.pruebasPendientes}/{req.totalPruebas}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <Link href={route('test-results.detail', { test: req.id })}>
+                            <Button
+                                variant="soft-primary"
+                                size="sm"
+                                className="btn-icon rounded-circle"
+                            >
+                                <IconifyIcon icon="tabler:eye" className="fs-16" />
+                            </Button>
+                        </Link>
                       </td>
                     </tr>
                   ))}

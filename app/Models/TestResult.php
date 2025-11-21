@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Casts\ContentWithUserCast;
 
 class TestResult extends Model
 {
@@ -15,7 +16,7 @@ class TestResult extends Model
     ];
 
     protected $casts = [
-        'content' => 'array',
+        'content' => ContentWithUserCast::class,
     ];
 
     public function test()

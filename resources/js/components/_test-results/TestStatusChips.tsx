@@ -2,49 +2,33 @@ import React from 'react';
 import { Card } from 'react-bootstrap';
 
 type Props = {
-  results: any[]; // arreglo que viene de testResult.results
+  results: any[];
 };
 
 const TestStatusChips: React.FC<Props> = ({ results }) => {
   const firstResult = results?.[0];
   const content = firstResult?.content ?? {};
 
-  // Cada key del content es una prueba: "Inicial", "AATCC150", "ASTMD5034", etc.
   const sections = Object.keys(content);
 
   const chips = sections.map((sectionKey) => {
     const section = content[sectionKey];
-
-    // section es un objeto con claves "1", "2", ..., "img"
-    const fields = Object.values(section).filter(
-      (field: any) => field && typeof field === 'object' && 'value' in field
-    );
-
-    const total = fields.length;
-    const filled = fields.filter((f: any) => f.value !== null && f.value !== '').length;
-
-    let status: 'completado' | 'en_proceso' | 'pendiente' = 'pendiente';
-
-    if (total > 0 && filled === total) {
-      status = 'completado';
-    } else if (filled > 0 && filled < total) {
-      status = 'en_proceso';
-    } else {
-      status = 'pendiente';
-    }
+    const statusValue = Number(section?.status ?? 0);
 
     let badgeClass = '';
     let statusLabel = '';
 
-    switch (status) {
-      case 'completado':
+    switch (statusValue) {
+      case 2:
         badgeClass = 'bg-success-subtle text-success-emphasis border border-success-subtle';
         statusLabel = 'Completado';
         break;
-      case 'en_proceso':
+
+      case 1:
         badgeClass = 'bg-primary-subtle text-primary-emphasis border border-primary-subtle';
         statusLabel = 'En Proceso';
         break;
+
       default:
         badgeClass = 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
         statusLabel = 'Pendiente';

@@ -13,7 +13,9 @@ class TestRequest extends Model
         'number',
         'user_id',
         'style_id',
+        'item',
         'status',
+        'notes'
     ];
 
     public function test()
@@ -26,11 +28,8 @@ class TestRequest extends Model
         return $this->belongsTo(User::class);
     }
 
-    /*
-     *  Estilo asociado a la solicitud (si tienes un modelo Style).
     public function style()
     {
         return $this->belongsTo(Style::class);
     }
-    */
 }
