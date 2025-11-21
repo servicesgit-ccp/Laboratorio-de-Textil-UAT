@@ -43,14 +43,14 @@ $grays: (
 // fusv-enable
 
 // scss-docs-start color-variables
-$blue: #465dff;
+$blue: #27359d;
 $indigo: #6b5eae;
-$purple: #783bff;
+$purple: #5425b9;
 $pink: #ff679b;
-$red: #ff6d43;
+$red: #c04b2b;
 $orange: #fd7e14;
-$yellow: #f9c45c;
-$green: #6ac75a;
+$yellow: #caa04c;
+$green: #2f8920;
 $teal: #02bc9c;
 $cyan: #67baf1;
 // scss-docs-end color-variables
@@ -304,13 +304,13 @@ $cyans: (
 // fusv-enable
 
 // scss-docs-start theme-color-variables
-$primary: $blue;
+$primary: $gray-900;
 $secondary: $purple;
 $success: $green;
 $info: $cyan;
 $warning: $yellow;
 $danger: $red;
-$light: $gray-200;
+$light: $gray-300;
 $dark: $gray-900;
 // scss-docs-end theme-color-variables
 
@@ -436,8 +436,8 @@ $body-bg: #fafdff;
 $body-secondary-color: #9ba6b7; //#8e92ad
 $body-secondary-bg: $white;
 
-$body-tertiary-color: rgba($body-color, 0.5);
-$body-tertiary-bg: $gray-100;
+$body-tertiary-color: rgba($body-color, 0.8);
+$body-tertiary-bg: $gray-400;
 $body-emphasis-color: rgba($body-color, 0.75);
 
 // Links

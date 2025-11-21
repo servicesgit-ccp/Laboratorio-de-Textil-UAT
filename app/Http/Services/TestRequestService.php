@@ -29,7 +29,6 @@ class TestRequestService
         $this->mTestType = new TestType();
         $this->mTerminology = new Terminology();
         $this->mStyle = new Style();
-
     }
 
     public function getAllTestRequest(int $perPage = 10, ?string $search = null, $status = null)
@@ -63,9 +62,8 @@ class TestRequestService
         $style = $this->mStyle->where('number', $data['item'])->first();
         DB::beginTransaction();
         try {
-            // 1️⃣ Crear Test Request
             $testRequest = $this->mTestRequest->create([
-                'user_id' => null,
+                'user_id' => 1,
                 'style_id' => $style->id ?? null,
                 'item' => $style != null ? $style->number : $data['item'],
                 'status' => 0,
@@ -73,13 +71,10 @@ class TestRequestService
                 'notes' => $data['notes']
             ]);
 
-
-            // 2️⃣ Crear Test asociado
             $test = $this->mTest->create([
                 'test_request_id' => $testRequest->id,
             ]);
 
-            // 3️⃣ Construir estructura de contenido
             $content = [];
 
             foreach ($data['test_type_ids'] as $testTypeId) {
@@ -88,7 +83,6 @@ class TestRequestService
 
                 $terminologies = $this->mTerminology::where('test_type_id', $testTypeId)->get();
 
-                // Usa consistentemente el nombre en español
                 $groupKey = $testType->name_es ?? $testType->name;
                 $content[$groupKey] = [];
 
@@ -100,11 +94,9 @@ class TestRequestService
                     ];
                 }
 
-                // Inicializar arreglo de imágenes
                 $content[$groupKey]['img'] = [];
             }
 
-            // 4️⃣ Crear TestResult
             $this->mTestResult->create([
                 'test_id' => $test->id,
                 'content' => $content,
@@ -182,5 +174,4 @@ class TestRequestService
         if ($prev == 0) return 0;
         return round((($current - $prev) / $prev) * 100, 1);
     }
-
 }
