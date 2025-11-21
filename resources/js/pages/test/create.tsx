@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 import MainLayout from '@/layouts/MainLayout';
 import PageTitle from '@/components/PageTitle';
-import TestForm from '@/components/_test/TestForm';
+import TestRequestForm from '@/components/_test/TestRequestForm';
 
 const TestRequestCreate = () => {
     return (
@@ -11,7 +11,7 @@ const TestRequestCreate = () => {
                 title="Nueva Solicitud de Análisis"
                 subTitle="Registrar solicitud de prueba textil"
             />
-            <TestForm />
+            <TestRequestForm />
         </MainLayout>
     );
 };

@@ -7,7 +7,7 @@ type ContainerCardProps = {
     children: ReactNode;
 };
 
-const ShowDetailTest = ({ title, description, children }: ContainerCardProps) => {
+const TestRequestShowDetail = ({ title, description, children }: ContainerCardProps) => {
     return (
         <Card>
             <CardHeader className="border-0 border-bottom border-dashed">
@@ -21,4 +21,4 @@ const ShowDetailTest = ({ title, description, children }: ContainerCardProps) =>
     );
 };
 
-export default ShowDetailTest;
+export default TestRequestShowDetail;
