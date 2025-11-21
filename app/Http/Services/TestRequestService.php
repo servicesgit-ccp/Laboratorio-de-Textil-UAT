@@ -21,6 +21,8 @@ class TestRequestService
     protected $mTerminology;
     protected $mStyle;
 
+    protected $sRecentActivity;
+
     public function __construct()
     {
         $this->mTestRequest = new TestRequest();
@@ -29,7 +31,7 @@ class TestRequestService
         $this->mTestType = new TestType();
         $this->mTerminology = new Terminology();
         $this->mStyle = new Style();
-
+        $this->sRecentActivity = new RecentActivityService();
     }
 
     public function getAllTestRequest(int $perPage = 10, ?string $search = null, $status = null)
@@ -111,6 +113,12 @@ class TestRequestService
             ]);
 
             DB::commit();
+
+            $this->sRecentActivity->registerActivity(
+                "Nueva solicitud creada",
+                "El usuario creó una nueva solicitud de pruebas",
+                "tabler:clipboard-plus"
+            );
 
             return $testRequest;
         } catch (\Throwable $e) {

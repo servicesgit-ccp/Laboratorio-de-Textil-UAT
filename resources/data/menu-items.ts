@@ -35,7 +35,7 @@ export const MENU_ITEMS: MenuItemType[] = [
         key: 'dashboard',
         label: 'Dashboard',
         icon: 'tabler:dashboard',
-        url: '/dashboard/',
+        url: '/admin/dashboard',
     },
     {
         key: 'test',

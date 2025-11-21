@@ -6,7 +6,7 @@ interface TestResultContentProps {
     result: any; // test result con campo content (JSON)
 }
 
-const ShowDetailTestContent: React.FC<TestResultContentProps> = ({ result }) => {
+const TestRequestShowDetailContent: React.FC<TestResultContentProps> = ({ result }) => {
     if (!result?.content) return <div className="text-muted">Sin contenido disponible.</div>;
 
     // Aseguramos que sea un objeto
@@ -120,4 +120,4 @@ const ShowDetailTestContent: React.FC<TestResultContentProps> = ({ result }) => 
     );
 };
 
-export default ShowDetailTestContent;
+export default TestRequestShowDetailContent;
