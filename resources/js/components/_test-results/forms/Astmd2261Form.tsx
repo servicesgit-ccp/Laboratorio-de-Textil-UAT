@@ -3,46 +3,49 @@ import { useForm } from '@inertiajs/react';
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
 import CameraCapture from '@/components/_test-results/CameraCapture';
 
-type Aatcc179Field = {
+type AstmdField = {
   label: string;
   display_name: string;
   value: string | null;
 };
 
-type Aatcc179Section = {
-  [key: string]: Aatcc179Field | any;
+type Astmd2261Section = {
+  [key: string]: AstmdField | any;
 };
 
 type Props = {
   testId: number;
-  aatcc179Section: Aatcc179Section;
+  astmd2261Section: Astmd2261Section;
 };
 
-const Aatcc179Form: React.FC<Props> = ({ testId, aatcc179Section }) => {
-  const safeSection = aatcc179Section || {};
+const Astmd2261Form: React.FC<Props> = ({ testId, astmd2261Section }) => {
+  const safeSection = astmd2261Section || {};
 
+  // Campos reales
   const fieldEntries = useMemo(
     () =>
       Object.entries(safeSection).filter(([key, value]) => {
         if (['img', 'status', 'user_id', 'user_name'].includes(key)) return false;
         return value && typeof value === 'object' && 'display_name' in value;
       }),
-    [safeSection]
+    [safeSection],
   );
 
+  // Estado inicial para useForm
   const initialData: Record<string, string> = {};
   fieldEntries.forEach(([key, field]) => {
-    initialData[key] = (field as Aatcc179Field).value ?? '';
+    const f = field as AstmdField;
+    initialData[key] = f.value ?? '';
   });
 
   const { data, setData, put, processing, errors } = useForm<{
-      fields: Record<string, string>;
-      images: File[];
-    }>({
-      fields: initialData,
-      images: [],
-    });
-  
+    fields: Record<string, string>;
+    images: File[];
+  }>({
+    fields: initialData,
+    images: [],
+  });
+    
   const handleFilesChange = (files: File[]) => {
     setData('images', files);
   };
@@ -50,7 +53,7 @@ const Aatcc179Form: React.FC<Props> = ({ testId, aatcc179Section }) => {
   const handleChange = (key: string, value: string) => {
     setData('fields', {
       ...data.fields,
-      [key]: value
+      [key]: value,
     });
   };
 
@@ -60,7 +63,7 @@ const Aatcc179Form: React.FC<Props> = ({ testId, aatcc179Section }) => {
     put(
       route('test-results.section.update', {
         test: testId,
-        section: 'AATCC179'
+        section: 'ASTMD2261',
       }),
       { preserveScroll: true }
     );
@@ -69,24 +72,25 @@ const Aatcc179Form: React.FC<Props> = ({ testId, aatcc179Section }) => {
   return (
     <Card className="border-0 shadow-sm rounded-4">
       <Card.Body className="p-4">
-        <h5 className="mb-3">AATCC 179 – Torsión y Dimensionalidad</h5>
+
+        <h5 className="mb-3">ASTM D2261 – Resistencia al desgarre</h5>
 
         <Form onSubmit={handleSubmit}>
           <Row className="g-3">
+
             {fieldEntries.map(([key, field]) => {
-              const f = field as Aatcc179Field;
+              const f = field as AstmdField;
+
               return (
                 <Col md={6} key={key}>
-                  <Form.Group controlId={`aatcc179-${key}`}>
+                  <Form.Group controlId={`astmd2261-${key}`}>
                     <Form.Label className="small">{f.display_name}</Form.Label>
-
                     <Form.Control
                       type="text"
                       value={data.fields[key] ?? ''}
                       onChange={(e) => handleChange(key, e.target.value)}
                       isInvalid={!!errors[`fields.${key}`]}
                     />
-
                     {errors[`fields.${key}`] && (
                       <Form.Control.Feedback type="invalid">
                         {errors[`fields.${key}`]}
@@ -96,6 +100,7 @@ const Aatcc179Form: React.FC<Props> = ({ testId, aatcc179Section }) => {
                 </Col>
               );
             })}
+
           </Row>
           {/* Módulo de cámara / fotos */}
           <hr className="my-4" />
@@ -128,9 +133,10 @@ const Aatcc179Form: React.FC<Props> = ({ testId, aatcc179Section }) => {
               className="rounded-pill px-4"
               disabled={processing}
             >
-              {processing ? 'Guardando...' : 'Guardar AATCC 179'}
+              {processing ? 'Guardando…' : 'Guardar ASTM D2261'}
             </Button>
           </div>
+
         </Form>
 
       </Card.Body>
@@ -138,4 +144,4 @@ const Aatcc179Form: React.FC<Props> = ({ testId, aatcc179Section }) => {
   );
 };
 
-export default Aatcc179Form;
+export default Astmd2261Form;

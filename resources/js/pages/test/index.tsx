@@ -11,7 +11,6 @@ const TestRequestIndex = () => {
         filters?: { q?: string; per_page?: number; status?: number };
     };
 
-    console.log(test_requests);
 
     const [searchTerm, setSearchTerm] = useState(filters?.q ?? '');
     const [statusFilter, setStatusFilter] = useState(filters?.status ?? 4);

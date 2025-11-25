@@ -59,25 +59,26 @@ const InitialSectionContent = ({ data = {}, testId }) => {
 
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">Datos Iniciales de la Muestra</h5>
-
-        {status === 1 && (
-          <button
-            type="button"
-            onClick={finishInitial}
-            className="btn btn-success rounded-pill px-3"
-          >
-            Terminar test
-          </button>
-        )}
-        {status !== 2 && (
-          <button
-            type="button"
-            onClick={goToForm}
-            className="btn btn-outline-dark rounded-pill px-3"
-          >
-            Editar Datos Iniciales
-          </button>
-        )}
+        <div className="d-flex align-items-center gap-2">
+          {status === 1 && (
+            <button
+              type="button"
+              onClick={finishInitial}
+              className="btn btn-success rounded-pill px-3"
+            >
+              Terminar test
+            </button>
+          )}
+          {status !== 2 && (
+            <button
+              type="button"
+              onClick={goToForm}
+              className="btn btn-outline-dark rounded-pill px-3"
+            >
+              Editar Datos Iniciales
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="card border-0 shadow-sm rounded-4">

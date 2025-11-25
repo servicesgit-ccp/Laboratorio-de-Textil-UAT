@@ -13,7 +13,6 @@ type Props = {
 
 const TestSectionTabs: React.FC<Props> = ({ sections, activeKey, onChange }) => {
   if (!sections.length) return null;
-  console.log(activeKey);
 
   return (
     <div className="d-flex flex-wrap gap-2 justify-content-center mt-3">

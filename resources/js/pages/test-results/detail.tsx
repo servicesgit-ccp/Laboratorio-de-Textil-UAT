@@ -16,6 +16,10 @@ import AATCC135SectionContent from '@/components/_test-results/contents/AATCC135
 import AstmD3776SectionContent from '@/components/_test-results/contents/AstmD3776SectionContent';
 import AstmD3512SectionContent from '@/components/_test-results/contents/AstmD3512SectionContent';
 import AATCC179SectionContent from '@/components/_test-results/contents/Aatcc179SectionContent';
+import AATCC8SectionContent from '@/components/_test-results/contents/Aatcc8SectionContent';
+import AATCC81SectionContent from '@/components/_test-results/contents/Aatcc81SectionContent';
+import Astmd2261SectionContent from '@/components/_test-results/contents/Astmd2261SectionContent';
+import AATCC61SectionContent from '@/components/_test-results/contents/Aatcc61SectionContent';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -31,7 +35,7 @@ const TestResultDetailPage: React.FC = () => {
 
   // Contar secciones con status
   let totalSectionsWithStatus = 0;
-  let pendingSections = 0; // status 0 o 1
+  let pendingSections = 0;
 
   (testResult.results ?? []).forEach((result: any) => {
     const content = result.content ?? {};
@@ -52,7 +56,6 @@ const TestResultDetailPage: React.FC = () => {
   const firstResult = testResult.results?.[0];
   const content = firstResult?.content ?? {};
 
-  // [{ key: 'Inicial', data: {...} }, { key: 'Apariencia', data: {...} }, ...]
   const sectionEntries = Object.entries(content).map(([key, value]) => ({
     key,
     data: value,
@@ -74,9 +77,6 @@ const TestResultDetailPage: React.FC = () => {
     }
   }, [testResult, activeSection]);
 
-  
-
-  // === ADAPTAMOS el objeto del backend ===
   const adapted = {
     folio: testResult.test_request?.number ?? '',
     estilo: testResult.test_request?.style_id ?? '',
@@ -161,6 +161,22 @@ const TestResultDetailPage: React.FC = () => {
           
           {activeSection === 'AATCC179' && (
             <AATCC179SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+          
+          {activeSection === 'AATCC8' && (
+            <AATCC8SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+          
+          {activeSection === 'AATCC81' && (
+            <AATCC81SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+
+          {activeSection === 'ASTMD2261' && (
+            <Astmd2261SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+
+          {activeSection === 'AATCC61' && (
+            <AATCC61SectionContent data={activeSectionData} testId={testResult.id} />
           )}
           
 

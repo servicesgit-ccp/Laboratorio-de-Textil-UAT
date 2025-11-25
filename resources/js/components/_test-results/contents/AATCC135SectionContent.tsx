@@ -58,26 +58,28 @@ const AATCC135SectionContent = ({ data = {}, testId }) => {
 
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">AATCC 135 - Estabilidad Dimensional</h5>
+        <div className="d-flex align-items-center gap-2">
+          {status === 1 && (
+            <button
+              type="button"
+              onClick={finishAATCC135}
+              className="btn btn-success rounded-pill px-3"
+            >
+              Terminar test
+            </button>
+          )}
 
-        {status === 1 && (
-          <button
-            type="button"
-            onClick={finishAATCC135}
-            className="btn btn-success rounded-pill px-3"
-          >
-            Terminar test
-          </button>
-        )}
-
-        {status !== 2 && (
-          <button
-            type="button"
-            onClick={goToForm}
-            className="btn btn-outline-dark rounded-pill px-3 ms-2"
-          >
-            Editar Datos
-          </button>
-        )}
+          {status !== 2 && (
+            <button
+              type="button"
+              onClick={goToForm}
+              className="btn btn-outline-dark rounded-pill px-3 ms-2"
+            >
+              Editar Datos
+            </button>
+          )}  
+        </div>
+        
       </div>
 
       <div className="card border-0 shadow-sm rounded-4">

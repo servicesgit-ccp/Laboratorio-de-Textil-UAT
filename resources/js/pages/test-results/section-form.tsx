@@ -17,6 +17,10 @@ import AATCC135Form from '@/components/_test-results/forms/AATCC135Form';
 import AstmD3776Form from '@/components/_test-results/forms/AstmD3776Form';
 import AstmD3512Form from '@/components/_test-results/forms/AstmD3512Form';
 import AATCC179Form from '@/components/_test-results/forms/Aatcc179Form';
+import AATCC8Form from '@/components/_test-results/forms/Aatcc8Form';
+import AATCC81Form from '@/components/_test-results/forms/Aatcc81Form';
+import Astmd2261Form from '@/components/_test-results/forms/Astmd2261Form';
+import AATCC61Form from '@/components/_test-results/forms/Aatcc61Form';
 
 type SectionField = {
   label: string;
@@ -90,6 +94,18 @@ const SectionFormPage: React.FC = () => {
         
       case 'AATCC179':
         return <AATCC179Form testId={test.id} aatcc179Section={sectionData} />
+        
+      case 'AATCC8':
+        return <AATCC8Form testId={test.id} aatcc8Section={sectionData} />
+        
+      case 'AATCC81':
+        return <AATCC81Form testId={test.id} aatcc81Section={sectionData} />
+        
+      case 'ASTMD2261':
+        return <Astmd2261Form testId={test.id} astmd2261Section={sectionData} />
+
+      case 'AATCC61':
+        return <AATCC61Form testId={test.id} />
 
       default:
         return (

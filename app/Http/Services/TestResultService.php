@@ -102,12 +102,7 @@ class TestResultService
         }
         $content = $result->content ?? [];
         if (!isset($content[$sectionKey])) {
-            $content[$sectionKey] = [
-                'img'       => [],
-                'status'    => 0,
-                'user_id'   => null,
-                'user_name' => null,
-            ];
+           return;
         }
 
         $content[$sectionKey]['status']    = 1;

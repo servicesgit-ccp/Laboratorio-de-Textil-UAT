@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
+import CameraCapture from '@/components/_test-results/CameraCapture';
 
 type DensidadField = {
   label: string;
@@ -18,14 +19,17 @@ type Props = {
 };
 
 const DensidadForm: React.FC<Props> = ({ testId, densidadSection }) => {
+  // Siempre trabajar con un objeto seguro
+  const safeSection = densidadSection || {};
+
   // Tomamos solo los campos reales de la sección
   const fieldEntries = useMemo(
     () =>
-      Object.entries(densidadSection).filter(([key, value]) => {
+      Object.entries(safeSection).filter(([key, value]) => {
         if (['img', 'status', 'user_id', 'user_name'].includes(key)) return false;
         return value && typeof value === 'object' && 'display_name' in value;
       }),
-    [densidadSection],
+    [safeSection],
   );
 
   // Estado inicial para useForm
@@ -37,8 +41,10 @@ const DensidadForm: React.FC<Props> = ({ testId, densidadSection }) => {
 
   const { data, setData, put, processing, errors } = useForm<{
     fields: Record<string, string>;
+    images: File[];
   }>({
     fields: initialData,
+    images: [],
   });
 
   const handleChange = (key: string, value: string) => {
@@ -46,6 +52,10 @@ const DensidadForm: React.FC<Props> = ({ testId, densidadSection }) => {
       ...data.fields,
       [key]: value,
     });
+  };
+
+  const handleFilesChange = (files: File[]) => {
+    setData('images', files);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -97,6 +107,22 @@ const DensidadForm: React.FC<Props> = ({ testId, densidadSection }) => {
               );
             })}
           </Row>
+
+          {/* Módulo de cámara / fotos */}
+          <hr className="my-4" />
+          <h6 className="mb-2">Evidencia fotográfica</h6>
+          <p className="text-muted small">
+            Captura o adjunta fotografías relacionadas con la densidad.
+          </p>
+
+          <CameraCapture
+            inputId="densidad-camera"
+            multiple={true}
+            helperText="Toca el botón para abrir la cámara o seleccionar fotos desde tu dispositivo."
+            error={errors.images as string | null}
+            initialImages={safeSection.img ?? []}
+            onFilesChange={handleFilesChange}
+          />
 
           <div className="d-flex justify-content-end mt-4 gap-2">
             <Button

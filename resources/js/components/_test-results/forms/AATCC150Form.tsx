@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
+import CameraCapture from '@/components/_test-results/CameraCapture';
 
 type AATCC150Field = {
   label: string;
@@ -36,9 +37,17 @@ const AATCC150Form: React.FC<Props> = ({ testId, aatccSection }) => {
     initialData[key] = f.value ?? '';
   });
 
-  const { data, setData, put, processing, errors } = useForm({
-    fields: initialData
-  });
+  const { data, setData, put, processing, errors } = useForm<{
+      fields: Record<string, string>;
+      images: File[];
+    }>({
+      fields: initialData,
+      images: [],
+    });
+
+  const handleFilesChange = (files: File[]) => {
+    setData('images', files);
+  };
 
   const handleChange = (key: string, value: string) => {
     setData('fields', {
@@ -92,8 +101,23 @@ const AATCC150Form: React.FC<Props> = ({ testId, aatccSection }) => {
             })}
           </Row>
 
-          <div className="d-flex justify-content-end mt-4 gap-2">
+          {/* Módulo de cámara / fotos */}
+          <hr className="my-4" />
+          <h6 className="mb-2">Evidencia fotográfica</h6>
+          <p className="text-muted small">
+            Captura o adjunta fotografías.
+          </p>
 
+          <CameraCapture
+            inputId="aatcc81-camera"
+            multiple={true}
+            helperText="Toca el botón para abrir la cámara o seleccionar fotos desde tu dispositivo."
+            error={errors.images as string | null}
+            initialImages={safeSection.img ?? []}
+            onFilesChange={handleFilesChange}
+          />
+
+          <div className="d-flex justify-content-end mt-4 gap-2">
             <Button
               type="button"
               variant="outline-secondary"

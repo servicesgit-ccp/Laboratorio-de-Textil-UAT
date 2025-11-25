@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
+import CameraCapture from '@/components/_test-results/CameraCapture';
 
 type AppearanceField = {
   label: string;
@@ -18,14 +19,16 @@ type Props = {
 };
 
 const AppearanceForm: React.FC<Props> = ({ testId, appearanceSection }) => {
-  // Tomamos solo los campos "reales" (7,8,9...31), ignorando img/status/user_id/user_name
+  // Siempre tener un objeto seguro
+  const safeSection = appearanceSection || {};
+
   const fieldEntries = useMemo(
     () =>
-      Object.entries(appearanceSection).filter(([key, value]) => {
+      Object.entries(safeSection).filter(([key, value]) => {
         if (['img', 'status', 'user_id', 'user_name'].includes(key)) return false;
         return value && typeof value === 'object' && 'display_name' in value;
       }),
-    [appearanceSection],
+    [safeSection],
   );
 
   // Estado inicial para useForm
@@ -37,8 +40,10 @@ const AppearanceForm: React.FC<Props> = ({ testId, appearanceSection }) => {
 
   const { data, setData, put, processing, errors } = useForm<{
     fields: Record<string, string>;
+    images: File[];
   }>({
     fields: initialData,
+    images: [],
   });
 
   const handleChange = (key: string, value: string) => {
@@ -48,11 +53,22 @@ const AppearanceForm: React.FC<Props> = ({ testId, appearanceSection }) => {
     });
   };
 
+  const handleFilesChange = (files: File[]) => {
+    setData('images', files);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    put(route('test-results.section.update', { test: testId, section: 'Apariencia' }), {
-      preserveScroll: true,
-    });
+
+    put(
+      route('test-results.section.update', {
+        test: testId,
+        section: 'Apariencia',
+      }),
+      {
+        preserveScroll: true,
+      },
+    );
   };
 
   return (
@@ -88,6 +104,22 @@ const AppearanceForm: React.FC<Props> = ({ testId, appearanceSection }) => {
               );
             })}
           </Row>
+
+          {/* Módulo de cámara / fotos */}
+          <hr className="my-4" />
+          <h6 className="mb-2">Evidencia fotográfica</h6>
+          <p className="text-muted small">
+            Captura o adjunta fotografías.
+          </p>
+
+          <CameraCapture
+            inputId="appearance-camera"
+            multiple={true}
+            helperText="Toca el botón para abrir la cámara o seleccionar fotos desde tu dispositivo."
+            error={errors.images as string | null}
+            initialImages={safeSection.img ?? []}
+            onFilesChange={handleFilesChange}
+          />
 
           <div className="d-flex justify-content-end mt-4 gap-2">
             <Button

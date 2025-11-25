@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
+import CameraCapture from '@/components/_test-results/CameraCapture';
 
 type AstmD3776Field = {
   label: string;
@@ -37,9 +38,15 @@ const AstmD3776Form: React.FC<Props> = ({ testId, astmSection }) => {
 
   const { data, setData, put, processing, errors } = useForm<{
     fields: Record<string, string>;
+    images: File[];
   }>({
     fields: initialData,
+    images: [],
   });
+        
+  const handleFilesChange = (files: File[]) => {
+    setData('images', files);
+  };
 
   const handleChange = (key: string, value: string) => {
     setData('fields', {
@@ -94,7 +101,21 @@ const AstmD3776Form: React.FC<Props> = ({ testId, astmSection }) => {
               );
             })}
           </Row>
+          {/* Módulo de cámara / fotos */}
+          <hr className="my-4" />
+          <h6 className="mb-2">Evidencia fotográfica</h6>
+          <p className="text-muted small">
+            Captura o adjunta fotografías.
+          </p>
 
+          <CameraCapture
+            inputId="aatcc81-camera"
+            multiple={true}
+            helperText="Toca el botón para abrir la cámara o seleccionar fotos desde tu dispositivo."
+            error={errors.images as string | null}
+            initialImages={safeSection.img ?? []}
+            onFilesChange={handleFilesChange}
+          />
           <div className="d-flex justify-content-end mt-4 gap-2">
             <Button
               type="button"

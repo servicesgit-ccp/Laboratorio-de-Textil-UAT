@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
+import CameraCapture from '@/components/_test-results/CameraCapture';
 
 type InitialField = {
   label: string;
@@ -18,14 +19,17 @@ type Props = {
 };
 
 const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
+  // Siempre trabajar con un objeto seguro
+  const safeSection = initialSection || {};
+
   // Filtramos solo los campos "reales", ignorando img/status/user_id/user_name
   const fieldEntries = useMemo(
     () =>
-      Object.entries(initialSection).filter(([key, value]) => {
+      Object.entries(safeSection).filter(([key, value]) => {
         if (['img', 'status', 'user_id', 'user_name'].includes(key)) return false;
         return value && typeof value === 'object' && 'display_name' in value;
       }),
-    [initialSection],
+    [safeSection],
   );
 
   // Estado inicial para useForm
@@ -37,8 +41,10 @@ const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
 
   const { data, setData, put, processing, errors } = useForm<{
     fields: Record<string, string>;
+    images: File[];
   }>({
     fields: initialData,
+    images: [],
   });
 
   const handleChange = (key: string, value: string) => {
@@ -48,12 +54,22 @@ const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
     });
   };
 
+  const handleFilesChange = (files: File[]) => {
+    setData('images', files);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      put(route('test-results.section.update', { test: testId, section: 'Inicial' }), {
+    e.preventDefault();
+    put(
+      route('test-results.section.update', {
+        test: testId,
+        section: 'Inicial',
+      }),
+      {
         preserveScroll: true,
-      });
-    };
+      },
+    );
+  };
 
   return (
     <Card className="border-0 shadow-sm rounded-4">
@@ -88,6 +104,22 @@ const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
               );
             })}
           </Row>
+
+          {/* Módulo de cámara / fotos */}
+          <hr className="my-4" />
+          <h6 className="mb-2">Evidencia fotográfica</h6>
+          <p className="text-muted small">
+            Captura o adjunta fotografías de la condición inicial de la prenda.
+          </p>
+
+          <CameraCapture
+            inputId="initial-camera"
+            multiple={true}
+            helperText="Toca el botón para abrir la cámara o seleccionar fotos desde tu dispositivo."
+            error={errors.images as string | null}
+            initialImages={safeSection.img ?? []}
+            onFilesChange={handleFilesChange}
+          />
 
           <div className="d-flex justify-content-end mt-4 gap-2">
             <Button

@@ -58,27 +58,28 @@ const AppearanceSectionContent = ({ data = {}, testId }) => {
 
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">Apariencia de la Prenda</h5>
+        <div className="d-flex align-items-center gap-2">
+          {/* Botón Terminar Test (solo status 1) */}
+          {status === 1 && (
+            <button
+              type="button"
+              onClick={finishAppearance}
+              className="btn btn-success rounded-pill px-3 me-2"
+            >
+              Terminar test
+            </button>
+          )}
 
-        {/* Botón Terminar Test (solo status 1) */}
-        {status === 1 && (
-          <button
-            type="button"
-            onClick={finishAppearance}
-            className="btn btn-success rounded-pill px-3 me-2"
-          >
-            Terminar test
-          </button>
-        )}
-
-        {status !== 2 && (
-          <button
-            type="button"
-            onClick={goToForm}
-            className="btn btn-outline-dark rounded-pill px-3"
-          >
-            Editar Apariencia
-          </button>
-        )}
+          {status !== 2 && (
+            <button
+              type="button"
+              onClick={goToForm}
+              className="btn btn-outline-dark rounded-pill px-3"
+            >
+              Editar Apariencia
+            </button>
+          )}  
+        </div>
       </div>
 
       <div className="card border-0 shadow-sm rounded-4">

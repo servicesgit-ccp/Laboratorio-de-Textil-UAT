@@ -72,25 +72,27 @@ const DensidadSectionContent: React.FC<Props> = ({ data = {}, testId }) => {
         <h5 className="mb-0">Densidad de la Tela</h5>
 
         <div className="d-flex gap-2">
-          {status === 1 && (
-            <button
-              type="button"
-              onClick={finishDensidad}
-              className="btn btn-success rounded-pill px-3"
-            >
-              Terminar test
-            </button>
-          )}
+          <div className="d-flex align-items-center gap-2">
+            {status === 1 && (
+              <button
+                type="button"
+                onClick={finishDensidad}
+                className="btn btn-success rounded-pill px-3"
+              >
+                Terminar test
+              </button>
+            )}
 
-          {status !== 2 && (
-            <button
-              type="button"
-              onClick={goToForm}
-              className="btn btn-outline-dark rounded-pill px-3"
-            >
-              Editar Densidad
-            </button>
-          )}
+            {status !== 2 && (
+              <button
+                type="button"
+                onClick={goToForm}
+                className="btn btn-outline-dark rounded-pill px-3"
+              >
+                Editar Densidad
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

@@ -55,7 +55,6 @@ const TestResultsPage = () => {
 
   const [search, setSearch] = useState(filters?.q ?? '');
   const perPage = Number(filters?.per_page ?? 10);
-  console.log(testResults);
 
   const rows = (testResults.data ?? []).map((item: any) => {
     const analystSet = new Set<string>();

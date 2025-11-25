@@ -58,28 +58,29 @@ const AstmD3512SectionContent = ({ data = {}, testId }) => {
 
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">ASTM D3512 – Pilling de la tela</h5>
+        <div className="d-flex align-items-center gap-2">
+          {/* Botón Terminar test (solo cuando está en proceso) */}
+          {status === 1 && (
+            <button
+              type="button"
+              onClick={finishAstmD3512}
+              className="btn btn-success rounded-pill px-3"
+            >
+              Terminar test
+            </button>
+          )}
 
-        {/* Botón Terminar test (solo cuando está en proceso) */}
-        {status === 1 && (
-          <button
-            type="button"
-            onClick={finishAstmD3512}
-            className="btn btn-success rounded-pill px-3"
-          >
-            Terminar test
-          </button>
-        )}
-
-        {/* Botón Editar mientras no esté terminado */}
-        {status !== 2 && (
-          <button
-            type="button"
-            onClick={goToForm}
-            className="btn btn-outline-dark rounded-pill px-3 ms-2"
-          >
-            Editar ASTM D3512
-          </button>
-        )}
+          {/* Botón Editar mientras no esté terminado */}
+          {status !== 2 && (
+            <button
+              type="button"
+              onClick={goToForm}
+              className="btn btn-outline-dark rounded-pill px-3 ms-2"
+            >
+              Editar ASTM D3512
+            </button>
+          )}  
+        </div>
       </div>
 
       {/* Datos capturados */}
