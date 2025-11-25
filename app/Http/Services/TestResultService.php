@@ -111,4 +111,31 @@ class TestResultService
         return $test->fresh(['testRequest.user', 'results']);
     }
 
+    public function updateInitialSection(Test $test, array $fields): void
+    {
+        $result = $test->results()->firstOrFail();
+        $content = $result->content ?? [];
+        if (!isset($content['Inicial']) || !is_array($content['Inicial'])) {
+            $content['Inicial'] = [];
+        }
+
+        foreach ($fields as $key => $value) {
+            if (isset($content['Inicial'][$key]) && is_array($content['Inicial'][$key])) {
+                $content['Inicial'][$key]['value'] = $value;
+            }
+        }
+
+        $content['Inicial']['status']    = 1;
+        $content['Inicial']['user_id']   = auth()->id();
+        $content['Inicial']['user_name'] = auth()->user()?->name;
+
+        $result->content = $content;
+        $result->save();
+
+        if (is_null($test->started_at)) {
+            $test->started_at = now();
+        }
+        $test->save();
+    }
 }
+

@@ -15,7 +15,7 @@ const TestResultsSummary: React.FC<TestResultsSummaryProps> = ({ stats }) => {
   const cards = [
     {
       key: 'inAnalysis',
-      title: 'Muestras en Análisis',
+      title: 'Solicitudes en Análisis',
       value: stats.inAnalysis,
       icon: 'tabler:test-pipe',
       iconBgClass: 'bg-primary-subtle',

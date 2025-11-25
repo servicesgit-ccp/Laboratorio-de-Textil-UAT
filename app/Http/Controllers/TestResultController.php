@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Services\TestResultService;
+use App\Models\Test;
+use App\Http\Requests\InitialSectionRequest;
+
 
 class TestResultController extends Controller
 {
@@ -56,5 +59,14 @@ class TestResultController extends Controller
             ],
             'initialSection' => $initialSection,
         ]);
+    }
+
+    public function updateInitial(InitialSectionRequest $request, Test $test)
+    {
+        $this->sTestResult->updateInitialSection($test, $request->validated()['fields']);
+
+        return redirect()
+            ->route('test-results.detail', ['test' => $test->id])
+            ->with('success', 'Datos iniciales guardados correctamente.');
     }
 }

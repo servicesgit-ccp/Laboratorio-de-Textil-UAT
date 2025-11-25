@@ -125,7 +125,7 @@ const TestResultsPage = () => {
   return (
     <MainLayout>
       <PageTitle
-        title="Análisis de Muestras"
+        title="Análisis de Solicitudes"
         subTitle="Análisis"
       />
       <div className="mt-3">
