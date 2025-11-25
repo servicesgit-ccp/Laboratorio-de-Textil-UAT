@@ -1,40 +1,44 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
 
-const InitialSectionContent = ({ data = {}, testId }) => {
+const Astmd5034SectionContent = ({ data = {}, testId }) => {
   const status = Number(data?.status ?? 0);
 
   const goToForm = () => {
-      router.get(
-        route('test-results.section.start', { test: testId, section: 'Inicial' })
-      );
-    };
-  
-  const finishInitial = () => {
+    router.get(
+      route('test-results.section.start', { test: testId, section: 'ASTMD5034' })
+    );
+  };
+
+  const finishAstmd = () => {
     router.post(
-      route('test-results.section.finish', { test: testId, section: 'Inicial' }),
+      route('test-results.section.finish', { test: testId, section: 'ASTMD5034' }),
       {},
       { preserveScroll: true },
     );
   };
 
+  // ================================
+  // 🔴 STATUS 0 → NO CAPTURADO
+  // ================================
   if (status === 0) {
     return (
       <div className="mt-3">
+
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="mb-0">Datos Iniciales de la Muestra</h5>
+          <h5 className="mb-0">ASTM D5034 – Resistencia a la Tracción</h5>
 
           <button
             type="button"
             className="btn btn-dark rounded-pill d-flex align-items-center gap-2 px-3"
             onClick={() =>
               router.get(
-                route('test-results.section.start', { test: testId, section: 'Inicial' })
+                route('test-results.section.start', { test: testId, section: 'ASTMD5034' })
               )
             }
           >
             <span className="fw-semibold">+</span>
-            Capturar Datos Iniciales
+            Capturar Datos ASTM D5034
           </button>
         </div>
 
@@ -47,44 +51,53 @@ const InitialSectionContent = ({ data = {}, testId }) => {
           }}
         >
           <i className="bi bi-exclamation-circle me-2" />
-          Pendiente de capturar datos iniciales
+          Pendiente de capturar datos de ASTM D5034
         </div>
+
       </div>
     );
   }
 
-  // Si YA hay datos (status 1 o 2)
+  // ================================
+  // 🟡 STATUS 1 O 2 → YA HAY DATOS
+  // ================================
   return (
     <div className="mt-3">
 
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Datos Iniciales de la Muestra</h5>
+        <h5 className="mb-0">ASTM D5034 – Resistencia a la Tracción</h5>
 
+        {/* Botón Terminar Test cuando status === 1 */}
         {status === 1 && (
           <button
             type="button"
-            onClick={finishInitial}
-            className="btn btn-success rounded-pill px-3"
+            onClick={finishAstmd}
+            className="btn btn-success rounded-pill px-3 me-2"
           >
             Terminar test
           </button>
         )}
+
+        {/* Botón Editar cuando NO está terminado */}
         {status !== 2 && (
           <button
             type="button"
             onClick={goToForm}
             className="btn btn-outline-dark rounded-pill px-3"
           >
-            Editar Datos Iniciales
+            Editar ASTM D5034
           </button>
         )}
       </div>
 
+      {/* Render de los valores capturados */}
       <div className="card border-0 shadow-sm rounded-4">
         <div className="card-body">
           <div className="row g-3">
             {Object.entries(data)
-              .filter(([key]) => !['img', 'status', 'user_id', 'user_name'].includes(key))
+              .filter(([key]) =>
+                !['img', 'status', 'user_id', 'user_name'].includes(key)
+              )
               .map(([key, field]) => (
                 <div className="col-md-6" key={key}>
                   <div className="text-muted small">{field.display_name}</div>
@@ -101,4 +114,4 @@ const InitialSectionContent = ({ data = {}, testId }) => {
   );
 };
 
-export default InitialSectionContent;
+export default Astmd5034SectionContent;

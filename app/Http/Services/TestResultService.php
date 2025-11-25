@@ -89,53 +89,118 @@ class TestResultService
         ];
     }
 
-    public function startInitialSection($testId)
+    public function startSection(int $testId, string $sectionKey)
     {
-        $user = Auth::user();
-        $test = $this->mTest
+        $testResult = $this->mTest
             ->with(['testRequest.user', 'results'])
             ->findOrFail($testId);
-        $result = $test->results->first();
 
-        if ($result) {
-            $content = $result->content ?? [];
-            if (isset($content['Inicial'])) {
-                $content['Inicial']['status'] = 1;
-                $content['Inicial']['user_id'] = $user->id;
-                $content['Inicial']['user_name'] = $user->name;
+        $result = $testResult->results->first();
 
-                $result->content = $content;
-                $result->save();
-            }
+        if (!$result) {
+            return $testResult;
         }
-        return $test->fresh(['testRequest.user', 'results']);
+        $content = $result->content ?? [];
+        if (!isset($content[$sectionKey])) {
+            $content[$sectionKey] = [
+                'img'       => [],
+                'status'    => 0,
+                'user_id'   => null,
+                'user_name' => null,
+            ];
+        }
+
+        $content[$sectionKey]['status']    = 1;
+        $content[$sectionKey]['user_id']   = auth()->id();
+        $content[$sectionKey]['user_name'] = auth()->user()?->name;
+
+        $result->content = $content;
+        $result->save();
+        if (is_null($testResult->started_at)) {
+            $testResult->started_at = now();
+            $testResult->save();
+        }
+
+        return $testResult->fresh(['testRequest.user', 'results']);
     }
 
-    public function updateInitialSection(Test $test, array $fields): void
+    public function updateSection(int $testId, string $sectionKey, array $fields)
     {
-        $result = $test->results()->firstOrFail();
+        $testResult = $this->mTest
+            ->with('results')
+            ->findOrFail($testId);
+
+        $result = $testResult->results->first();
+        if (!$result) {
+            throw new \RuntimeException('El test no tiene resultados asociados.');
+        }
+
         $content = $result->content ?? [];
-        if (!isset($content['Inicial']) || !is_array($content['Inicial'])) {
-            $content['Inicial'] = [];
+
+        if (!isset($content[$sectionKey])) {
+            throw new \RuntimeException("La sección {$sectionKey} no existe en el contenido del test.");
         }
 
         foreach ($fields as $key => $value) {
-            if (isset($content['Inicial'][$key]) && is_array($content['Inicial'][$key])) {
-                $content['Inicial'][$key]['value'] = $value;
+            if (
+                isset($content[$sectionKey][$key]) &&
+                is_array($content[$sectionKey][$key]) &&
+                array_key_exists('value', $content[$sectionKey][$key])
+            ) {
+                $content[$sectionKey][$key]['value'] = $value;
             }
         }
-
-        $content['Inicial']['status']    = 1;
-        $content['Inicial']['user_id']   = auth()->id();
-        $content['Inicial']['user_name'] = auth()->user()?->name;
+        if (isset($content[$sectionKey]['status'])) {
+            $content[$sectionKey]['status'] = 1;
+            $content[$sectionKey]['user_id'] = auth()->id();
+            $content[$sectionKey]['user_name'] = auth()->user()?->name;
+        }
 
         $result->content = $content;
         $result->save();
 
-        if (is_null($test->started_at)) {
-            $test->started_at = now();
+        return $testResult->fresh(['testRequest.user', 'results']);
+    }
+
+    public function finishInitialSection(Test $test)
+    {
+        $user = Auth::user();
+        $result = $test->results()->first();
+        if (!$result) {
+            return $test;
         }
-        $test->save();
+        $content = $result->content ?? [];
+        if (!isset($content['Inicial'])) {
+            return $test;
+        }
+        $content['Inicial']['status'] = 2;
+        $content['Inicial']['user_id'] = $user->id;
+        $content['Inicial']['user_name'] = $user->name;
+        $result->content = $content;
+        $result->save();
+        return $test->fresh(['testRequest', 'results']);
+    }
+
+    public function finishSection(int $testId, string $section): void
+    {
+        $user = Auth::user();
+        $test = $this->mTest->with('results')->findOrFail($testId);
+        $result = $test->results->first();
+
+        if (!$result) {
+            return;
+        }
+
+        $content = $result->content ?? [];
+        if (!isset($content[$section])) {
+            return;
+        }
+        $content[$section]['status']    = 2;
+        $content[$section]['user_id']   = $user->id;
+        $content[$section]['user_name'] = $user->name;
+
+        $result->content = $content;
+        $result->save();
     }
 }
 

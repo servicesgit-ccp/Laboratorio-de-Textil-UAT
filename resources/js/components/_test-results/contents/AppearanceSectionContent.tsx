@@ -1,18 +1,18 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
 
-const InitialSectionContent = ({ data = {}, testId }) => {
+const AppearanceSectionContent = ({ data = {}, testId }) => {
   const status = Number(data?.status ?? 0);
 
   const goToForm = () => {
-      router.get(
-        route('test-results.section.start', { test: testId, section: 'Inicial' })
-      );
-    };
-  
-  const finishInitial = () => {
+    router.get(
+      route('test-results.section.start', { test: testId, section: 'Apariencia' })
+    );
+  };
+
+  const finishAppearance = () => {
     router.post(
-      route('test-results.section.finish', { test: testId, section: 'Inicial' }),
+      route('test-results.section.finish', { test: testId, section: 'Apariencia' }),
       {},
       { preserveScroll: true },
     );
@@ -22,19 +22,19 @@ const InitialSectionContent = ({ data = {}, testId }) => {
     return (
       <div className="mt-3">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="mb-0">Datos Iniciales de la Muestra</h5>
+          <h5 className="mb-0">Apariencia de la Prenda</h5>
 
           <button
             type="button"
             className="btn btn-dark rounded-pill d-flex align-items-center gap-2 px-3"
             onClick={() =>
               router.get(
-                route('test-results.section.start', { test: testId, section: 'Inicial' })
+                route('test-results.section.start', { test: testId, section: 'Apariencia' })
               )
             }
           >
             <span className="fw-semibold">+</span>
-            Capturar Datos Iniciales
+            Capturar Apariencia
           </button>
         </div>
 
@@ -47,35 +47,36 @@ const InitialSectionContent = ({ data = {}, testId }) => {
           }}
         >
           <i className="bi bi-exclamation-circle me-2" />
-          Pendiente de capturar datos iniciales
+          Pendiente de capturar datos de apariencia
         </div>
       </div>
     );
   }
 
-  // Si YA hay datos (status 1 o 2)
   return (
     <div className="mt-3">
 
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Datos Iniciales de la Muestra</h5>
+        <h5 className="mb-0">Apariencia de la Prenda</h5>
 
+        {/* Botón Terminar Test (solo status 1) */}
         {status === 1 && (
           <button
             type="button"
-            onClick={finishInitial}
-            className="btn btn-success rounded-pill px-3"
+            onClick={finishAppearance}
+            className="btn btn-success rounded-pill px-3 me-2"
           >
             Terminar test
           </button>
         )}
+
         {status !== 2 && (
           <button
             type="button"
             onClick={goToForm}
             className="btn btn-outline-dark rounded-pill px-3"
           >
-            Editar Datos Iniciales
+            Editar Apariencia
           </button>
         )}
       </div>
@@ -101,4 +102,4 @@ const InitialSectionContent = ({ data = {}, testId }) => {
   );
 };
 
-export default InitialSectionContent;
+export default AppearanceSectionContent;

@@ -1,40 +1,52 @@
 import React from 'react';
 import { router } from '@inertiajs/react';
 
-const InitialSectionContent = ({ data = {}, testId }) => {
+type DensityField = {
+  label: string;
+  display_name: string;
+  value: string | null;
+};
+
+type DensitySection = {
+  [key: string]: DensityField | any;
+};
+
+type Props = {
+  data?: DensitySection;
+  testId: number;
+};
+
+const DensidadSectionContent: React.FC<Props> = ({ data = {}, testId }) => {
   const status = Number(data?.status ?? 0);
 
   const goToForm = () => {
-      router.get(
-        route('test-results.section.start', { test: testId, section: 'Inicial' })
-      );
-    };
-  
-  const finishInitial = () => {
+    router.get(
+      route('test-results.section.start', { test: testId, section: 'Densidad' }),
+    );
+  };
+
+  const finishDensidad = () => {
     router.post(
-      route('test-results.section.finish', { test: testId, section: 'Inicial' }),
+      route('test-results.section.finish', { test: testId, section: 'Densidad' }),
       {},
       { preserveScroll: true },
     );
   };
 
+  // 👉 Si NO ha sido capturada (status 0)
   if (status === 0) {
     return (
       <div className="mt-3">
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="mb-0">Datos Iniciales de la Muestra</h5>
+          <h5 className="mb-0">Densidad de la Tela</h5>
 
           <button
             type="button"
             className="btn btn-dark rounded-pill d-flex align-items-center gap-2 px-3"
-            onClick={() =>
-              router.get(
-                route('test-results.section.start', { test: testId, section: 'Inicial' })
-              )
-            }
+            onClick={goToForm}
           >
             <span className="fw-semibold">+</span>
-            Capturar Datos Iniciales
+            Capturar Densidad
           </button>
         </div>
 
@@ -43,41 +55,43 @@ const InitialSectionContent = ({ data = {}, testId }) => {
           style={{
             background: '#fdf7f2',
             borderColor: '#f4e3d7',
-            color: '#b3541e'
+            color: '#b3541e',
           }}
         >
           <i className="bi bi-exclamation-circle me-2" />
-          Pendiente de capturar datos iniciales
+          Pendiente de capturar datos de densidad
         </div>
       </div>
     );
   }
 
-  // Si YA hay datos (status 1 o 2)
+  // 👉 Si YA hay datos (status 1 o 2)
   return (
     <div className="mt-3">
-
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Datos Iniciales de la Muestra</h5>
+        <h5 className="mb-0">Densidad de la Tela</h5>
 
-        {status === 1 && (
-          <button
-            type="button"
-            onClick={finishInitial}
-            className="btn btn-success rounded-pill px-3"
-          >
-            Terminar test
-          </button>
-        )}
-        {status !== 2 && (
-          <button
-            type="button"
-            onClick={goToForm}
-            className="btn btn-outline-dark rounded-pill px-3"
-          >
-            Editar Datos Iniciales
-          </button>
-        )}
+        <div className="d-flex gap-2">
+          {status === 1 && (
+            <button
+              type="button"
+              onClick={finishDensidad}
+              className="btn btn-success rounded-pill px-3"
+            >
+              Terminar test
+            </button>
+          )}
+
+          {status !== 2 && (
+            <button
+              type="button"
+              onClick={goToForm}
+              className="btn btn-outline-dark rounded-pill px-3"
+            >
+              Editar Densidad
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="card border-0 shadow-sm rounded-4">
@@ -87,7 +101,9 @@ const InitialSectionContent = ({ data = {}, testId }) => {
               .filter(([key]) => !['img', 'status', 'user_id', 'user_name'].includes(key))
               .map(([key, field]) => (
                 <div className="col-md-6" key={key}>
-                  <div className="text-muted small">{field.display_name}</div>
+                  <div className="text-muted small">
+                    {field.display_name}
+                  </div>
                   <div className="fw-semibold">
                     {field.value ?? '--'}
                   </div>
@@ -96,9 +112,8 @@ const InitialSectionContent = ({ data = {}, testId }) => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };
 
-export default InitialSectionContent;
+export default DensidadSectionContent;

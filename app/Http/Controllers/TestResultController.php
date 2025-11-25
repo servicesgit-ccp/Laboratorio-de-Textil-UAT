@@ -44,29 +44,61 @@ class TestResultController extends Controller
         ]);
     }
 
-    public function startInitial($testId)
+    public function startSection($testId, $sectionKey)
     {
-        $testResult = $this->sTestResult->startInitialSection($testId);
+        $testResult = $this->sTestResult->startSection($testId, $sectionKey);
+
         $result = $testResult->results->first();
-        $initialSection = $result?->content['Inicial'] ?? [];
-        return Inertia::render('test-results/initial', [
+        $sectionData = $result?->content[$sectionKey] ?? [];
+
+        return Inertia::render('test-results/section-form', [
             'test' => [
-                'id'        => $testResult->id,
-                'number'    => $testResult->testRequest->number,
-                'item'      => $testResult->testRequest->item,
-                'notes'     => $testResult->testRequest->notes,
+                'id'           => $testResult->id,
+                'number'       => $testResult->testRequest->number,
+                'item'         => $testResult->testRequest->item,
+                'notes'        => $testResult->testRequest->notes,
                 'requested_by' => $testResult->testRequest->user->name,
             ],
-            'initialSection' => $initialSection,
+            'sectionKey'   => $sectionKey,      // "Inicial", "Apariencia", etc.
+            'sectionData'  => $sectionData,     // contenido de esa sección
         ]);
     }
 
-    public function updateInitial(InitialSectionRequest $request, Test $test)
+    public function updateSection(Request $request, $testId, $sectionKey)
     {
-        $this->sTestResult->updateInitialSection($test, $request->validated()['fields']);
+        $validated = $request->validate([
+            'fields'   => ['required', 'array'],
+            'fields.*' => ['nullable', 'string'],
+        ]);
+
+        $this->sTestResult->updateSection(
+            (int) $testId,
+            (string) $sectionKey,
+            $validated['fields']
+        );
+
+        return redirect()
+            ->route('test-results.detail', ['test' => $testId])
+            ->with('success', 'Se guardaron los datos de la sección.');
+    }
+
+    public function finishInitial(Request $request, Test $test)
+    {
+        $this->sTestResult->finishInitialSection($test);
 
         return redirect()
             ->route('test-results.detail', ['test' => $test->id])
-            ->with('success', 'Datos iniciales guardados correctamente.');
+            ->with('success', 'Datos iniciales marcados como completados.');
+    }
+
+    public function finishSection(Request $request, int $test)
+    {
+        $section = $request->input('section');
+
+        $this->sTestResult->finishSection($test, $section);
+
+        return redirect()
+            ->route('test-results.detail', ['test' => $test])
+            ->with('success', "La sección {$section} se marcó como terminada.");
     }
 }

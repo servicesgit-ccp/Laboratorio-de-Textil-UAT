@@ -2,82 +2,85 @@ import React, { useMemo } from 'react';
 import { useForm } from '@inertiajs/react';
 import { Card, Row, Col, Form, Button } from 'react-bootstrap';
 
-type InitialField = {
+type AATCC150Field = {
   label: string;
   display_name: string;
   value: string | null;
 };
 
-type InitialSection = {
-  [key: string]: InitialField | any;
+type AATCC150Section = {
+  [key: string]: AATCC150Field | any;
 };
 
 type Props = {
   testId: number;
-  initialSection: InitialSection;
+  aatccSection: AATCC150Section;
 };
 
-const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
-  // Filtramos solo los campos "reales", ignorando img/status/user_id/user_name
+const AATCC150Form: React.FC<Props> = ({ testId, aatccSection }) => {
+  const safeSection = aatccSection || {};
+
   const fieldEntries = useMemo(
     () =>
-      Object.entries(initialSection).filter(([key, value]) => {
+      Object.entries(safeSection).filter(([key, value]) => {
         if (['img', 'status', 'user_id', 'user_name'].includes(key)) return false;
+
         return value && typeof value === 'object' && 'display_name' in value;
       }),
-    [initialSection],
+    [safeSection]
   );
 
-  // Estado inicial para useForm
   const initialData: Record<string, string> = {};
   fieldEntries.forEach(([key, field]) => {
-    const f = field as InitialField;
+    const f = field as AATCC150Field;
     initialData[key] = f.value ?? '';
   });
 
-  const { data, setData, put, processing, errors } = useForm<{
-    fields: Record<string, string>;
-  }>({
-    fields: initialData,
+  const { data, setData, put, processing, errors } = useForm({
+    fields: initialData
   });
 
   const handleChange = (key: string, value: string) => {
     setData('fields', {
       ...data.fields,
-      [key]: value,
+      [key]: value
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      put(route('test-results.section.update', { test: testId, section: 'Inicial' }), {
-        preserveScroll: true,
-      });
-    };
+    e.preventDefault();
+
+    put(
+      route('test-results.section.update', {
+        test: testId,
+        section: 'AATCC150'
+      }),
+      { preserveScroll: true }
+    );
+  };
 
   return (
     <Card className="border-0 shadow-sm rounded-4">
       <Card.Body className="p-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5 className="mb-0">Datos Iniciales</h5>
-        </div>
+        <h5 className="mb-3">AATCC 150 – Lavado Doméstico</h5>
 
         <Form onSubmit={handleSubmit}>
           <Row className="g-3">
             {fieldEntries.map(([key, field]) => {
-              const f = field as InitialField;
+              const f = field as AATCC150Field;
+
               return (
                 <Col md={6} key={key}>
-                  <Form.Group controlId={`initial-${key}`}>
-                    <Form.Label className="small">
-                      {f.display_name}
-                    </Form.Label>
+                  <Form.Group controlId={`aatcc150-${key}`}>
+                    <Form.Label className="small">{f.display_name}</Form.Label>
+
                     <Form.Control
                       type="text"
                       value={data.fields[key] ?? ''}
                       onChange={(e) => handleChange(key, e.target.value)}
                       isInvalid={!!errors[`fields.${key}`]}
                     />
+
                     {errors[`fields.${key}`] && (
                       <Form.Control.Feedback type="invalid">
                         {errors[`fields.${key}`]}
@@ -90,6 +93,7 @@ const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
           </Row>
 
           <div className="d-flex justify-content-end mt-4 gap-2">
+
             <Button
               type="button"
               variant="outline-secondary"
@@ -105,8 +109,9 @@ const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
               className="rounded-pill px-4"
               disabled={processing}
             >
-              {processing ? 'Guardando...' : 'Guardar Datos Iniciales'}
+              {processing ? 'Guardando...' : 'Guardar AATCC 150'}
             </Button>
+
           </div>
         </Form>
       </Card.Body>
@@ -114,4 +119,4 @@ const InitialForm: React.FC<Props> = ({ testId, initialSection }) => {
   );
 };
 
-export default InitialForm;
+export default AATCC150Form;

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import { usePage, router } from '@inertiajs/react';
 import MainLayout from '@/layouts/MainLayout';
@@ -8,6 +8,10 @@ import TestResultInfoCard from '@/components/_test-results/TestResultInfoCard';
 import TestStatusChips from '@/components/_test-results/TestStatusChips';
 import TestSectionTabs from '@/components/_test-results/TestSectionTabs';
 import InitialSectionContent from '@/components/_test-results/contents/InitialSectionContent';
+import AppearanceSectionContent from '@/components/_test-results/contents/AppearanceSectionContent';
+import DensidadSectionContent from '@/components/_test-results/contents/DensidadSectionContent';
+import Astmd5034SectionContent from '@/components/_test-results/contents/Astmd5034SectionContent';
+import AATCC150SectionContent from '@/components/_test-results/contents/AATCC150SectionContent';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -56,6 +60,17 @@ const TestResultDetailPage: React.FC = () => {
   const [activeSectionData, setActiveSectionData] = useState<any>(
     sectionEntries[0]?.data ?? null
   );
+  useEffect(() => {
+    const result = testResult.results?.[0];
+    const freshContent = result?.content ?? {};
+    const freshSectionData = freshContent[activeSection];
+
+    if (freshSectionData) {
+      setActiveSectionData(freshSectionData);
+    }
+  }, [testResult, activeSection]);
+
+  
 
   // === ADAPTAMOS el objeto del backend ===
   const adapted = {
@@ -110,17 +125,24 @@ const TestResultDetailPage: React.FC = () => {
         {/* Secciones de las tabs */}
         <div className="mt-4">
           {activeSection === 'Inicial' && (
-            <InitialSectionContent 
-              data={activeSectionData}
-              testId={testResult.id}
-            />
+            <InitialSectionContent data={activeSectionData} testId={testResult.id} />
           )}
 
-          {activeSection !== 'Inicial' && (
-            <div className="text-muted small">
-              Aquí va el contenido de la prueba: {activeSection}
-            </div>
+          {activeSection === 'Apariencia' && (
+            <AppearanceSectionContent data={activeSectionData} testId={testResult.id} />
           )}
+
+          {activeSection === 'Densidad' && (
+            <DensidadSectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+
+          {activeSection === 'ASTMD5034' && (
+            <Astmd5034SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+          {activeSection === 'AATCC150' && (
+            <AATCC150SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+          
 
         </div>
       </div>
