@@ -12,6 +12,10 @@ import AppearanceSectionContent from '@/components/_test-results/contents/Appear
 import DensidadSectionContent from '@/components/_test-results/contents/DensidadSectionContent';
 import Astmd5034SectionContent from '@/components/_test-results/contents/Astmd5034SectionContent';
 import AATCC150SectionContent from '@/components/_test-results/contents/AATCC150SectionContent';
+import AATCC135SectionContent from '@/components/_test-results/contents/AATCC135SectionContent';
+import AstmD3776SectionContent from '@/components/_test-results/contents/AstmD3776SectionContent';
+import AstmD3512SectionContent from '@/components/_test-results/contents/AstmD3512SectionContent';
+import AATCC179SectionContent from '@/components/_test-results/contents/Aatcc179SectionContent';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -141,6 +145,22 @@ const TestResultDetailPage: React.FC = () => {
           )}
           {activeSection === 'AATCC150' && (
             <AATCC150SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+
+          {activeSection === 'AATCC135' && (
+            <AATCC135SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+          
+          {activeSection === 'ASTM D3776' && (
+            <AstmD3776SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+          
+          {activeSection === 'ASTM D3512' && (
+            <AstmD3512SectionContent data={activeSectionData} testId={testResult.id} />
+          )}
+          
+          {activeSection === 'AATCC179' && (
+            <AATCC179SectionContent data={activeSectionData} testId={testResult.id} />
           )}
           
 

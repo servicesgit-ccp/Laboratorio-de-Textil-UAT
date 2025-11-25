@@ -13,7 +13,10 @@ import AppearanceForm from '@/components/_test-results/forms/AppearanceForm';
 import DensidadForm from '@/components/_test-results/forms/DensidadForm';
 import Astmd5034Form from '@/components/_test-results/forms/Astmd5034Form';
 import AATCC150Form from '@/components/_test-results/forms/AATCC150Form';
-
+import AATCC135Form from '@/components/_test-results/forms/AATCC135Form';
+import AstmD3776Form from '@/components/_test-results/forms/AstmD3776Form';
+import AstmD3512Form from '@/components/_test-results/forms/AstmD3512Form';
+import AATCC179Form from '@/components/_test-results/forms/Aatcc179Form';
 
 type SectionField = {
   label: string;
@@ -75,6 +78,18 @@ const SectionFormPage: React.FC = () => {
 
       case 'AATCC150':
         return <AATCC150Form testId={test.id} aatccSection={sectionData} />
+        
+      case 'AATCC135':
+        return <AATCC135Form testId={test.id} aatccSection={sectionData} />
+
+      case 'ASTM D3776':
+        return <AstmD3776Form testId={test.id} astmSection={sectionData} />
+
+      case 'ASTM D3512':
+        return <AstmD3512Form testId={test.id} astmSection={sectionData} />
+        
+      case 'AATCC179':
+        return <AATCC179Form testId={test.id} aatcc179Section={sectionData} />
 
       default:
         return (
