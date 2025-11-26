@@ -10,7 +10,7 @@ import TestRequestTable from "@/components/_test/TestRequestTable";
 import TestRequestFilters from "@/components/_test/TestRequestFilters";
 
 const TestRequestIndex = () => {
-    const { test_requests, stats, filters } = usePage().props as {
+    const { test_requests, stats, filters } = usePage().props as unknown as {
         test_requests: any;
         stats: any;
         filters: { q?: string; per_page?: number; status?: number; date_range?: string };
@@ -42,7 +42,7 @@ const TestRequestIndex = () => {
                             filters={filters}
                         />
 
-                        <TestRequestTable test_requests={test_requests} />
+                        <TestRequestTable test_requests={test_requests} test_results={undefined} />
 
                         <CardFooter>
                             <div className="d-flex align-items-center justify-content-between gap-3">
