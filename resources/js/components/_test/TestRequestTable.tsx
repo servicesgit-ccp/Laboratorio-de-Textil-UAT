@@ -1,7 +1,13 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
-import { Link } from '@inertiajs/react';
-import { Badge, Button } from 'react-bootstrap';
+import { Link, router } from '@inertiajs/react';
+import {
+    Badge,
+    Button,
+    Collapse,
+    Modal,
+    OverlayTrigger,
+    Tooltip,
+} from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 type Props = {
@@ -9,11 +15,49 @@ type Props = {
     test_results: any;
 };
 
-const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results }) => {
+const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
     const [openRowId, setOpenRowId] = useState<number | null>(null);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
 
     const toggleRow = (rowId: number) => {
         setOpenRowId((prev) => (prev === rowId ? null : rowId));
+    };
+
+    const handleOpenModal = (item: any) => {
+        setSelectedRequest(item);
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedRequest(null);
+    };
+
+    const handleSendRequest = () => {
+        if (!selectedRequest) return;
+
+        router.post(
+            route('test.request.send', selectedRequest.id),
+            {},
+            {
+                onFinish: () => setShowModal(false),
+                preserveScroll: true,
+            }
+        );
+    };
+
+    const handleCancelRequest = () => {
+        if (!selectedRequest) return;
+
+        router.post(
+            route('test.request.cancel', selectedRequest.id),
+            {},
+            {
+                onFinish: () => setShowModal(false),
+                preserveScroll: true,
+            }
+        );
     };
 
     const getStatusBadge = (status: number | string) => {
@@ -24,237 +68,282 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results }) => 
             case 1:
                 return <Badge bg="success">Completado</Badge>;
             case 2:
-                return <Badge bg="warning" text="dark">En proceso</Badge>;
+                return (
+                    <Badge bg="soft-secondary" text="dark">
+                        En proceso
+                    </Badge>
+                );
             case 3:
                 return <Badge bg="danger">Cancelado</Badge>;
             default:
-                return <Badge bg="light" text="dark">Desconocido</Badge>;
+                return (
+                    <Badge bg="light" text="dark">
+                        Desconocido
+                    </Badge>
+                );
         }
     };
 
-    return (
-        <table className="table table-nowrap mb-0 align-middle">
-            <thead className="bg-light-subtle">
-=======
-// components/test/TestRequestTable.tsx
-import { Button, Badge } from "react-bootstrap";
-import { Link } from "@inertiajs/react";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
+    const renderTooltip = (id: string, text: string) => (
+        <Tooltip id={id}>{text}</Tooltip>
+    );
 
-const getStatusBadge = (status: number) => {
-    switch (Number(status)) {
-        case 0: return <Badge bg="secondary">Creado</Badge>;
-        case 1: return <Badge bg="success">Completado</Badge>;
-        case 2: return <Badge bg="warning" text="dark">En proceso</Badge>;
-        case 3: return <Badge bg="danger">Cancelado</Badge>;
-        default: return <Badge bg="light" text="dark">Desconocido</Badge>;
-    }
-};
+    // Para el modal: obtener contentKeys del selectedRequest
+    const modalContentKeys = (() => {
+        if (!selectedRequest?.test?.[0]?.results?.[0]?.content) return [];
+        return Object.keys(selectedRequest.test[0].results[0].content);
+    })();
 
-const TestRequestTable = ({ test_requests }) => {
     return (
-        <div className="table-responsive">
+        <>
             <table className="table table-nowrap mb-0 align-middle">
                 <thead className="bg-light-subtle">
->>>>>>> 96750299f7cd29a45861250f0b8e7869d0256e65
-                <tr>
-                    <th>Folio</th>
-                    <th>Fecha Ingreso</th>
-                    <th>Fecha Salida</th>
-                    <th>SKU</th>
-                    <th>Descripción</th>
-                    <th>Proveedor</th>
-                    <th>Pruebas</th>
-                    <th>Status</th>
-                    <th className="text-center" style={{ width: 120 }}>Acción</th>
-                </tr>
-<<<<<<< HEAD
-            </thead>
-            <tbody>
-                {test_requests?.data?.length ? (
-                    test_requests.data.map((item: any, idx: number) => {
-                        const rowId = item.id ?? idx;
+                    <tr>
+                        <th>Folio</th>
+                        <th>Fecha Ingreso</th>
+                        <th>Fecha Salida</th>
+                        <th>SKU</th>
+                        <th>Descripción</th>
+                        <th>Proveedor</th>
+                        <th>Pruebas</th>
+                        <th>Status</th>
+                        <th className="text-center" style={{ width: 160 }}>
+                            Acción
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {test_requests?.data?.length ? (
+                        test_requests.data.map((item: any, idx: number) => {
+                            const rowId = item.id ?? idx;
+                            const content = item.test?.[0]?.results?.[0]?.content ?? null;
+                            const contentKeys = content ? Object.keys(content) : [];
 
-                        // Aquí tomamos el resultado correspondiente a esta fila
-                        const resultRow = test_results?.data?.[idx];
-                        const content =
-                            resultRow?.test?.[0]?.results?.[0]?.content ?? null;
-                        const contentKeys = content ? Object.keys(content) : [];
-
-                        return (
-                            <React.Fragment key={rowId}>
-                                <tr>
-                                    <td>{item.number}</td>
-
-                                    <td>
-                                        {item.test?.[0]?.started_at
-                                            ? new Date(item.test[0].started_at).toLocaleString()
-                                            : 'Sin fecha'}
-                                    </td>
-
-                                    <td>
-                                        {item.test?.[0]?.finished_at
-                                            ? new Date(item.test[0].finished_at).toLocaleString()
-                                            : 'Sin fecha'}
-                                    </td>
-
-                                    {item.style?.number?.length > 0 ? (
-                                        <td>{item.style.number}</td>
-                                    ) : (
-                                        <td>{item.item}</td>
-                                    )}
-
-                                    <td>{item.style?.description ?? 'S/N'}</td>
-                                    <td>{item.style?.provider?.name ?? 'S/N'}</td>
-
-                                    {/* Mantengo tu conteo original con item.test */}
-                                    <td>
-                                        {item.test?.[0]?.results?.[0]?.content
-                                            ? Object.keys(item.test[0].results[0].content).length
-                                            : 0}
-                                    </td>
-
-                                    <td>{getStatusBadge(item.status)}</td>
-
-                                    <td className="pe-3 text-center">
-                                        <div className="hstack gap-1 justify-content-center">
-                                            {/* Botón para expandir/colapsar detalles */}
-                                            <Button
-                                                variant="soft-info"
-                                                size="sm"
-                                                className="btn-icon rounded-circle"
-                                                onClick={() => toggleRow(rowId)}
-                                            >
-                                                <IconifyIcon
-                                                    icon={
-                                                        openRowId === rowId
-                                                            ? 'tabler:chevron-up'
-                                                            : 'tabler:chevron-down'
-                                                    }
-                                                    className="fs-16"
-                                                />
-                                            </Button>
-
-                                            <Link href={route('test.request.show', item.id)}>
-                                                <Button
-                                                    variant="soft-primary"
-                                                    size="sm"
-                                                    className="btn-icon rounded-circle"
-                                                >
-                                                    <IconifyIcon icon="tabler:eye" className="fs-16" />
-                                                </Button>
-                                            </Link>
-
-                                            <Link href={route('test.request.edit', item.id)}>
-                                                <Button
-                                                    variant="soft-success"
-                                                    size="sm"
-                                                    className="btn-icon rounded-circle"
-                                                >
-                                                    <IconifyIcon icon="tabler:edit" className="fs-16" />
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                {/* Fila expandible: sólo si la row está abierta y hay keys */}
-                                {openRowId === rowId && contentKeys.length > 0 && (
+                            return (
+                                <React.Fragment key={rowId}>
                                     <tr>
-                                        {/* colSpan = número de columnas de la tabla principal */}
-                                        <td colSpan={9} className="bg-light-subtle">
-                                            <div className="p-2">
-                                                <strong>Pruebas (keys de content)</strong>
-                                                <table className="table table-sm mb-0 mt-2">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Nombre de la prueba</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {contentKeys.map((key) => (
-                                                            <tr key={key}>
-                                                                <td>{key}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                                        <td>{item.number}</td>
+
+                                        <td>
+                                            {item.created_at
+                                                ? new Date(
+                                                      item.created_at
+                                                  ).toLocaleString()
+                                                : 'Sin fecha'}
+                                        </td>
+
+                                        <td>
+                                            {item.test?.[0]?.finished_at
+                                                ? new Date(
+                                                      item.test[0].finished_at
+                                                  ).toLocaleString()
+                                                : 'Sin fecha'}
+                                        </td>
+
+                                        {item.style?.number?.length > 0 ? (
+                                            <td>{item.style.number}</td>
+                                        ) : (
+                                            <td>{item.item}</td>
+                                        )}
+
+                                        <td>{item.style?.description ?? 'S/N'}</td>
+                                        <td>{item.style?.provider?.name ?? 'S/N'}</td>
+
+                                        <td>
+                                            {item.test?.[0]?.results?.[0]?.content
+                                                ? Object.keys(
+                                                      item.test[0].results[0].content
+                                                  ).length
+                                                : 0}
+                                        </td>
+
+                                        <td>{getStatusBadge(item.status)}</td>
+
+                                        <td className="pe-3 text-center">
+                                            <div className="hstack gap-1 justify-content-center">
+                                                {/* Botón modal resumen (enviar/cancelar) */}
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={renderTooltip(
+                                                        `tooltip-summary-${rowId}`,
+                                                        'Ver resumen / acciones'
+                                                    )}
+                                                >
+                                                    <Button
+                                                        variant="soft-success"
+                                                        size="sm"
+                                                        className="btn-icon rounded-circle"
+                                                        onClick={() => handleOpenModal(item)}
+                                                    >
+                                                        <IconifyIcon
+                                                            icon="tabler:send"
+                                                            className="fs-16"
+                                                        />
+                                                    </Button>
+                                                </OverlayTrigger>
+
+                                                {/* Ver detalle */}
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={renderTooltip(
+                                                        `tooltip-view-${rowId}`,
+                                                        'Ver detalle'
+                                                    )}
+                                                >
+                                                    <Link href={route('test.request.show', item.id)}>
+                                                        <Button
+                                                            variant="soft-secondary"
+                                                            size="sm"
+                                                            className="btn-icon rounded-circle"
+                                                        >
+                                                            <IconifyIcon
+                                                                icon="tabler:eye"
+                                                                className="fs-16"
+                                                            />
+                                                        </Button>
+                                                    </Link>
+                                                </OverlayTrigger>
+
+                                                {/* Editar */}
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={renderTooltip(
+                                                        `tooltip-edit-${rowId}`,
+                                                        'Editar solicitud'
+                                                    )}
+                                                >
+                                                    <Link href={route('test.request.edit', item.id)}>
+                                                        <Button
+                                                            variant="soft-warning"
+                                                            size="sm"
+                                                            className="btn-icon rounded-circle"
+                                                        >
+                                                            <IconifyIcon
+                                                                icon="tabler:edit"
+                                                                className="fs-16"
+                                                            />
+                                                        </Button>
+                                                    </Link>
+                                                </OverlayTrigger>
                                             </div>
                                         </td>
                                     </tr>
-                                )}
-                            </React.Fragment>
-                        );
-                    })
-=======
-                </thead>
 
-                <tbody>
-                {test_requests?.data?.length ? (
-                    test_requests.data.map((item: any, idx: number) => (
-                        <tr key={item.id ?? idx}>
-                            <td>{item.number}</td>
-
-                            <td>
-                                {item.test[0]?.started_at
-                                    ? new Date(item.test[0].started_at).toLocaleString()
-                                    : "Sin fecha"}
-                            </td>
-
-                            <td>
-                                {item.test[0]?.finished_at
-                                    ? new Date(item.test[0].finished_at).toLocaleString()
-                                    : "Sin fecha"}
-                            </td>
-
-                            <td>
-                                {item.style?.number?.length > 0 ? item.style.number : item.item}
-                            </td>
-
-                            <td>{item.style?.description ?? "S/N"}</td>
-                            <td>{item.style?.provider?.name ?? "S/N"}</td>
-
-                            <td>{Object.keys(item.test[0].results[0].content).length}</td>
-
-                            <td>{getStatusBadge(item.status)}</td>
-
-                            <td className="text-center">
-                                <div className="hstack gap-1 justify-content-center">
-                                    <Link href={route("test.request.show", item.id)}>
-                                        <Button variant="soft-primary" size="sm" className="btn-icon rounded-circle">
-                                            <IconifyIcon icon="tabler:eye" className="fs-16" />
-                                        </Button>
-                                    </Link>
-                                    <Link href={route("test.request.edit", item.id)}>
-                                        <Button variant="soft-success" size="sm" className="btn-icon rounded-circle">
-                                            <IconifyIcon icon="tabler:edit" className="fs-16" />
-                                        </Button>
-                                    </Link>
-                                </div>
+                                    <tr>
+                                        <td colSpan={9} className="bg-light-subtle p-0">
+                                            <Collapse in={openRowId === rowId}>
+                                                <div className="p-2">
+                                                    {contentKeys.length > 0 ? (
+                                                        <table className="table table-sm mb-0 mt-2">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Pruebas solicitadas</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {contentKeys.map((key) => (
+                                                                    <tr key={key}>
+                                                                        <td>{key}</td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    ) : (
+                                                        <span className="text-muted">
+                                                            Sin pruebas registradas
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </Collapse>
+                                        </td>
+                                    </tr>
+                                </React.Fragment>
+                            );
+                        })
+                    ) : (
+                        <tr>
+                            <td colSpan={9} className="text-center text-muted py-4">
+                                No hay solicitudes registradas
                             </td>
                         </tr>
-                    ))
->>>>>>> 96750299f7cd29a45861250f0b8e7869d0256e65
-                ) : (
-                    <tr>
-                        <td colSpan={9} className="text-center text-muted py-4">
-                            No hay solicitudes registradas
-                        </td>
-                    </tr>
-                )}
-<<<<<<< HEAD
-            </tbody>
-        </table>
+                    )}
+                </tbody>
+            </table>
+
+            {/* MODAL RESUMEN */}
+            {selectedRequest && (
+                <Modal show={showModal} onHide={handleCloseModal} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>
+                            Solicitud #{selectedRequest.number ?? selectedRequest.id}
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="mb-2">
+                            <strong>SKU / Estilo:</strong>{' '}
+                            {selectedRequest.style?.number ?? selectedRequest.item}
+                        </div>
+                        <div className="mb-2">
+                            <strong>Descripción:</strong>{' '}
+                            {selectedRequest.style?.description ?? 'S/N'}
+                        </div>
+                        <div className="mb-2">
+                            <strong>Proveedor:</strong>{' '}
+                            {selectedRequest.style?.provider?.name ?? 'S/N'}
+                        </div>
+                        <div className="mb-2">
+                            <strong>Status:</strong> {getStatusBadge(selectedRequest.status)}
+                        </div>
+                        <div className="mb-2">
+                            <strong>Notas:</strong>{' '}
+                            {selectedRequest.notes || (
+                                <span className="text-muted">Sin notas</span>
+                            )}
+                        </div>
+
+                        <hr />
+
+                        <div>
+                            <strong>Pruebas solicitadas:</strong>
+                            {modalContentKeys.length > 0 ? (
+                                <ul className="mt-2 mb-0">
+                                    {modalContentKeys.map((name: string) => (
+                                        <li key={name}>{name}</li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="mt-2 text-muted">
+                                    Sin pruebas registradas
+                                </div>
+                            )}
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button
+                            variant="soft-danger"
+                            onClick={handleCancelRequest}
+                        >
+                            <IconifyIcon
+                                icon="tabler:x"
+                                className="me-1"
+                            />
+                            Cancelar solicitud
+                        </Button>
+                        <Button
+                            variant="soft-success"
+                            onClick={handleSendRequest}
+                        >
+                            <IconifyIcon
+                                icon="tabler:send"
+                                className="me-1"
+                            />
+                            Enviar solicitud
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+            )}
+        </>
     );
 };
 
 export default TestRequestsTable;
-=======
-                </tbody>
-            </table>
-        </div>
-    );
-};
-
-export default TestRequestTable;
->>>>>>> 96750299f7cd29a45861250f0b8e7869d0256e65

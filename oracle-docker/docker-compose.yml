@@ -1,18 +1,19 @@
 services:
-  oracle:
-    image: gvenzl/oracle-free:23-slim
-    container_name: oracle-free
+  oracle19c:
+    image: oracle/database:19.3.0-ee
+    container_name: oracle-19c
     environment:
-      ORACLE_PASSWORD: Oracle123
-      APP_USER: app
-      APP_USER_PASSWORD: app123
+      ORACLE_SID: TEXTILAB
+      ORACLE_PDB: TEXTILABPDB
+      ORACLE_PWD: Oracle123
       ORACLE_CHARACTERSET: AL32UTF8
-      ORACLE_DATABASE: TEXTILAB
     ports:
       - "1521:1521"
       - "5500:5500"
     volumes:
       - oracle-data:/opt/oracle/oradata
+      - ./oracle/scripts/setup:/opt/oracle/scripts/setup
+    shm_size: "2g"
 
 volumes:
   oracle-data:

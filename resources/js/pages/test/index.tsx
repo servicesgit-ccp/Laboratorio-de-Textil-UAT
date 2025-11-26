@@ -10,10 +10,15 @@ import TestRequestTable from "@/components/_test/TestRequestTable";
 import TestRequestFilters from "@/components/_test/TestRequestFilters";
 
 const TestRequestIndex = () => {
-    const { test_requests, stats, filters } = usePage().props;
+    const { test_requests, stats, filters } = usePage().props as {
+        test_requests: any;
+        stats: any;
+        filters: { q?: string; per_page?: number; status?: number; date_range?: string };
+    };
 
     const [searchTerm, setSearchTerm] = useState(filters?.q ?? "");
     const [statusFilter, setStatusFilter] = useState(filters?.status ?? 4);
+    const [dateRange, setDateRange] = useState(filters?.date_range ?? ""); // 🔹 nuevo
 
     return (
         <MainLayout>
@@ -32,6 +37,8 @@ const TestRequestIndex = () => {
                             setSearchTerm={setSearchTerm}
                             statusFilter={statusFilter}
                             setStatusFilter={setStatusFilter}
+                            dateRange={dateRange}          // 🔹 nuevo
+                            setDateRange={setDateRange}    // 🔹 nuevo
                             filters={filters}
                         />
 
@@ -52,6 +59,7 @@ const TestRequestIndex = () => {
                                                     per_page: e.target.value,
                                                     q: searchTerm,
                                                     status: statusFilter,
+                                                    date_range: dateRange, // 🔹 mantener el rango
                                                     page: 1,
                                                 },
                                                 { preserveState: true, preserveScroll: true }
@@ -69,7 +77,7 @@ const TestRequestIndex = () => {
                                 </div>
 
                                 <ul className="pagination mb-0">
-                                    {test_requests?.links?.map((link, i) => {
+                                    {test_requests?.links?.map((link: any, i: number) => {
                                         let label = link.label;
                                         if (label.includes("Previous")) label = "&laquo;";
                                         if (label.includes("Next")) label = "&raquo;";

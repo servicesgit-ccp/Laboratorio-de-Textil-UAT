@@ -16,7 +16,7 @@ class CatalogueService
 
     public function findSkuByNumber(string $number)
     {
-        return Sku::where('NUMBER', $number)->with(['style', 'style.department'])->first();
+        return Sku::where('NUMBER', $number)->with(['style', 'style.department', 'style.provider'])->first();
     }
 
     // ======================
