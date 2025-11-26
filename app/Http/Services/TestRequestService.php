@@ -89,7 +89,7 @@ class TestRequestService
             $testRequest = $this->mTestRequest->create([
                 'user_id' => auth()->user()->id,
                 'style_id' => $data['style_id'] ?? null,
-                'item' => $data['item'],
+                'item' =>  $data['item'],
                 'status' => 0,
                 'number' => $this->generateTestNumber(),
                 'notes' => $data['notes']

@@ -40,7 +40,7 @@ const TestRequestShowDetailContent: React.FC<TestResultContentProps> = ({ result
                         {groupKeys.map((group) => {
                             const groupData = content[group];
                             const entries = Object.entries(groupData || {}).filter(
-                                ([key]) => key !== 'img'
+                                ([key]) => key !== 'img' && key !== 'status' && key !== 'user_id' && key !== 'user_name'
                             );
 
                             return (
