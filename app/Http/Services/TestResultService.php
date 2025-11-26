@@ -24,11 +24,11 @@ class TestResultService
         $perPage = $request->input('per_page', 10);
         $query = $this->mTest
             ->whereHas('testRequest', function ($q) {
-                $q->where('status', 1);
+                $q->where('status', 2);
             })
             ->with([
                 'testRequest' => function ($q) {
-                    $q->where('status', 1);
+                    $q->where('status', 2);
                 },
                 'testRequest.user',
                 'results'
@@ -60,7 +60,9 @@ class TestResultService
     public function getStats(): array
     {
         $userId = Auth::id();
-        $tests = $this->mTest->with('results')->get();
+        $tests = $this->mTest->whereHas('testRequest', function ($q) {
+                $q->where('status', 2);
+            })->with('results')->get();
         $inAnalysis = $tests->count();
         $pending = 0;
         $inProcess = 0;
@@ -218,7 +220,7 @@ class TestResultService
             if (! $test->testRequest) {
                 throw new ModelNotFoundException("TestRequest no encontrado para el Test {$testId}.");
             }
-            $test->testRequest->status = 2;
+            $test->testRequest->status = 3; //PENDIENTE
             $test->testRequest->save();
         });
     }
