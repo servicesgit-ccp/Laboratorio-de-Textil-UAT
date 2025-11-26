@@ -4,6 +4,8 @@ namespace App\Http\Services;
 
 use App\Models\Test;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class TestResultService
 {
@@ -20,9 +22,17 @@ class TestResultService
     public function getAllTest($request)
     {
         $perPage = $request->input('per_page', 10);
-
-        $query = $this->mTest->with(['testRequest.user', 'results']);
-
+        $query = $this->mTest
+            ->whereHas('testRequest', function ($q) {
+                $q->where('status', 1);
+            })
+            ->with([
+                'testRequest' => function ($q) {
+                    $q->where('status', 1);
+                },
+                'testRequest.user',
+                'results'
+            ]);
         if ($request->filled('q')) {
             $q = $request->input('q');
 
@@ -196,6 +206,21 @@ class TestResultService
 
         $result->content = $content;
         $result->save();
+    }
+
+    public function submitReview(int $testId)
+    {
+        DB::transaction(function () use ($testId) {
+            $test = Test::with('testRequest')->find($testId);
+            if (! $test) {
+                throw new ModelNotFoundException("Test {$testId} no encontrado.");
+            }
+            if (! $test->testRequest) {
+                throw new ModelNotFoundException("TestRequest no encontrado para el Test {$testId}.");
+            }
+            $test->testRequest->status = 2;
+            $test->testRequest->save();
+        });
     }
 }
 

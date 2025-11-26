@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 // bootstrap
-import { Button, Card, CardFooter, CardHeader, Col, Row } from 'react-bootstrap';
+import { Button, Card, CardFooter, CardHeader, Col, Row, Tooltip } from 'react-bootstrap';
 // components
 import PageTitle from '@/components/PageTitle';
 import MainLayout from '@/layouts/MainLayout';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import TestResultsSummary from '@/components/_test-results/TestResultsSummary';
+import ConfirmModal from '@/components/_general/ConfirmModal';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -55,6 +56,11 @@ const TestResultsPage = () => {
 
   const [search, setSearch] = useState(filters?.q ?? '');
   const perPage = Number(filters?.per_page ?? 10);
+  const [confirmModal, setConfirmModal] = useState<{ show: boolean; testId: number | null }>({
+    show: false,
+    testId: null,
+  });
+  const [submitting, setSubmitting] = useState(false);
 
   const rows = (testResults.data ?? []).map((item: any) => {
     const analystSet = new Set<string>();
@@ -117,6 +123,22 @@ const TestResultsPage = () => {
       {
         preserveState: true,
         preserveScroll: true,
+      },
+    );
+  };
+
+  const handleSendToReview = () => {
+    if (!confirmModal.testId) return;
+    setSubmitting(true);
+    router.put(
+      route('test-results.review', { id: confirmModal.testId }),
+      {},
+      {
+        preserveScroll: true,
+        onFinish: () => {
+          setSubmitting(false);
+          setConfirmModal({ show: false, testId: null });
+        },
       },
     );
   };
@@ -256,11 +278,28 @@ const TestResultsPage = () => {
                             <Button
                                 variant="soft-primary"
                                 size="sm"
-                                className="btn-icon rounded-circle"
+                                className="btn-icon rounded-circle me-2"
                             >
                                 <IconifyIcon icon="tabler:eye" className="fs-16" />
                             </Button>
                         </Link>
+                        {req.pruebasPendientes === 0 && req.totalPruebas > 0 && (
+                          <Button
+                            type="button"
+                            variant="soft-success"
+                            size="sm"
+                            className="btn-icon rounded-circle"
+                            title="Enviar a revisión"
+                            onClick={() =>
+                              setConfirmModal({
+                                show: true,
+                                testId: req.id,
+                              })
+                            }
+                          >
+                            <IconifyIcon icon="tabler:send" className="fs-16" />
+                          </Button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -324,6 +363,21 @@ const TestResultsPage = () => {
           </Card>
         </Col>
       </Row>
+      <ConfirmModal
+        show={confirmModal.show}
+        title="Enviar a revisión"
+        body="Se enviará la solicitud a revisión. ¿Deseas continuar?"
+        confirmText="Enviar a revisión"
+        confirmVariant="success"
+        cancelText="Cancelar"
+        loading={submitting}
+        onConfirm={handleSendToReview}
+        onClose={() => {
+          if (!submitting) {
+            setConfirmModal({ show: false, testId: null });
+          }
+        }}
+      />
     </MainLayout>
   );
 };

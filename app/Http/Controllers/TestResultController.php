@@ -6,8 +6,6 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Services\TestResultService;
 use App\Models\Test;
-use App\Http\Requests\InitialSectionRequest;
-
 
 class TestResultController extends Controller
 {
@@ -100,5 +98,11 @@ class TestResultController extends Controller
         return redirect()
             ->route('test-results.detail', ['test' => $test])
             ->with('success', "La sección {$section} se marcó como terminada.");
+    }
+
+     public function submitReview(int $id)
+    {
+        $this->sTestResult->submitReview($id);
+        return back()->with('success', 'Enviado a revisión');
     }
 }

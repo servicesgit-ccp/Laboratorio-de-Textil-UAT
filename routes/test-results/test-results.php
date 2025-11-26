@@ -11,3 +11,5 @@ Route::post('/test-results/{test}/{section}', [TestResultController::class, 'upd
     ->name('test-results.section.update');
 Route::post('/test-results/{test}/section/finish',[TestResultController::class, 'finishSection']
     )->name('test-results.section.finish');
+Route::put('test-results/{id}/submit-review', [TestResultController::class, 'submitReview'])
+    ->name('test-results.review');
