@@ -39,17 +39,17 @@
         --#{$prefix}menu-item-color: #{$gray-700};
         --#{$prefix}menu-item-hover-color: #{$primary};
         --#{$prefix}menu-item-hover-bg: #{rgba($primary, 0.1)};
-        --#{$prefix}menu-item-active-color: #{$primary};
-        --#{$prefix}menu-item-active-bg: #{rgba($primary, 0.1)};
+        --#{$prefix}menu-item-active-color: #ffffff;
+        --#{$prefix}menu-item-active-bg: #{rgba($primary, 0.9)};
     }
 
     // Dark Left Sidebar
     &[data-menu-color='dark'] {
-        --#{$prefix}menu-bg: #232e51;
-        --#{$prefix}menu-item-color: #97aac1;
-        --#{$prefix}menu-item-hover-color: #e2eeff;
-        --#{$prefix}menu-item-hover-bg: #2f3a5f;
-        --#{$prefix}menu-item-active-color: #e2eeff;
+        --#{$prefix}menu-bg: #000000;
+        --#{$prefix}menu-item-color: #d7dadf;
+        --#{$prefix}menu-item-hover-color: #b85555;
+        --#{$prefix}menu-item-hover-bg: #primary;
+        --#{$prefix}menu-item-active-color: #274e85;
         --#{$prefix}menu-item-active-bg: #2f3a5f;
     }
 
