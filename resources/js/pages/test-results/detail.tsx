@@ -20,6 +20,8 @@ import AATCC8SectionContent from '@/components/_test-results/contents/Aatcc8Sect
 import AATCC81SectionContent from '@/components/_test-results/contents/Aatcc81SectionContent';
 import Astmd2261SectionContent from '@/components/_test-results/contents/Astmd2261SectionContent';
 import AATCC61SectionContent from '@/components/_test-results/contents/Aatcc61SectionContent';
+import GenericSectionContent from '@/components/_test-results/contents/GenericSectionContent';
+import { SectionKey } from '@/components/_test-results/sectionConfig';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -128,58 +130,13 @@ const TestResultDetailPage: React.FC = () => {
         />
         {/* Secciones de las tabs */}
         <div className="mt-4">
-          {activeSection === 'Inicial' && (
-            <InitialSectionContent data={activeSectionData} testId={testResult.id} />
+          {activeSection && (
+            <GenericSectionContent
+              sectionName={activeSection as SectionKey}
+              testId={testResult.id}
+              data={activeSectionData}
+            />
           )}
-
-          {activeSection === 'Apariencia' && (
-            <AppearanceSectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-
-          {activeSection === 'Densidad' && (
-            <DensidadSectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-
-          {activeSection === 'ASTMD5034' && (
-            <Astmd5034SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-          {activeSection === 'AATCC150' && (
-            <AATCC150SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-
-          {activeSection === 'AATCC135' && (
-            <AATCC135SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-          
-          {activeSection === 'ASTM D3776' && (
-            <AstmD3776SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-          
-          {activeSection === 'ASTM D3512' && (
-            <AstmD3512SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-          
-          {activeSection === 'AATCC179' && (
-            <AATCC179SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-          
-          {activeSection === 'AATCC8' && (
-            <AATCC8SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-          
-          {activeSection === 'AATCC81' && (
-            <AATCC81SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-
-          {activeSection === 'ASTMD2261' && (
-            <Astmd2261SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-
-          {activeSection === 'AATCC61' && (
-            <AATCC61SectionContent data={activeSectionData} testId={testResult.id} />
-          )}
-          
-
         </div>
       </div>
     </MainLayout>

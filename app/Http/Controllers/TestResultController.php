@@ -44,12 +44,12 @@ class TestResultController extends Controller
         ]);
     }
 
-    public function startSection($testId, $sectionKey)
+    public function startSection(int $testId, string $section)
     {
-        $testResult = $this->sTestResult->startSection($testId, $sectionKey);
-
-        $result = $testResult->results->first();
-        $sectionData = $result?->content[$sectionKey] ?? [];
+        $testResult = $this->sTestResult->startSection($testId, $section);
+        $result     = $testResult->results->first();
+        $content    = $result?->content ?? [];
+        $sectionData = $content[$section] ?? [];
 
         return Inertia::render('test-results/section-form', [
             'test' => [
@@ -59,8 +59,8 @@ class TestResultController extends Controller
                 'notes'        => $testResult->testRequest->notes,
                 'requested_by' => $testResult->testRequest->user->name,
             ],
-            'sectionKey'   => $sectionKey,      // "Inicial", "Apariencia", etc.
-            'sectionData'  => $sectionData,     // contenido de esa sección
+            'sectionName' => $section,
+            'sectionData' => $sectionData,
         ]);
     }
 
