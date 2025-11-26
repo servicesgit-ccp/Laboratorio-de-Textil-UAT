@@ -22,7 +22,7 @@ export default function ConfirmModal({
           {cancelText}
         </Button>
         <Button variant={confirmVariant} onClick={onConfirm} disabled={loading}>
-          {loading ? 'Eliminando…' : confirmText}
+          {loading ? 'Procesando…' : confirmText}
         </Button>
       </Modal.Footer>
     </Modal>

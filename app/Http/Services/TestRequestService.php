@@ -87,9 +87,9 @@ class TestRequestService
         DB::beginTransaction();
         try {
             $testRequest = $this->mTestRequest->create([
-                'user_id' => 1,
-                'style_id' => $data['style_id'] ?? null,
-                'item' => $data['item'],
+                'user_id' => auth()->user()->id,
+                'style_id' => $style->id ?? null,
+                'item' => $style != null ? $style->number : $data['item'],
                 'status' => 0,
                 'number' => $this->generateTestNumber(),
                 'notes' => $data['notes']
@@ -119,6 +119,9 @@ class TestRequestService
                 }
 
                 $content[$groupKey]['img'] = [];
+                $content[$groupKey]['status'] = 0;
+                $content[$groupKey]['user_id'] = null;
+                
             }
 
             $this->mTestResult->create([

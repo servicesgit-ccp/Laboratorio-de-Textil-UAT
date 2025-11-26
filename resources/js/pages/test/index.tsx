@@ -17,6 +17,7 @@ const TestRequestIndex = () => {
     };
 
     const [searchTerm, setSearchTerm] = useState(filters?.q ?? "");
+
     const [statusFilter, setStatusFilter] = useState(filters?.status ?? 4);
     const [dateRange, setDateRange] = useState(filters?.date_range ?? ""); // 🔹 nuevo
 
