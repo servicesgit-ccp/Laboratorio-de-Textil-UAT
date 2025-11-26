@@ -1,17 +1,19 @@
 export type SectionKey =
-  | 'Inicial'
-  | 'Apariencia'
-  | 'Densidad'
-  | 'ASTMD5034'
-  | 'AATCC150'
-  | 'AATCC135'
-  | 'ASTM D3776'
-  | 'ASTM D3512'
-  | 'AATCC179'
-  | 'AATCC8'
-  | 'AATCC81'
-  | 'ASTMD2261'
-  | 'AATCC61';
+  | 'INICIAL'
+  | 'APARIENCIA'
+  | 'DENSIDAD'
+  | 'TRACCION'
+  | 'ESTABILIDAD EN PRENDA'
+  | 'ESTABILIDAD EN TELA'
+  | 'PESO'
+  | 'PILLING'
+  | 'TORSION'
+  | 'FROTE'
+  | 'VALOR PH'
+  | 'RASGADO'
+  | 'LAVADO';
+
+  
 
 type SectionConfig = {
   title: string;
@@ -24,100 +26,100 @@ type SectionConfig = {
 };
 
 export const SECTION_CONFIG: Record<SectionKey, SectionConfig> = {
-  Inicial: {
+  INICIAL: {
     title: 'Datos Iniciales de la Muestra',
-    routeSection: 'Inicial',
+    routeSection: 'INICIAL',
     startButtonLabel: 'Capturar Datos Iniciales',
     pendingMessage: 'Pendiente de capturar datos iniciales',
     editButtonLabel: 'Editar Datos Iniciales',
     allowImages: true,
   },
-  Apariencia: {
+  APARIENCIA: {
     title: 'Apariencia de la Prenda',
-    routeSection: 'Apariencia',
-    startButtonLabel: 'Capturar Apariencia',
-    pendingMessage: 'Pendiente de capturar datos de apariencia',
-    editButtonLabel: 'Editar Apariencia',
+    routeSection: 'APARIENCIA',
+    startButtonLabel: 'Capturar APARIENCIA',
+    pendingMessage: 'Pendiente de capturar datos de APARIENCIA',
+    editButtonLabel: 'Editar APARIENCIA',
     allowImages: true,
   },
-  Densidad: {
+  DENSIDAD: {
     title: 'Datos de Densidad',
-    routeSection: 'Densidad',
+    routeSection: 'DENSIDAD',
     startButtonLabel: 'Capturar Densidad',
     pendingMessage: 'Pendiente de capturar datos de densidad',
     editButtonLabel: 'Editar Densidad',
   },
-  ASTMD5034: {
+  TRACCION: {
     title: 'ASTM D5034 – Resistencia a la tracción',
-    routeSection: 'ASTMD5034',
-    startButtonLabel: 'Capturar ASTM D5034',
-    pendingMessage: 'Pendiente de capturar datos ASTM D5034',
-    editButtonLabel: 'Editar ASTM D5034',
+    routeSection: 'TRACCION',
+    startButtonLabel: 'Capturar TRACCION',
+    pendingMessage: 'Pendiente de capturar datos TRACCION',
+    editButtonLabel: 'Editar TRACCION',
   },
-  AATCC150: {
+  'ESTABILIDAD EN PRENDA': {
     title: 'AATCC 150 – Dimensionalidad',
-    routeSection: 'AATCC150',
-    startButtonLabel: 'Capturar AATCC 150',
-    pendingMessage: 'Pendiente de capturar datos AATCC 150',
-    editButtonLabel: 'Editar AATCC 150',
+    routeSection: 'ESTABILIDAD EN PRENDA',
+    startButtonLabel: 'Capturar ESTABILIDAD EN PRENDA',
+    pendingMessage: 'Pendiente de capturar datos ESTABILIDAD EN PRENDA',
+    editButtonLabel: 'Editar ESTABILIDAD EN PRENDA',
   },
-  AATCC135: {
+  'ESTABILIDAD EN TELA': {
     title: 'AATCC 135 – Dimensionalidad (Lavado)',
-    routeSection: 'AATCC135',
-    startButtonLabel: 'Capturar AATCC 135',
-    pendingMessage: 'Pendiente de capturar datos AATCC 135',
-    editButtonLabel: 'Editar AATCC 135',
+    routeSection: 'ESTABILIDAD EN TELA',
+    startButtonLabel: 'Capturar ESTABILIDAD EN TELA',
+    pendingMessage: 'Pendiente de capturar datos ESTABILIDAD EN TELA',
+    editButtonLabel: 'Editar ESTABILIDAD EN TELA',
   },
-  'ASTM D3776': {
+  PESO: {
     title: 'ASTM D3776 – Peso del tejido',
-    routeSection: 'ASTM D3776',
-    startButtonLabel: 'Capturar ASTM D3776',
-    pendingMessage: 'Pendiente de capturar datos ASTM D3776',
-    editButtonLabel: 'Editar ASTM D3776',
+    routeSection: 'PESO',
+    startButtonLabel: 'Capturar PESO',
+    pendingMessage: 'Pendiente de capturar datos PESO', 
+    editButtonLabel: 'Editar PESO',
   },
-  'ASTM D3512': {
+  PILLING: {
     title: 'ASTM D3512 – Pilling',
-    routeSection: 'ASTM D3512',
-    startButtonLabel: 'Capturar ASTM D3512',
-    pendingMessage: 'Pendiente de capturar datos ASTM D3512',
-    editButtonLabel: 'Editar ASTM D3512',
+    routeSection: 'PILLING',
+    startButtonLabel: 'Capturar PILLING',
+    pendingMessage: 'Pendiente de capturar datos PILLING',
+    editButtonLabel: 'Editar PILLING',
   },
-  AATCC179: {
+  TORSION: {
     title: 'AATCC 179 – Torsión',
-    routeSection: 'AATCC179',
-    startButtonLabel: 'Capturar AATCC 179',
-    pendingMessage: 'Pendiente de capturar datos AATCC 179',
-    editButtonLabel: 'Editar AATCC 179',
+    routeSection: 'TORSION',
+    startButtonLabel: 'Capturar TORSION',
+    pendingMessage: 'Pendiente de capturar datos TORSION',
+    editButtonLabel: 'Editar TORSION',
   },
-  AATCC8: {
+  FROTE: {
     title: 'AATCC 8 – Solidez del color al frote',
-    routeSection: 'AATCC8',
-    startButtonLabel: 'Capturar AATCC 8',
-    pendingMessage: 'Pendiente de capturar datos AATCC 8',
-    editButtonLabel: 'Editar AATCC 8',
+    routeSection: 'FROTE',
+    startButtonLabel: 'Capturar FROTE',
+    pendingMessage: 'Pendiente de capturar datos FROTE',
+    editButtonLabel: 'Editar FROTE',
     allowImages: true,
   },
-  AATCC81: {
+  'VALOR PH': {
     title: 'AATCC 81 – Valor de pH',
-    routeSection: 'AATCC81',
-    startButtonLabel: 'Capturar AATCC 81',
-    pendingMessage: 'Pendiente de capturar datos AATCC 81',
-    editButtonLabel: 'Editar AATCC 81',
+    routeSection: 'VALOR PH',
+    startButtonLabel: 'Capturar VALOR PH',
+    pendingMessage: 'Pendiente de capturar datos VALOR PH',
+    editButtonLabel: 'Editar VALOR PH',
     allowImages: true,
   },
-  ASTMD2261: {
+  RASGADO: {
     title: 'ASTM D2261 – Resistencia a la rasgadura',
-    routeSection: 'ASTMD2261',
-    startButtonLabel: 'Capturar ASTM D2261',
-    pendingMessage: 'Pendiente de capturar datos ASTM D2261',
-    editButtonLabel: 'Editar ASTM D2261',
+    routeSection: 'RASGADO',
+    startButtonLabel: 'Capturar RASGADO',
+    pendingMessage: 'Pendiente de capturar datos RASGADO',
+    editButtonLabel: 'Editar RASGADO',
   },
-  AATCC61: {
+  LAVADO: {
     title: 'AATCC 61 – Solidez del color al lavado',
-    routeSection: 'AATCC61',
-    startButtonLabel: 'Capturar Evidencia AATCC 61',
-    pendingMessage: 'Pendiente de capturar evidencia fotográfica AATCC 61',
-    editButtonLabel: 'Editar Evidencia AATCC 61',
+    routeSection: 'LAVADO',
+    startButtonLabel: 'Capturar LAVADO',
+    pendingMessage: 'Pendiente de capturar datos LAVADO',
+    editButtonLabel: 'Editar LAVADO',
     allowImages: true,
     onlyImages: true,
   },
