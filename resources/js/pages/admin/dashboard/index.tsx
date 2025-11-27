@@ -4,28 +4,31 @@ import CardStats from "@/components/_admin/cards/CardStats";
 import RecentActivity from "@/components/_admin/cards/RecentActivity";
 import BarChart from "@/components/_admin/charts/BarChart";
 import LineChart from "@/components/_admin/charts/LineChart";
+import { Col, Row } from 'react-bootstrap';
 
 const IndexDashboard = ({ cards, barChart, lineChart, recentActivities }) => {
     return (
         <MainLayout>
             <PageTitle title="Dashboard" subTitle="CCP Textil Lab" />
-
-            {/* Grid 2x2 */}
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 mt-6">
-                <div className="col-span-3">
+            <Row>
+                <Col>
                     <CardStats cards={cards} />
-                </div>
-
-                <div>
-                    <RecentActivity activities={recentActivities} />
-                </div>
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <BarChart data={barChart} />
-                <LineChart data={lineChart} />
-            </div>
+                    <Row xxl={4}>
+                        <Col xxl={8}>
+                            <BarChart data={barChart} />
+                        </Col>
+                        <Col xxl={4}>
+                            <RecentActivity activities={recentActivities} />
+                        </Col>
+                    </Row>
+                    <Row>
+                        &nbsp;
+                        <Col xxl={12}>
+                            <LineChart data={lineChart} />
+                        </Col>
+                    </Row>
+                </Col>
+            </Row>
         </MainLayout>
     );
 };

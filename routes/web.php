@@ -23,7 +23,7 @@ require __DIR__ . '/auth.php';
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route::get('/', [DashboardController::class, 'sales'])->name('dashboard');
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/clinic', [DashboardController::class, 'clinic']);
     Route::get('/dashboard/wallet', [DashboardController::class, 'wallet']);
 

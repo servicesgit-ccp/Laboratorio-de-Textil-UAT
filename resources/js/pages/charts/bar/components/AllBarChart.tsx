@@ -18,7 +18,7 @@ const BasicBarChart = () => {
     return (
         <ComponentContainerCard title="Basic Bar Chart">
             <div dir="ltr">
-                <ReactApexChart height={380} options={basicBarChartOpts} series={basicBarChartOpts.series} type="bar" className="apex-charts" />
+                <ReactApexChart height={480} options={basicBarChartOpts} series={basicBarChartOpts.series} type="bar" className="apex-charts" />
             </div>
         </ComponentContainerCard>
     );

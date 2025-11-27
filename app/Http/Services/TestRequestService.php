@@ -133,7 +133,7 @@ class TestRequestService
             $this->sRecentActivity->registerActivity(
                 "Nueva solicitud creada",
                 "El usuario creó una nueva solicitud de pruebas",
-                "tabler:clipboard-plus"
+                "success"
             );
 
             return $testRequest;
@@ -215,7 +215,7 @@ class TestRequestService
             $this->sRecentActivity->registerActivity(
                 "Solicitud actualizada",
                 "El usuario actualizó la solicitud de pruebas #{$testRequest->number}",
-                "tabler:clipboard-check"
+                "primary"
             );
 
             return $testRequest->fresh(['test.results', 'style', 'style.provider', 'style.department']);
