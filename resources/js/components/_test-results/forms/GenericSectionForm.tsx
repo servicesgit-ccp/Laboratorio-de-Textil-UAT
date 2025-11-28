@@ -16,16 +16,25 @@ type SectionData = {
 
 type Props = {
   testId: number;
-  sectionName: SectionKey | string;   // ← por si en runtime llega algo fuera del union
+  sectionName: SectionKey | string;
   sectionData: SectionData;
 };
 
+type SavedImage = {
+  path: string;
+  uploaded_at: string;
+};
+
+type FormDataType = {
+  fields: Record<string, string>;
+  images: File[];
+  deleted_images: string[];
+};
+
 const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData }) => {
-  // Intentamos obtener la config
   const config = SECTION_CONFIG[sectionName as SectionKey];
   const safeSection = sectionData || {};
 
-  // Si no hay config, evitamos que truene y mostramos algo útil
   if (!config) {
     console.error('SECTION_CONFIG no encontrada para sectionName:', sectionName);
 
@@ -35,8 +44,6 @@ const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData 
           <h5 className="mb-3">Sección desconocida</h5>
           <p className="text-muted small mb-0">
             No se encontró configuración para la sección: <strong>{String(sectionName)}</strong>.
-            Revisa que el nombre que envías desde el backend coincida exactamente
-            con las llaves definidas en SECTION_CONFIG.
           </p>
         </Card.Body>
       </Card>
@@ -52,18 +59,24 @@ const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData 
     [safeSection],
   );
 
+  const handleDeleteSavedImage = (img: SavedImage) => {
+    const path = img.path;
+    if (!path) return;
+    if (data.deleted_images.includes(path)) return;
+
+    setData('deleted_images', [...data.deleted_images, path]);
+  };
+
   const initialData: Record<string, string> = {};
   fieldEntries.forEach(([key, field]) => {
     const f = field as Field;
     initialData[key] = f.value ?? '';
   });
 
-  const { data, setData, post, processing, errors } = useForm<{
-    fields: Record<string, string>;
-    images: File[];
-  }>({
+  const { data, setData, post, processing, errors } = useForm<FormDataType>({
     fields: initialData,
     images: [],
+    deleted_images: [],
   });
 
   const handleChange = (key: string, value: string) => {
@@ -83,10 +96,9 @@ const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData 
     post(
       route('test-results.section.update', {
         test: testId,
-        section: config.routeSection, // usa el valor del config
+        section: config.routeSection,
       }),
       {
-        preserveScroll: true,
         forceFormData: true,
       },
     );
@@ -100,14 +112,13 @@ const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData 
         <h5 className="mb-3">{config.title}</h5>
 
         <Form onSubmit={handleSubmit}>
-          {/* Campos numéricos / de texto */}
           {hasFields && (
             <Row className="g-3">
               {fieldEntries.map(([key, field]) => {
                 const f = field as Field;
 
                 return (
-                  <Col md={6} key={key}>
+                  <Col xs={6} sm={6} md={4} lg={3} key={key}>
                     <Form.Group controlId={`${sectionName}-${key}`}>
                       <Form.Label className="small">
                         {f.display_name}
@@ -130,7 +141,6 @@ const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData 
             </Row>
           )}
 
-          {/* Módulo de cámara / fotos (si aplica) */}
           {config.allowImages && (
             <>
               <hr className="my-4" />
@@ -146,6 +156,7 @@ const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData 
                 error={errors.images as string | null}
                 initialImages={safeSection.img ?? []}
                 onFilesChange={handleFilesChange}
+                onDeleteSavedImage={handleDeleteSavedImage}
               />
             </>
           )}

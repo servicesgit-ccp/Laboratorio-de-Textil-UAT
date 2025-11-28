@@ -16,7 +16,7 @@ type Props = {
 
 const TestResultInfoCard: React.FC<Props> = ({ data }) => {
   return (
-    <Card className="border-0 bg-body-tertiary rounded-4">
+    <Card className="border-3 bg-body-tertiary rounded-4">
       <Card.Body className="p-4">
         <Row className="gy-3">
           <Col md={3}>

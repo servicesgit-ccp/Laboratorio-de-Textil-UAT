@@ -114,9 +114,9 @@ const GenericSectionContent: React.FC<Props> = ({ sectionName, testId, data = {}
           {entries.length > 0 && (
             <div className="row g-3">
               {entries.map(([key, field]: any) => (
-                <div className="col-md-6" key={key}>
-                  <div className="text-muted small">{field.display_name}</div>
-                  <div className="fw-semibold">
+                <div className="col-xs-6 col-sm-6 col-md-4 col-lg-3" key={key}>
+                  <div className="fw-semibold">{field.display_name}</div>
+                  <div className="fw-bold text-success">
                     {field.value ?? '--'}
                   </div>
                 </div>

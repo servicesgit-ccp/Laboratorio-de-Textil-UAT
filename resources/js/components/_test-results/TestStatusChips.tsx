@@ -25,12 +25,12 @@ const TestStatusChips: React.FC<Props> = ({ results }) => {
         break;
 
       case 1:
-        badgeClass = 'bg-primary-subtle text-primary-emphasis border border-primary-subtle';
+        badgeClass = 'bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle';
         statusLabel = 'En Proceso';
         break;
 
       default:
-        badgeClass = 'bg-warning-subtle text-warning-emphasis border border-warning-subtle';
+        badgeClass = 'bg-warning-subtle text-warning-emphasis border border-primary-subtle';
         statusLabel = 'Pendiente';
         break;
     }
@@ -45,7 +45,7 @@ const TestStatusChips: React.FC<Props> = ({ results }) => {
   if (!sections.length) return null;
 
   return (
-    <Card className="border-0 bg-body-tertiary rounded-4 mt-3">
+    <Card className="border-3 bg-body-tertiary rounded-4 mt-3">
       <Card.Body className="p-3">
         <div className="mb-2 fw-semibold">Estado de Pruebas</div>
         <div className="d-flex flex-wrap gap-2">

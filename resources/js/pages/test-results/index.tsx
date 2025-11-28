@@ -39,7 +39,7 @@ const TestResultsPage = () => {
     }[];
   };
 
-  const { testResults, filters, stats } = usePage().props as {
+  const { testResults, filters, stats } = usePage().props as unknown as {
     testResults: Paginated<TestResult>;
     filters?: {
       q?: string;
@@ -168,7 +168,7 @@ const TestResultsPage = () => {
                     <IconifyIcon icon="tabler:search" className="me-2 text-muted fs-5" />
                     <input
                       type="search"
-                      className="form-control border-0 bg-transparent shadow-none"
+                      className="form-control border-0 bg-transparent"
                       placeholder="Buscar Muestra (folio)"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}

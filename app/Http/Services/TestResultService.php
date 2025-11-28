@@ -6,6 +6,7 @@ use App\Models\Test;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 
 class TestResultService
 {
@@ -42,8 +43,8 @@ class TestResultService
         }
 
         return $query->orderByDesc('created_at')
-                    ->paginate($perPage)
-                    ->withQueryString();
+            ->paginate($perPage)
+            ->withQueryString();
     }
 
     /**
@@ -61,8 +62,8 @@ class TestResultService
     {
         $userId = Auth::id();
         $tests = $this->mTest->whereHas('testRequest', function ($q) {
-                $q->where('status', 2);
-            })->with('results')->get();
+            $q->where('status', 2);
+        })->with('results')->get();
         $inAnalysis = $tests->count();
         $pending = 0;
         $inProcess = 0;
@@ -114,7 +115,7 @@ class TestResultService
         }
         $content = $result->content ?? [];
         if (!isset($content[$sectionKey])) {
-           return;
+            return;
         }
 
         $content[$sectionKey]['status']    = 1;
@@ -131,8 +132,13 @@ class TestResultService
         return $testResult->fresh(['testRequest.user', 'results']);
     }
 
-    public function updateSection(int $testId, string $sectionKey, array $fields)
-    {
+    public function updateSection(
+        int $testId,
+        string $sectionKey,
+        array $fields,
+        array $newImagePaths = [],
+        array $deletedImagePaths = []
+    ) {
         $testResult = $this->mTest
             ->with('results')
             ->findOrFail($testId);
@@ -157,9 +163,36 @@ class TestResultService
                 $content[$sectionKey][$key]['value'] = $value;
             }
         }
+
+        if (!isset($content[$sectionKey]['img']) || !is_array($content[$sectionKey]['img'])) {
+            $content[$sectionKey]['img'] = [];
+        }
+
+        if (!empty($deletedImagePaths)) {
+            $content[$sectionKey]['img'] = array_values(array_filter(
+                $content[$sectionKey]['img'],
+                function ($img) use ($deletedImagePaths) {
+                    return !in_array($img['path'] ?? '', $deletedImagePaths, true);
+                }
+            ));
+
+            foreach ($deletedImagePaths as $path) {
+                if ($path) {
+                    Storage::disk('public')->delete($path);
+                }
+            }
+        }
+
+        foreach ($newImagePaths as $path) {
+            $content[$sectionKey]['img'][] = [
+                'path'        => $path,
+                'uploaded_at' => now()->toISOString(),
+            ];
+        }
+
         if (isset($content[$sectionKey]['status'])) {
-            $content[$sectionKey]['status'] = 1;
-            $content[$sectionKey]['user_id'] = auth()->id();
+            $content[$sectionKey]['status']    = 1;
+            $content[$sectionKey]['user_id']   = auth()->id();
             $content[$sectionKey]['user_name'] = auth()->user()?->name;
         }
 
@@ -225,4 +258,3 @@ class TestResultService
         });
     }
 }
-

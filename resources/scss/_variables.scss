@@ -332,7 +332,7 @@ $primary-text-emphasis: shade-color($primary, 15%);
 $secondary-text-emphasis: shade-color($secondary, 15%);
 $success-text-emphasis: shade-color($success, 15%);
 $info-text-emphasis: shade-color($info, 15%);
-$warning-text-emphasis: shade-color($warning, 15%);
+$warning-text-emphasis: 'black';
 $danger-text-emphasis: shade-color($danger, 15%);
 $light-text-emphasis: $gray-600;
 $dark-text-emphasis: $gray-800;
@@ -343,7 +343,7 @@ $primary-bg-subtle: tint-color($primary, 85%);
 $secondary-bg-subtle: tint-color($secondary, 85%);
 $success-bg-subtle: tint-color($success, 85%);
 $info-bg-subtle: tint-color($info, 85%);
-$warning-bg-subtle: tint-color($warning, 85%);
+$warning-bg-subtle: tint-color($warning, 75%);
 $danger-bg-subtle: tint-color($danger, 85%);
 $light-bg-subtle: mix($gray-100, $white);
 $dark-bg-subtle: $gray-400;
@@ -437,7 +437,7 @@ $body-secondary-color: #9ba6b7; //#8e92ad
 $body-secondary-bg: $white;
 
 $body-tertiary-color: rgba($body-color, 0.8);
-$body-tertiary-bg: $gray-400;
+$body-tertiary-bg: $gray-200;
 $body-emphasis-color: rgba($body-color, 0.75);
 
 // Links

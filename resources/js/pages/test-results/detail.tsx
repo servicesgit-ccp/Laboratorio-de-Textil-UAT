@@ -7,19 +7,6 @@ import PageTitle from '@/components/PageTitle';
 import TestResultInfoCard from '@/components/_test-results/TestResultInfoCard';
 import TestStatusChips from '@/components/_test-results/TestStatusChips';
 import TestSectionTabs from '@/components/_test-results/TestSectionTabs';
-import InitialSectionContent from '@/components/_test-results/contents/InitialSectionContent';
-import AppearanceSectionContent from '@/components/_test-results/contents/AppearanceSectionContent';
-import DensidadSectionContent from '@/components/_test-results/contents/DensidadSectionContent';
-import Astmd5034SectionContent from '@/components/_test-results/contents/Astmd5034SectionContent';
-import AATCC150SectionContent from '@/components/_test-results/contents/AATCC150SectionContent';
-import AATCC135SectionContent from '@/components/_test-results/contents/AATCC135SectionContent';
-import AstmD3776SectionContent from '@/components/_test-results/contents/AstmD3776SectionContent';
-import AstmD3512SectionContent from '@/components/_test-results/contents/AstmD3512SectionContent';
-import AATCC179SectionContent from '@/components/_test-results/contents/Aatcc179SectionContent';
-import AATCC8SectionContent from '@/components/_test-results/contents/Aatcc8SectionContent';
-import AATCC81SectionContent from '@/components/_test-results/contents/Aatcc81SectionContent';
-import Astmd2261SectionContent from '@/components/_test-results/contents/Astmd2261SectionContent';
-import AATCC61SectionContent from '@/components/_test-results/contents/Aatcc61SectionContent';
 import GenericSectionContent from '@/components/_test-results/contents/GenericSectionContent';
 import { SectionKey } from '@/components/_test-results/sectionConfig';
 
@@ -35,7 +22,6 @@ const formatDate = (iso: string | null) => {
 const TestResultDetailPage: React.FC = () => {
   const testResult = usePage().props.testResult as any;
 
-  // Contar secciones con status
   let totalSectionsWithStatus = 0;
   let pendingSections = 0;
 
@@ -103,7 +89,7 @@ const TestResultDetailPage: React.FC = () => {
       <div className="mb-3 border-bottom pb-3">
         <div className="d-flex justify-content-between align-items-center">
           <p className="mb-0 text-muted">
-            Registra los resultados de las pruebas de laboratorio
+            Registra los resultados de las pruebas de laboratorion
           </p>
           <button
             type="button"

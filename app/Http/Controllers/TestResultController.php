@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 use App\Http\Services\TestResultService;
 use App\Models\Test;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class TestResultController extends Controller
 {
@@ -49,6 +52,15 @@ class TestResultController extends Controller
         $content    = $result?->content ?? [];
         $sectionData = $content[$section] ?? [];
 
+        $savedImages = [];
+        if (isset($sectionData['img']) && is_array($sectionData['img'])) {
+            $savedImages = collect($sectionData['img'])
+                ->pluck('url')
+                ->filter()
+                ->values()
+                ->all();
+        }
+
         return Inertia::render('test-results/section-form', [
             'test' => [
                 'id'           => $testResult->id,
@@ -57,6 +69,7 @@ class TestResultController extends Controller
                 'notes'        => $testResult->testRequest->notes,
                 'requested_by' => $testResult->testRequest->user->name,
             ],
+            'savedImages' => $savedImages,
             'sectionName' => $section,
             'sectionData' => $sectionData,
         ]);
@@ -67,12 +80,39 @@ class TestResultController extends Controller
         $validated = $request->validate([
             'fields'   => ['required', 'array'],
             'fields.*' => ['nullable', 'string'],
+            'images'   => ['sometimes', 'array'],
+            'images.*' => ['file', 'image', 'max:5120'],
+            'deleted_images' => ['sometimes', 'array'],
+            'deleted_images.*' => ['string'],
         ]);
+
+        $imagePaths = [];
+        $deletedImagePaths = $validated['deleted_images'] ?? [];
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $file) {
+                $sectionSlug = Str::slug($sectionKey);
+                $dir = "test-results/{$testId}/{$sectionSlug}";
+
+                $filename = Str::random(40) . '.jpg';
+                $path = "{$dir}/{$filename}";
+
+                $image = Image::read($file->getRealPath());
+                $image->scaleDown(1600);
+                $encoded = $image->encodeByMediaType('image/jpeg', 70);
+
+                Storage::disk('public')->put($path, (string) $encoded);
+
+                $imagePaths[] = $path;
+            }
+        }
 
         $this->sTestResult->updateSection(
             (int) $testId,
             (string) $sectionKey,
-            $validated['fields']
+            $validated['fields'],
+            $imagePaths,
+            $deletedImagePaths
         );
 
         return redirect()
@@ -100,7 +140,7 @@ class TestResultController extends Controller
             ->with('success', "La sección {$section} se marcó como terminada.");
     }
 
-     public function submitReview(int $id)
+    public function submitReview(int $id)
     {
         $this->sTestResult->submitReview($id);
         return back()->with('success', 'Enviado a revisión');
