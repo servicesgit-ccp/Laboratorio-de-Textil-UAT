@@ -37,7 +37,7 @@ class DashboardController extends Controller
         return Inertia::render('admin/dashboard/index', [
             'cards' => $this->dashboard->getCardStats(),
             'barChart' => $this->dashboard->getBarChartData(),
-            'lineChart' => $this->dashboard->getProductivityTrend(),
+            'lineChart' => $this->dashboard->getMonthlyTestsSummary(),
             'recentActivities' => $this->recentActivityService->getRecentActivities()
         ]);
     }

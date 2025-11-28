@@ -10,20 +10,20 @@ const CardStats = ({ cards }) => {
             title: "Total Pruebas",
             value: cards.total_tests,
             icon: "tabler:clipboard",
-            iconBgClass: "bg-primary-subtle",
+            iconBgClass: "bg-success-subtle",
         },
         {
-            key: 'providers',
-            title: "Total Proveedores",
-            value: cards.total_providers,
-            icon: "tabler:users-group",
-            iconBgClass: "bg-warning-subtle",
+            key: 'tests_month',
+            title: "Pruebas este Mes",
+            value: cards.tests_this_month,
+            icon: "tabler:calendar-month",
+            iconBgClass: "bg-secondary-subtle",
         },
         {
-            key: 'styles',
-            title: "Total Estilos",
-            value: cards.total_styles,
-            icon: "tabler:shirt",
+            key: 'tests_week',
+            title: "Pruebas esta Semana",
+            value: cards.tests_this_week,
+            icon: "tabler:calendar-week",
             iconBgClass: "bg-info-subtle",
         },
         {
@@ -31,7 +31,7 @@ const CardStats = ({ cards }) => {
             title: "Total Usuarios",
             value: cards.total_users,
             icon: "tabler:user",
-            iconBgClass: "bg-success-subtle",
+            iconBgClass: "bg-primary-subtle",
         },
     ];
 
@@ -42,7 +42,6 @@ const CardStats = ({ cards }) => {
                     <Card className="h-70 border-0 shadow-sm rounded-4">
                         <Card.Body className="d-flex flex-column justify-content-between p-3">
 
-                            {/* Header */}
                             <div className="d-flex justify-content-between align-items-start">
                                 <div className="me-1">
                                     <div className="fw-semibold fs-5">
@@ -61,11 +60,10 @@ const CardStats = ({ cards }) => {
                                 </div>
                             </div>
 
-                            {/* Valor */}
                             <div>
-                <span className="fw-bold fs-3">
-                  {card.value}
-                </span>
+                                <span className="fw-bold fs-3">
+                                    {card.value}
+                                </span>
                             </div>
 
                         </Card.Body>
