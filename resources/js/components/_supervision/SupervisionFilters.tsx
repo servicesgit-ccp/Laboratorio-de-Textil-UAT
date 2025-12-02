@@ -1,11 +1,10 @@
-// src/components/_test/TestRequestFilters.tsx
 
 import { Link, router } from "@inertiajs/react";
 import { CardHeader, Row, Col, Button } from "react-bootstrap";
 import CustomFlatpickr from "@/components/CustomFlatpickr";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 
-const TestRequestFilters = ({
+const SupervisionFilters = ({
     searchTerm,
     setSearchTerm,
     statusFilter,
@@ -17,7 +16,7 @@ const TestRequestFilters = ({
     const handleSearchKeyDown = (e) => {
         if (e.key === "Enter") {
             router.get(
-                route("test.request.index"),
+                route("supervision.index"),
                 {
                     ...filters,
                     q: searchTerm,
@@ -35,7 +34,7 @@ const TestRequestFilters = ({
         setStatusFilter(newStatus);
 
         router.get(
-            route("test.request.index"),
+            route("supervision.index"),
             {
                 ...filters,
                 q: searchTerm,
@@ -51,7 +50,7 @@ const TestRequestFilters = ({
         setDateRange(dateStr);
         console.log(dateStr);
         router.get(
-            route("test.request.index"),
+            route("supervision.index"),
             {
                 ...filters,
                 q: searchTerm,
@@ -65,14 +64,14 @@ const TestRequestFilters = ({
 
     const handleClearFilters = () => {
         setSearchTerm("");
-        setStatusFilter(5);
+        setStatusFilter(4);
         setDateRange("");
 
         router.get(
-            route("test.request.index"),
+            route("supervision.index"),
             {
                 q: "",
-                status: 4,
+                status: 5,
                 date_range: "",
                 per_page: filters?.per_page ?? 10,
                 page: 1,
@@ -85,7 +84,7 @@ const TestRequestFilters = ({
         <CardHeader className="border-bottom border-light">
             <Row className="g-2 align-items-end">
                 {/* 🔹 Search */}
-                <Col md={2}>
+                <Col md={4}>
                     <input
                         type="search"
                         className="form-control"
@@ -136,19 +135,9 @@ const TestRequestFilters = ({
                         <IconifyIcon icon="tabler:filter-off" />
                     </Button>
                 </Col>
-                <Col md={2} className="text-end">
-                    <Link href={route("test.request.create")}>
-                <Button variant="success" className="bg-gradient">
-                    <IconifyIcon icon="tabler:plus" className="me-1" /> Nueva solicitud
-                </Button>
-                </Link>
-                </Col>
-
-
-
             </Row>
         </CardHeader>
     );
 };
 
-export default TestRequestFilters;
+export default SupervisionFilters;

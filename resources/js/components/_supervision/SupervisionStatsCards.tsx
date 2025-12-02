@@ -2,46 +2,37 @@ import React from 'react';
 import { Row, Col, Card } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
-type TestRequestStatsCardProps = {
+type SupervisionStatsCardProps = {
     stats: {
         total: number;
-        total_variation: number;
-        in_progress: number;
-        in_progress_variation: number;
         pending_review: number;
-        pending_review_variation: number;
         approved: number;
-        approved_variation: number;
         rejected: number;
-        rejected_variation: number;
     };
 };
 
-const TestRequestStatsCard: React.FC<TestRequestStatsCardProps> = ({ stats }) => {
+const SupervisionStatsCards: React.FC<SupervisionStatsCardProps> = ({ stats }) => {
     const cards = [
         {
             key: "total",
-            title: "Total Solicitudes",
+            title: "Total Muestras",
             value: stats.total,
-            variation: stats.total_variation,
             icon: "tabler:clipboard",
-            iconBgClass: "bg-primary-subtle",
-            color: "primary",
+            iconBgClass: "bg-info-subtle",
+            color: "info",
         },
         {
             key: "pending_review",
-            title: "Revisón pendiente",
+            title: "Pendientes en Revisión",
             value: stats.pending_review,
-            variation: stats.pending_review_variation,
-            icon: "tabler:send",
-            iconBgClass: "bg-info-subtle",
-            color: "info",
+            icon: "tabler:clock",
+            iconBgClass: "bg-warning-subtle",
+            color: "warning",
         },
         {
             key: "approved",
             title: "Aprobadas",
             value: stats.approved,
-            variation: stats.approved_variation,
             icon: "tabler:circle-check",
             iconBgClass: "bg-success-subtle",
             color: "success",
@@ -50,7 +41,6 @@ const TestRequestStatsCard: React.FC<TestRequestStatsCardProps> = ({ stats }) =>
             key: "rejected",
             title: "Rechazadas",
             value: stats.rejected,
-            variation: stats.rejected_variation,
             icon: "tabler:circle-x",
             iconBgClass: "bg-danger-subtle",
             color: "danger",
@@ -67,9 +57,7 @@ const TestRequestStatsCard: React.FC<TestRequestStatsCardProps> = ({ stats }) =>
                             {/* Header */}
                             <div className="d-flex justify-content-between align-items-start">
                                 <div className="me-1">
-                                    <div className="fw-semibold fs-5">
-                                        {card.title}
-                                    </div>
+                                    <div className="fw-semibold fs-5">{card.title}</div>
                                 </div>
 
                                 <div
@@ -80,19 +68,10 @@ const TestRequestStatsCard: React.FC<TestRequestStatsCardProps> = ({ stats }) =>
                                 </div>
                             </div>
 
-                            {/* Value + variation */}
+                            {/* Value */}
                             <div className="mt-3">
                                 <span className="fw-bold fs-3">{card.value}</span>
-
-                                <div className={`fw-semibold mt-1 text-${card.variation >= 0 ? "success" : "danger"}`}>
-                                    <IconifyIcon
-                                        icon={card.variation >= 0 ? "tabler:trending-up" : "tabler:trending-down"}
-                                        className="me-1"
-                                    />
-                                    {card.variation}%
-                                </div>
                             </div>
-
                         </Card.Body>
                     </Card>
                 </Col>
@@ -101,4 +80,4 @@ const TestRequestStatsCard: React.FC<TestRequestStatsCardProps> = ({ stats }) =>
     );
 };
 
-export default TestRequestStatsCard;
+export default SupervisionStatsCards;

@@ -50,7 +50,7 @@ class TestRequestService
             });
         }
 
-        if ($status !== null && $status !== '' && (int) $status !== 4) {
+        if ($status !== null && $status !== '' && (int) $status !== 5) {
             $query->where('status', (int) $status);
         }
 
@@ -90,7 +90,7 @@ class TestRequestService
                 'user_id' => auth()->user()->id,
                 'style_id' => $data['style_id'] ?? null,
                 'item' =>  $data['item'],
-                'status' => 0,
+                'status' => $this->mTestRequest::STATUS['CREATED'],
                 'number' => $this->generateTestNumber(),
                 'notes' => $data['notes']
             ]);
@@ -242,9 +242,10 @@ class TestRequestService
 
         // Conteo actual
         $total = $this->mTestRequest->count();
-        $pending = $this->mTestRequest->where('status', 0)->count();
-        $send = $this->mTestRequest->where('status', 2)->count();
-        $finished = $this->mTestRequest->where('status', 1)->count();
+        $inProgress = $this->mTestRequest->where('status', $this->mTestRequest::STATUS['IN_PROGRESS'])->count();
+        $pendingReview = $this->mTestRequest->where('status', $this->mTestRequest::STATUS['PENDING_REVIEW'])->count();
+        $approved = $this->mTestRequest->where('status', $this->mTestRequest::STATUS['APPROVED'])->count();
+        $rejected = $this->mTestRequest->where('status', $this->mTestRequest::STATUS['REJECTED'])->count();
 
         // Mes pasado
         $lastMonth = $now->copy()->subMonth();
@@ -271,15 +272,17 @@ class TestRequestService
 
         return [
             'total' => $total,
-            'pending' => $pending,
-            'send' => $send,
-            'finished' => $finished,
+            'in_progress' => $inProgress,
+            'pending_review' => $pendingReview,
+            'approved' => $approved,
+            'rejected' => $rejected,
 
             // Variaciones
             'total_variation' => $this->variationCalc($totalLastMonth, $total),
-            'pending_variation' => $this->variationCalc($pendingLastWeek, $pending),
-            'send_variation' => $this->variationCalc($totalLastMonth, $send),
-            'finished_variation' => $this->variationCalc($finishedLastMonth, $finished),
+            'in_progress_variation' => $this->variationCalc($pendingLastWeek, $inProgress),
+            'pending_review_variation' => $this->variationCalc($totalLastMonth, $pendingReview),
+            'approved_variation' => $this->variationCalc($finishedLastMonth, $approved),
+            'rejected_variation' => $this->variationCalc($finishedLastMonth, $rejected),
         ];
     }
 
@@ -291,8 +294,8 @@ class TestRequestService
 
     public function sendTest($id)
     {
-        $test = TestRequest::findOrFail($id);
-        $test->status = 2;
+        $test = $this->mTestRequest->findOrFail($id);
+        $test->status = $this->mTestRequest::STATUS['IN_PROGRESS'];
         $test->save();
     }
 }
