@@ -5,14 +5,14 @@ import { Card, CardFooter, Col, Row } from "react-bootstrap";
 import PageTitle from "@/components/PageTitle";
 import MainLayout from "@/layouts/MainLayout";
 
-import TestRequestStatsCards from "@/components/_test/TestRequestStatsCard";
-import TestRequestTable from "@/components/_test/TestRequestTable";
-import TestRequestFilters from "@/components/_test/TestRequestFilters";
 import SupervisionStatsCards from "@/components/_supervision/SupervisionStatsCards";
+import SupervisionTable from "@/components/_supervision/SupervisionTable";
+import SupervisionFilters from "@/components/_supervision/SupervisionFilters";
+import TestResultsSummary from "@/components/_test-results/TestResultsSummary";
 
-const TestRequestIndex = () => {
-    const { test_requests, stats, filters } = usePage().props as unknown as {
-        test_requests: any;
+const SupervisionIndex = () => {
+    const { tests, stats, filters } = usePage().props as unknown as {
+        tests: any;
         stats: any;
         filters: { q?: string; per_page?: number; status?: number; date_range?: string };
     };
@@ -24,32 +24,33 @@ const TestRequestIndex = () => {
     return (
         <MainLayout>
             <PageTitle
-                title="Solicitudes de Análisis"
-                subTitle="Solicitudes de Pruebas Textiles"
+                title="Supervisión de Muestras"
+                subTitle="Supervisión"
             />
 
             <div className="mt-3">
                 <p className="mb-0 text-muted">
-                    Gestiona las solicitudes creadas y enviadas a análisis
+                    Revisa y aprueba los resultados de análisis completados.
                 </p>
                 <br />
-                <TestRequestStatsCards stats={stats} />
+                <SupervisionStatsCards stats={stats} />
             </div>
+
 
             <Row>
                 <Col xs={12}>
                     <Card>
-                        <TestRequestFilters
+                        <SupervisionFilters
                             searchTerm={searchTerm}
                             setSearchTerm={setSearchTerm}
                             statusFilter={statusFilter}
                             setStatusFilter={setStatusFilter}
-                            dateRange={dateRange}          // 🔹 nuevo
-                            setDateRange={setDateRange}    // 🔹 nuevo
+                            dateRange={dateRange}
+                            setDateRange={setDateRange}
                             filters={filters}
                         />
 
-                        <TestRequestTable test_requests={test_requests} test_results={undefined} />
+                        <SupervisionTable test_requests={tests} test_results={undefined} />
 
                         <CardFooter>
                             <div className="d-flex align-items-center justify-content-between gap-3">
@@ -60,13 +61,13 @@ const TestRequestIndex = () => {
                                         value={filters?.per_page ?? 10}
                                         onChange={(e) =>
                                             router.get(
-                                                route("test.request.index"),
+                                                route("supervision.index"),
                                                 {
                                                     ...filters,
                                                     per_page: e.target.value,
                                                     q: searchTerm,
                                                     status: statusFilter,
-                                                    date_range: dateRange, // 🔹 mantener el rango
+                                                    date_range: dateRange,
                                                     page: 1,
                                                 },
                                                 { preserveState: true, preserveScroll: true }
@@ -84,7 +85,7 @@ const TestRequestIndex = () => {
                                 </div>
 
                                 <ul className="pagination mb-0">
-                                    {test_requests?.links?.map((link: any, i: number) => {
+                                    {tests?.links?.map((link: any, i: number) => {
                                         let label = link.label;
                                         if (label.includes("Previous")) label = "&laquo;";
                                         if (label.includes("Next")) label = "&raquo;";
@@ -123,4 +124,4 @@ const TestRequestIndex = () => {
     );
 };
 
-export default TestRequestIndex;
+export default SupervisionIndex;

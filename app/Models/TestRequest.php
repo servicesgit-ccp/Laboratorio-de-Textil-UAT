@@ -18,6 +18,15 @@ class TestRequest extends Model
         'notes'
     ];
 
+    public const STATUS = [
+        'CREATED' => 0,
+        'IN_PROGRESS' => 1,
+        'PENDING_REVIEW' => 2,
+        'APPROVED'    => 3,
+        'REJECTED' => 4,
+        'ALL'  => 5,
+    ];
+
     public function test()
     {
         return $this->hasMany(Test::class);

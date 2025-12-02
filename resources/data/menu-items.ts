@@ -50,10 +50,10 @@ export const MENU_ITEMS: MenuItemType[] = [
         url: '/test-results',
     },
     {
-        key: 'samples',
-        label: 'Muestras',
+        key: 'supervision',
+        label: 'Supervisión de Muestras',
         icon: 'tabler:test-pipe',
-        url: '/samples',
+        url: '/supervision',
     },
     {
         key: 'clients',

@@ -105,9 +105,9 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                         <th>Proveedor</th>
                         <th>Pruebas</th>
                         <th>Status</th>
-                        <th className="text-center" style={{ width: 160 }}>
+                        {/*<th className="text-center" style={{ width: 160 }}>
                             Acción
-                        </th>
+                        </th> */}
                     </tr>
                 </thead>
                 <tbody>
@@ -157,9 +157,8 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
 
                                         <td>{getStatusBadge(item.status)}</td>
 
-                                        <td className="pe-3 text-center">
+                                        {/* <td className="pe-3 text-center">
                                             <div className="hstack gap-1 justify-content-center">
-                                                {/* Botón modal resumen (enviar/cancelar) */}
                                                 <OverlayTrigger
                                                     placement="top"
                                                     overlay={renderTooltip(
@@ -180,7 +179,6 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                                     </Button>
                                                 </OverlayTrigger>
 
-                                                {/* Ver detalle */}
                                                 <OverlayTrigger
                                                     placement="top"
                                                     overlay={renderTooltip(
@@ -202,7 +200,6 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                                     </Link>
                                                 </OverlayTrigger>
 
-                                                {/* Editar */}
                                                 <OverlayTrigger
                                                     placement="top"
                                                     overlay={renderTooltip(
@@ -224,7 +221,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                                     </Link>
                                                 </OverlayTrigger>
                                             </div>
-                                        </td>
+                                        </td>*/}
                                     </tr>
 
                                     <tr>
@@ -269,6 +266,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
             </table>
 
             {/* MODAL RESUMEN */}
+            {/*
             {selectedRequest && (
                 <Modal show={showModal} onHide={handleCloseModal} centered>
                     <Modal.Header closeButton>
@@ -340,6 +338,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                     </Modal.Footer>
                 </Modal>
             )}
+            */}
         </>
     );
 };
