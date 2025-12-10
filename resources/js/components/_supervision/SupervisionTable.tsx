@@ -38,20 +38,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
         if (!selectedRequest) return;
 
         router.post(
-            route('test.request.send', selectedRequest.id),
-            {},
-            {
-                onFinish: () => setShowModal(false),
-                preserveScroll: true,
-            }
-        );
-    };
-
-    const handleCancelRequest = () => {
-        if (!selectedRequest) return;
-
-        router.post(
-            route('test.request.cancel', selectedRequest.id),
+            route('supervision.send', selectedRequest.id),
             {},
             {
                 onFinish: () => setShowModal(false),
@@ -70,9 +57,27 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
             case 2:
                 return <Badge bg="warning">Revisión pendiente</Badge>;
             case 3:
-                return <Badge bg="success">Aprobado</Badge>;
+                return <Badge bg="info">Revisión completada</Badge>;
             case 4:
+                return <Badge bg="success">Aprobado</Badge>;
+            case 5:
                 return <Badge bg="danger">Rechazado</Badge>;
+            default:
+                return (
+                    <Badge bg="light" text="dark">
+                        Desconocido
+                    </Badge>
+                );
+        }
+    };
+
+    const getCommitteeBadge = (in_committee: number | string) => {
+        const ic = Number(in_committee);
+        switch (ic) {
+            case 0:
+                return <Badge bg="danger">No enviado</Badge>;
+            case 1:
+                return <Badge bg="success">Enviado</Badge>;
             default:
                 return (
                     <Badge bg="light" text="dark">
@@ -94,8 +99,9 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
 
     return (
         <>
-            <table className="table table-nowrap mb-0 align-middle">
-                <thead className="bg-light-subtle">
+            <div className="table-responsive mt-3">
+                <table className="table table-nowrap mb-0">
+                    <thead className="bg-light-subtle">
                     <tr>
                         <th>Folio</th>
                         <th>Fecha Ingreso</th>
@@ -103,14 +109,15 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                         <th>SKU</th>
                         <th>Descripción</th>
                         <th>Proveedor</th>
-                        <th>Pruebas</th>
+                        <th>Pruebas Completadas</th>
                         <th>Status</th>
-                        {/*<th className="text-center" style={{ width: 160 }}>
-                            Acción
-                        </th> */}
+                        <th>Comité</th>
+                        <th className="text-center" style={{ width: 160 }}>
+                            Acciones
+                        </th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {test_requests?.data?.length ? (
                         test_requests.data.map((item: any, idx: number) => {
                             const rowId = item.id ?? idx;
@@ -125,16 +132,16 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                         <td>
                                             {item.created_at
                                                 ? new Date(
-                                                      item.created_at
-                                                  ).toLocaleString()
+                                                    item.created_at
+                                                ).toLocaleString()
                                                 : 'Sin fecha'}
                                         </td>
 
                                         <td>
                                             {item.test?.[0]?.finished_at
                                                 ? new Date(
-                                                      item.test[0].finished_at
-                                                  ).toLocaleString()
+                                                    item.test[0].finished_at
+                                                ).toLocaleString()
                                                 : 'Sin fecha'}
                                         </td>
 
@@ -147,37 +154,34 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                         <td>{item.style?.description ?? 'S/N'}</td>
                                         <td>{item.style?.provider?.name ?? 'S/N'}</td>
 
-                                        <td>
-                                            {item.test?.[0]?.results?.[0]?.content
-                                                ? Object.keys(
-                                                      item.test[0].results[0].content
-                                                  ).length
-                                                : 0}
-                                        </td>
-
+                                        <td>{item.completed_tests}/{item.total_tests}</td>
                                         <td>{getStatusBadge(item.status)}</td>
+                                        <td>{getCommitteeBadge(item.in_committee)}</td>
 
-                                        {/* <td className="pe-3 text-center">
+                                        <td className="pe-3 text-center">
                                             <div className="hstack gap-1 justify-content-center">
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    overlay={renderTooltip(
-                                                        `tooltip-summary-${rowId}`,
-                                                        'Ver resumen / acciones'
-                                                    )}
-                                                >
-                                                    <Button
-                                                        variant="soft-success"
-                                                        size="sm"
-                                                        className="btn-icon rounded-circle"
-                                                        onClick={() => handleOpenModal(item)}
+                                                {(item.status == 3 || item.status == 4 || item.status == 5 ) && (
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={renderTooltip(
+                                                            `tooltip-send-${rowId}`,
+                                                            'Enviar solicitud a comité'
+                                                        )}
                                                     >
-                                                        <IconifyIcon
-                                                            icon="tabler:send"
-                                                            className="fs-16"
-                                                        />
-                                                    </Button>
-                                                </OverlayTrigger>
+                                                        <Button
+                                                            variant={item.in_committee == 0 ? "soft-success" : "primary"}
+                                                            size="sm"
+                                                            disabled={item.in_committee == 1}
+                                                            className="btn-icon rounded-circle"
+                                                            onClick={() => handleOpenModal(item)}
+                                                        >
+                                                            <IconifyIcon
+                                                                icon="tabler:send"
+                                                                className="fs-16"
+                                                            />
+                                                        </Button>
+                                                    </OverlayTrigger>
+                                                )}
 
                                                 <OverlayTrigger
                                                     placement="top"
@@ -186,7 +190,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                                         'Ver detalle'
                                                     )}
                                                 >
-                                                    <Link href={route('test.request.show', item.id)}>
+                                                    <Link href={route('supervision.show', item.id)}>
                                                         <Button
                                                             variant="soft-secondary"
                                                             size="sm"
@@ -200,28 +204,8 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                                     </Link>
                                                 </OverlayTrigger>
 
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    overlay={renderTooltip(
-                                                        `tooltip-edit-${rowId}`,
-                                                        'Editar solicitud'
-                                                    )}
-                                                >
-                                                    <Link href={route('test.request.edit', item.id)}>
-                                                        <Button
-                                                            variant="soft-warning"
-                                                            size="sm"
-                                                            className="btn-icon rounded-circle"
-                                                        >
-                                                            <IconifyIcon
-                                                                icon="tabler:edit"
-                                                                className="fs-16"
-                                                            />
-                                                        </Button>
-                                                    </Link>
-                                                </OverlayTrigger>
                                             </div>
-                                        </td>*/}
+                                        </td>
                                     </tr>
 
                                     <tr>
@@ -231,16 +215,16 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                                     {contentKeys.length > 0 ? (
                                                         <table className="table table-sm mb-0 mt-2">
                                                             <thead>
-                                                                <tr>
-                                                                    <th>Pruebas solicitadas</th>
-                                                                </tr>
+                                                            <tr>
+                                                                <th>Pruebas solicitadas</th>
+                                                            </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {contentKeys.map((key) => (
-                                                                    <tr key={key}>
-                                                                        <td>{key}</td>
-                                                                    </tr>
-                                                                ))}
+                                                            {contentKeys.map((key) => (
+                                                                <tr key={key}>
+                                                                    <td>{key}</td>
+                                                                </tr>
+                                                            ))}
                                                             </tbody>
                                                         </table>
                                                     ) : (
@@ -262,68 +246,34 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                             </td>
                         </tr>
                     )}
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+
+            </div>
 
             {/* MODAL RESUMEN */}
-            {/*
             {selectedRequest && (
                 <Modal show={showModal} onHide={handleCloseModal} centered>
                     <Modal.Header closeButton>
                         <Modal.Title>
-                            Solicitud #{selectedRequest.number ?? selectedRequest.id}
+                            Enviar a Comité de Análisis
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <div className="mb-2">
-                            <strong>SKU / Estilo:</strong>{' '}
-                            {selectedRequest.style?.number ?? selectedRequest.item}
-                        </div>
-                        <div className="mb-2">
-                            <strong>Descripción:</strong>{' '}
-                            {selectedRequest.style?.description ?? 'S/N'}
-                        </div>
-                        <div className="mb-2">
-                            <strong>Proveedor:</strong>{' '}
-                            {selectedRequest.style?.provider?.name ?? 'S/N'}
-                        </div>
-                        <div className="mb-2">
-                            <strong>Status:</strong> {getStatusBadge(selectedRequest.status)}
-                        </div>
-                        <div className="mb-2">
-                            <strong>Notas:</strong>{' '}
-                            {selectedRequest.notes || (
-                                <span className="text-muted">Sin notas</span>
-                            )}
-                        </div>
-
-                        <hr />
-
-                        <div>
-                            <strong>Pruebas solicitadas:</strong>
-                            {modalContentKeys.length > 0 ? (
-                                <ul className="mt-2 mb-0">
-                                    {modalContentKeys.map((name: string) => (
-                                        <li key={name}>{name}</li>
-                                    ))}
-                                </ul>
-                            ) : (
-                                <div className="mt-2 text-muted">
-                                    Sin pruebas registradas
-                                </div>
-                            )}
+                            ¿Está seguro que desea enviar la muestra <strong> #{selectedRequest.number} </strong> al Comité de Análisis? Esta acción moverá la muestra al módulo de Comité para su evaluación final.
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
                         <Button
                             variant="soft-danger"
-                            onClick={handleCancelRequest}
+                            onClick={handleCloseModal}
                         >
                             <IconifyIcon
                                 icon="tabler:x"
                                 className="me-1"
                             />
-                            Cancelar solicitud
+                            Cerrar
                         </Button>
                         <Button
                             variant="soft-success"
@@ -333,12 +283,11 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                                 icon="tabler:send"
                                 className="me-1"
                             />
-                            Enviar solicitud
+                            Enviar a comité
                         </Button>
                     </Modal.Footer>
                 </Modal>
             )}
-            */}
         </>
     );
 };

@@ -3,6 +3,7 @@
 namespace App\Http\Services;
 
 use App\Models\Test;
+use App\Models\TestRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -11,10 +12,12 @@ use Illuminate\Support\Facades\Storage;
 class TestResultService
 {
     protected $mTest;
+    protected $mTestRequest;
 
     public function __construct()
     {
         $this->mTest = new Test();
+        $this->mTestRequest = new TestRequest();
     }
 
     /**
@@ -25,11 +28,11 @@ class TestResultService
         $perPage = $request->input('per_page', 10);
         $query = $this->mTest
             ->whereHas('testRequest', function ($q) {
-                $q->where('status', 2);
+                $q->where('status', $this->mTestRequest::STATUS['IN_PROGRESS']);
             })
             ->with([
                 'testRequest' => function ($q) {
-                    $q->where('status', 2);
+                    $q->where('status', $this->mTestRequest::STATUS['IN_PROGRESS']);
                 },
                 'testRequest.user',
                 'results'
@@ -253,7 +256,7 @@ class TestResultService
             if (! $test->testRequest) {
                 throw new ModelNotFoundException("TestRequest no encontrado para el Test {$testId}.");
             }
-            $test->testRequest->status = 3; //PENDIENTE
+            $test->testRequest->status = $this->mTestRequest::STATUS['PENDING_REVIEW']; //PENDIENTE
             $test->testRequest->save();
         });
     }

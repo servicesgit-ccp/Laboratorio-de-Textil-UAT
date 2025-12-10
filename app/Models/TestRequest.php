@@ -19,16 +19,18 @@ class TestRequest extends Model
         'new_image',
         'is_development',
         'is_informative',
-        'assignated_to'
+        'assignated_to',
+        'cancelation_notes'
     ];
 
     public const STATUS = [
         'CREATED' => 0,
         'IN_PROGRESS' => 1,
         'PENDING_REVIEW' => 2,
-        'APPROVED'    => 3,
-        'REJECTED' => 4,
-        'ALL'  => 5,
+        'COMPLETED_REVIEW' => 3,
+        'APPROVED'    => 4,
+        'REJECTED' => 5,
+        'ALL'  => 6,
     ];
 
     protected $appends = ['image'];

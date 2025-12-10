@@ -64,14 +64,14 @@ const SupervisionFilters = ({
 
     const handleClearFilters = () => {
         setSearchTerm("");
-        setStatusFilter(4);
+        setStatusFilter(6);
         setDateRange("");
 
         router.get(
             route("supervision.index"),
             {
                 q: "",
-                status: 5,
+                status: 6,
                 date_range: "",
                 per_page: filters?.per_page ?? 10,
                 page: 1,
@@ -117,9 +117,10 @@ const SupervisionFilters = ({
                         value={statusFilter}
                         onChange={handleStatusChange}
                     >
-                        <option value={5}>Todos</option>
+                        <option value={6}>Todos</option>
                         <option value={1}>En progreso</option>
-                        <option value={2}>En revisión</option>
+                        <option value={2}>Revisión pendiente</option>
+                        <option value={2}>Revision completada</option>
                         <option value={3}>Aprobado</option>
                         <option value={4}>Rechazado</option>
                     </select>

@@ -75,7 +75,7 @@ const GenericSectionContent: React.FC<Props> = ({ sectionName, testId, data = {}
   }
 
   const entries = Object.entries(data).filter(
-    ([key]) => !['img', 'status', 'user_id', 'user_name'].includes(key),
+    ([key]) => !['img', 'status', 'user_id', 'user_name', 'approved'].includes(key),
   );
 
   return (

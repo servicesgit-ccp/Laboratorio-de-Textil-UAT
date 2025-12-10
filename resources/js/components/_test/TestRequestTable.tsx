@@ -22,7 +22,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
     const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
     const [imageLoadError, setImageLoadError] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
-    const [assignatedTo, setAssignatedTo] = useState<number | null>(analysts[0].id);
+    const [assignatedTo, setAssignatedTo] = useState<number | null>(analysts[0]?.id);
 
     const toggleRow = (rowId: number) => {
         setOpenRowId((prev) => (prev === rowId ? null : rowId));
@@ -85,8 +85,10 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
             case 2:
                 return <Badge bg="warning">Revisión pendiente</Badge>;
             case 3:
-                return <Badge bg="success">Aprobado</Badge>;
+                return <Badge bg="info">Revisión completada</Badge>;
             case 4:
+                return <Badge bg="success">Aprobado</Badge>;
+            case 5:
                 return <Badge bg="danger">Rechazado</Badge>;
             default:
                 return (
@@ -193,8 +195,9 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
                                                     )}
                                                 >
                                                     <Button
-                                                        variant="soft-success"
+                                                        variant={item.status == 0 ? "soft-success" : "primary"}
                                                         size="sm"
+                                                        disabled={item.status != 0}
                                                         className="btn-icon rounded-circle"
                                                         onClick={() => handleOpenModal(item)}
                                                     >

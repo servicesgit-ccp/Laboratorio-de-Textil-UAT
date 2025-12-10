@@ -65,14 +65,14 @@ const TestRequestFilters = ({
 
     const handleClearFilters = () => {
         setSearchTerm("");
-        setStatusFilter(5);
+        setStatusFilter(6);
         setDateRange("");
 
         router.get(
             route("test.request.index"),
             {
                 q: "",
-                status: 4,
+                status: 6,
                 date_range: "",
                 per_page: filters?.per_page ?? 10,
                 page: 1,
@@ -118,11 +118,12 @@ const TestRequestFilters = ({
                         value={statusFilter}
                         onChange={handleStatusChange}
                     >
-                        <option value={5}>Todos</option>
+                        <option value={6}>Todos</option>
                         <option value={1}>En progreso</option>
-                        <option value={2}>En revisión</option>
-                        <option value={3}>Aprobado</option>
-                        <option value={4}>Rechazado</option>
+                        <option value={2}>Revisión pendiente</option>
+                        <option value={3}>Revisión completada</option>
+                        <option value={4}>Aprobado</option>
+                        <option value={5}>Rechazado</option>
                     </select>
                 </Col>
 

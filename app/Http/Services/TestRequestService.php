@@ -53,7 +53,7 @@ class TestRequestService
             });
         }
 
-        if ($status !== null && $status !== '' && (int) $status !== 5) {
+        if ($status !== null && $status !== '' && (int) $status !== $this->mTestRequest::STATUS['ALL']) {
             $query->where('status', (int) $status);
         }
 
@@ -142,6 +142,8 @@ class TestRequestService
                 $content[$groupKey]['img'] = [];
                 $content[$groupKey]['status'] = 0;
                 $content[$groupKey]['user_id'] = null;
+                $content[$groupKey]['approved'] = null;
+
             }
 
             $this->mTestResult->create([

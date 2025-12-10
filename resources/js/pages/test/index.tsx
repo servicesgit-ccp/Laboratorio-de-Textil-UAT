@@ -8,7 +8,6 @@ import MainLayout from "@/layouts/MainLayout";
 import TestRequestStatsCards from "@/components/_test/TestRequestStatsCard";
 import TestRequestTable from "@/components/_test/TestRequestTable";
 import TestRequestFilters from "@/components/_test/TestRequestFilters";
-import SupervisionStatsCards from "@/components/_supervision/SupervisionStatsCards";
 
 const TestRequestIndex = () => {
     const { test_requests, stats, filters, analysts } = usePage().props as unknown as {
@@ -19,7 +18,7 @@ const TestRequestIndex = () => {
     };
 
     const [searchTerm, setSearchTerm] = useState(filters?.q ?? "");
-    const [statusFilter, setStatusFilter] = useState(filters?.status ?? 5);
+    const [statusFilter, setStatusFilter] = useState(filters?.status ?? 6);
     const [dateRange, setDateRange] = useState(filters?.date_range ?? "");
 
     return (
