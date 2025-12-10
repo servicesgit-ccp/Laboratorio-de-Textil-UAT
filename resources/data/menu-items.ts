@@ -56,6 +56,12 @@ export const MENU_ITEMS: MenuItemType[] = [
         url: '/supervision',
     },
     {
+        key: 'committee',
+        label: ' Comité de Análisis',
+        icon: 'tabler:users-minus',
+        url: '/committee',
+    },
+    {
         key: 'clients',
         label: 'Clientes',
         icon: 'tabler:users',
