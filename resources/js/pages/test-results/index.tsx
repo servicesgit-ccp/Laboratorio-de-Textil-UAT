@@ -9,6 +9,7 @@ import MainLayout from '@/layouts/MainLayout';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import TestResultsSummary from '@/components/_test-results/TestResultsSummary';
 import ConfirmModal from '@/components/_general/ConfirmModal';
+import TestResultsTable from "@/components/_test-results/TestResultsTable";
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';

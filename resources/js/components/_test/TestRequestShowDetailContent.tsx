@@ -40,7 +40,7 @@ const TestRequestShowDetailContent: React.FC<TestResultContentProps> = ({ result
                         {groupKeys.map((group) => {
                             const groupData = content[group];
                             const entries = Object.entries(groupData || {}).filter(
-                                ([key]) => key !== 'img' && key !== 'status' && key !== 'user_id' && key !== 'user_name'
+                                ([key]) => key !== 'img' && key !== 'status' && key !== 'approved' && key !== 'user_id' && key !== 'user_name'
                             );
 
                             return (
@@ -67,10 +67,10 @@ const TestRequestShowDetailContent: React.FC<TestResultContentProps> = ({ result
                                                 {entries.map(([termId, termData]: any) => (
                                                     <tr key={termId}>
                                                         <td>{termId}</td>
-                                                        <td>{termData.display_name}</td>
+                                                        <td>{termData?.display_name ?? ''}</td>
                                                         <td>
-                                                            {termData.value !== null
-                                                                ? termData.value
+                                                            {termData?.value !== null
+                                                                ? termData?.value
                                                                 : (
                                                                     <Badge bg="secondary">
                                                                         Sin valor

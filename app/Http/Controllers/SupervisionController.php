@@ -39,4 +39,50 @@ class SupervisionController
             ],
         ]);
     }
+
+    public function sendTestToCommittee($id)
+    {
+        $this->sSupervision->sendToCommittee($id);
+        return redirect()->route('supervision.index')->with('success', 'Solicitud enviada a comité correctamente.');
+    }
+
+    public function showTest($id)
+    {
+        $test = $this->sSupervision->getTestById($id);
+        return Inertia::render('supervision/show', [
+            'testRequest' => $test
+        ]);
+    }
+
+    public function rejectTest(Request $request)
+    {
+
+        $this->sSupervision->rejectTest($request);
+        return redirect()->route('supervision.show', $request->test_id)
+            ->with('danger', 'Test rechazado');
+    }
+
+    public function approveTest(Request $request)
+    {
+        $this->sSupervision->approveTest($request);
+
+        return redirect()->route('supervision.show', $request->test_id)
+            ->with('success', 'Test aprobado correctamente.');
+    }
+
+    public function rejectTestRequest(Request $request)
+    {
+
+        $this->sSupervision->rejectTestRequest($request);
+        return redirect()->route('supervision.index')
+            ->with('danger', 'Solicitud de muestra rechazado');
+    }
+
+    public function approveTestRequest(Request $request)
+    {
+        $this->sSupervision->approveTestRequest($request);
+
+        return redirect()->route('supervision.index')
+            ->with('success', 'Solicitud de muestra aprobada correctamente.');
+    }
 }
