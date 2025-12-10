@@ -11,15 +11,16 @@ import TestRequestFilters from "@/components/_test/TestRequestFilters";
 import SupervisionStatsCards from "@/components/_supervision/SupervisionStatsCards";
 
 const TestRequestIndex = () => {
-    const { test_requests, stats, filters } = usePage().props as unknown as {
+    const { test_requests, stats, filters, analysts } = usePage().props as unknown as {
         test_requests: any;
         stats: any;
         filters: { q?: string; per_page?: number; status?: number; date_range?: string };
+        analysts: any;
     };
 
     const [searchTerm, setSearchTerm] = useState(filters?.q ?? "");
     const [statusFilter, setStatusFilter] = useState(filters?.status ?? 5);
-    const [dateRange, setDateRange] = useState(filters?.date_range ?? ""); // 🔹 nuevo
+    const [dateRange, setDateRange] = useState(filters?.date_range ?? "");
 
     return (
         <MainLayout>
@@ -28,11 +29,7 @@ const TestRequestIndex = () => {
                 subTitle="Solicitudes de Pruebas Textiles"
             />
 
-            <div className="mt-3">
-                <p className="mb-0 text-muted">
-                    Gestiona las solicitudes creadas y enviadas a análisis
-                </p>
-                <br />
+            <div className="mt-0">
                 <TestRequestStatsCards stats={stats} />
             </div>
 
@@ -44,12 +41,12 @@ const TestRequestIndex = () => {
                             setSearchTerm={setSearchTerm}
                             statusFilter={statusFilter}
                             setStatusFilter={setStatusFilter}
-                            dateRange={dateRange}          // 🔹 nuevo
-                            setDateRange={setDateRange}    // 🔹 nuevo
+                            dateRange={dateRange}
+                            setDateRange={setDateRange}
                             filters={filters}
                         />
 
-                        <TestRequestTable test_requests={test_requests} test_results={undefined} />
+                        <TestRequestTable test_requests={test_requests} test_results={undefined} analysts={analysts} />
 
                         <CardFooter>
                             <div className="d-flex align-items-center justify-content-between gap-3">
@@ -66,7 +63,7 @@ const TestRequestIndex = () => {
                                                     per_page: e.target.value,
                                                     q: searchTerm,
                                                     status: statusFilter,
-                                                    date_range: dateRange, // 🔹 mantener el rango
+                                                    date_range: dateRange,
                                                     page: 1,
                                                 },
                                                 { preserveState: true, preserveScroll: true }

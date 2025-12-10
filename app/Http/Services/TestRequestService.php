@@ -9,8 +9,11 @@ use App\Models\TestRequest;
 use App\Models\TestResult;
 use App\Models\TestType;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Intervention\Image\Laravel\Facades\Image;
 
 class TestRequestService
 {
@@ -92,8 +95,26 @@ class TestRequestService
                 'item' =>  $data['item'],
                 'status' => $this->mTestRequest::STATUS['CREATED'],
                 'number' => $this->generateTestNumber(),
-                'notes' => $data['notes']
+                'notes' => $data['notes'],
+                'is_development' => $data['is_development'] ?? 0,
+                'is_informative' => $data['is_informative'] ?? 0,
             ]);
+
+            if (isset($data['new_image'])) {
+                $file = $data['new_image'];
+                $dir = "test-requests/{$testRequest->id}";
+                $filename = Str::random(40) . '.jpg';
+                $path = "{$dir}/{$filename}";
+
+                $image = Image::read($file->getRealPath());
+                $image->scaleDown(1600);
+                $encoded = $image->encodeByMediaType('image/jpeg', 70);
+
+                Storage::disk('public')->put($path, (string) $encoded);
+            }
+
+            $testRequest->new_image = $path;
+            $testRequest->save();
 
             $test = $this->mTest->create([
                 'test_request_id' => $testRequest->id,
@@ -153,11 +174,32 @@ class TestRequestService
             $testRequest = $this->mTestRequest
                 ->with(['test.results'])
                 ->findOrFail($id);
+            $path = null;
+
+            if (isset($data['new_image'])) {
+                if ($testRequest->new_image) {
+                    Storage::disk('public')->delete($testRequest->new_image);
+                }
+
+                $file = $data['new_image'];
+                $dir = "test-requests/{$testRequest->id}";
+                $filename = Str::random(40) . '.jpg';
+                $path = "{$dir}/{$filename}";
+
+                $image = Image::read($file->getRealPath());
+                $image->scaleDown(1600);
+                $encoded = $image->encodeByMediaType('image/jpeg', 70);
+
+                Storage::disk('public')->put($path, (string) $encoded);
+            }
 
             $testRequest->update([
-                'style_id' => $data['style_id'] ?? null,
+                'style_id' => $data['style_id'] ?? 0,
                 'item'     => $data['item'],
                 'notes'    => $data['notes'] ?? null,
+                'new_image' => $path ?? null,
+                'is_informative' => $data['is_informative'] ?? 0,
+                'is_development' => $data['is_development'] ?? 0
             ]);
 
             $test = $testRequest->test()->first();
@@ -292,10 +334,11 @@ class TestRequestService
         return round((($current - $prev) / $prev) * 100, 1);
     }
 
-    public function sendTest($id)
+    public function sendTest($id, $assignated_to)
     {
         $test = $this->mTestRequest->findOrFail($id);
         $test->status = $this->mTestRequest::STATUS['IN_PROGRESS'];
+        $test->assignated_to = $assignated_to;
         $test->save();
     }
 }

@@ -29,6 +29,7 @@ class StoreTestRequest extends FormRequest
             'notes' => 'string|max:255',
             'test_type_ids' => 'required|array|min:1',
             'test_type_ids.*' => 'exists:test_types,id',
+            'new_image' => 'sometimes|file|image|max:5120'
         ];
     }
 }

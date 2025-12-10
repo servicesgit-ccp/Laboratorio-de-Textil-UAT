@@ -25,7 +25,7 @@ class CatalogueService
 
     public function findStyleByNumber(string $number): ?Style
     {
-        return Style::where('NUMBER', $number)->first();
+        return Style::where('NUMBER', $number)->with(['department', 'provider'])->first();
     }
 
     // ======================

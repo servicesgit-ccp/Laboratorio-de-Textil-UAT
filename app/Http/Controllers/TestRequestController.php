@@ -6,6 +6,7 @@ use App\Http\Requests\StoreTestRequest;
 use App\Http\Services\TestRequestService;
 use App\Http\Services\TestTypeService;
 use App\Http\Services\UserService;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -29,6 +30,7 @@ class TestRequestController extends Controller
         $status = $request->input('status', null);
         $search  = $request->input('q');
         $dateRange = $request->input('date_range');
+        $analysts = User::role('lab_technician')->get();
         $stats = $this->sTestRequest->getTestRequestStats();
         $testRequests = $this->sTestRequest->getAllTestRequest(
             $perPage,
@@ -39,6 +41,7 @@ class TestRequestController extends Controller
         return Inertia::render('test/index', [
             'test_requests' => $testRequests,
             'stats'         => $stats,
+            'analysts'      => $analysts,
             'filters'       => [
                 'q'          => $search,
                 'status'     => $status,
@@ -88,9 +91,9 @@ class TestRequestController extends Controller
         return redirect()->route('test.request.index')->with('success', 'Solicitud modificada correctamente.');
     }
 
-    public function sendTestRequest($id)
+    public function sendTestRequest(Request $request, $id)
     {
-        $this->sTestRequest->sendTest($id);
+        $this->sTestRequest->sendTest($id, $request->assignated_to);
         return redirect()->route('test.request.index')->with('success', 'Solicitud enviada correctamente.');
     }
 }

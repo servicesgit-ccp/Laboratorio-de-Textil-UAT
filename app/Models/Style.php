@@ -17,6 +17,8 @@ class Style extends Model
         'department_id',
     ];
 
+    protected $appends = ['image'];
+
     public function provider()
     {
         return $this->belongsTo(Provider::class);
@@ -32,4 +34,8 @@ class Style extends Model
         return $this->belongsTo(Department::class);
     }
 
+    public function getImageAttribute()
+    {
+        return 'http://40.114.30.62/productshot?estilo=' . $this->number;
+    }
 }

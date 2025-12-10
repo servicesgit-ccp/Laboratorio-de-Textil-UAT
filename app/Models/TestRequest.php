@@ -15,7 +15,11 @@ class TestRequest extends Model
         'style_id',
         'item',
         'status',
-        'notes'
+        'notes',
+        'new_image',
+        'is_development',
+        'is_informative',
+        'assignated_to'
     ];
 
     public const STATUS = [
@@ -26,6 +30,8 @@ class TestRequest extends Model
         'REJECTED' => 4,
         'ALL'  => 5,
     ];
+
+    protected $appends = ['image'];
 
     public function test()
     {
@@ -40,5 +46,10 @@ class TestRequest extends Model
     public function style()
     {
         return $this->belongsTo(Style::class);
+    }
+
+    public function getImageAttribute()
+    {
+        return $this->style->image;
     }
 }
