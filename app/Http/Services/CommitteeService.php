@@ -23,8 +23,16 @@ class CommitteeService
 
         if ($search) {
             $query->where(function ($qq) use ($search) {
-                $qq->where('number', 'like', "%{$search}%");
-                $qq->where('style.name', 'like', "%{$search}%");
+                $qq->where('number', 'like', "%{$search}%")
+                ->orWhere('item', 'like', "%{$search}%")
+                ->orWhereHas('style', function ($s) use ($search) {
+                    $s->where('number', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                })
+                ->orWhereHas('style.provider', function ($p) use ($search) {
+                    $p->where('name', 'like', "%{$search}%")
+                        ->orWhere('number', 'like', "%{$search}%");
+                });
             });
         }
 

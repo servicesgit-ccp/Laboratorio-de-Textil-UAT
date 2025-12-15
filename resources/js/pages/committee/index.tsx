@@ -7,9 +7,9 @@ import { Button, Card, CardFooter, CardHeader, Col, Row, Tooltip } from 'react-b
 import PageTitle from '@/components/PageTitle';
 import MainLayout from '@/layouts/MainLayout';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import TestResultsSummary from '@/components/_test-results/TestResultsSummary';
+import CommitteeSummary from '@/components/_committee/CommitteeSummary';
 import ConfirmModal from '@/components/_general/ConfirmModal';
-import TestResultsTable from "@/components/_test-results/TestResultsTable";
+import CommitteeTable from "@/components/_committee/CommitteeTable";
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -47,14 +47,13 @@ const CommitteePage = () => {
       per_page?: number | string;
     };
     stats: {
-      inAnalysis: number;
-      pending: number;
-      inProcess: number;
-      completed: number;
+      total: number;
+      pending_review: number;
+      approved: number;
+      rejected: number;
     };
   };
 
-  console.log(testResults);
   const [search, setSearch] = useState(filters?.q ?? '');
   const perPage = Number(filters?.per_page ?? 10);
   const [confirmModal, setConfirmModal] = useState<{ show: boolean; testId: number | null }>({
@@ -63,44 +62,49 @@ const CommitteePage = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const rows = (testResults.data ?? []).map((item: any) => {
+  const rows: Row[] = (testResults.data ?? []).map((item: any) => {
     const analystSet = new Set<string>();
     let totalSectionsWithStatus = 0;
     let pendingSections = 0;
-    (item.results ?? []).forEach((result: any) => {
-      const content = result.content ?? {};
 
-      Object.values(content).forEach((section: any) => {
-        if (section && typeof section === 'object') {
-          if ('user_name' in section && section.user_name) {
-            analystSet.add(section.user_name as string);
-          }
-          if ('status' in section) {
+    const tests = item.test ?? [];
+    tests.forEach((t: any) => {
+      (t.results ?? []).forEach((r: any) => {
+        const content = r.content ?? {};
+
+        Object.values(content).forEach((section: any) => {
+          if (!section || typeof section !== "object") return;
+
+          if (section.user_name) analystSet.add(section.user_name);
+
+          if ("status" in section) {
             totalSectionsWithStatus++;
             const statusValue = Number(section.status);
-            if (statusValue === 0 || statusValue === 1) {
-              pendingSections++;
-            }
+            if (statusValue === 0 || statusValue === 1) pendingSections++;
           }
-        }
+        });
       });
     });
-    const analystNames = Array.from(analystSet);
-    return {
-      id: item.id,
-      folio: item.test_request?.number ?? '',
-      fechaIngreso: formatDate(item.created_at),
-      fechaSalida: item.finished_at ? formatDate(item.finished_at) : '--',
-      sku: item.test_request?.item ?? 'DESCONOCIDO',
-      analista: analystNames,
-      pruebasPendientes: pendingSections,
-      totalPruebas: totalSectionsWithStatus
-    };
-  });
+
+  return {
+    id: item.id,
+    number: item.number ?? "",
+    item: item.item ?? "DESCONOCIDO",
+    notes: item.notes ?? null,
+    new_image: item.new_image ?? null,
+    image: item.image ?? null,
+    style: item.style
+      ? { id: Number(item.style.id), description: item.style.description ?? "" }
+      : null,
+    provider: item.style?.provider.name ?? null,
+    votes: item.votes ?? '--',
+    fechaIngreso: formatDate(item.created_at),
+  };
+});
 
   const handleSearch = () => {
     router.get(
-      route('test-results'),
+      route('committee.index'),
       {
         q: search,
         per_page: perPage,
@@ -115,7 +119,7 @@ const CommitteePage = () => {
 
   const handlePerPageChange = (value: string) => {
     router.get(
-      route('test-results'),
+      route('committee.index'),
       {
         q: search,
         per_page: value,
@@ -155,7 +159,7 @@ const CommitteePage = () => {
           Gestiona casos especiales que requieren revisión del comité técnico
         </p>
         <br />
-        <TestResultsSummary stats={stats} />
+        <CommitteeSummary stats={stats} />
       </div>
       <Row className="mt-4">
         <Col xs={12}>
@@ -170,7 +174,7 @@ const CommitteePage = () => {
                     <input
                       type="search"
                       className="form-control border-0 bg-transparent"
-                      placeholder="Buscar Muestra (folio)"
+                      placeholder="Buscar Muestra (folio, sku, estilo, cliente)"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       onKeyDown={(e) => {
@@ -196,117 +200,7 @@ const CommitteePage = () => {
             </CardHeader>
 
             {/* TABLA */}
-            <div className="table-responsive mt-3">
-              <table className="table table-nowrap mb-0">
-                <thead className="bg-light-subtle">
-                  <tr>
-                    <th>Folio</th>
-                    <th>Fecha Ingreso</th>
-                    <th>Fecha Salida</th>
-                    <th>SKU/ ESTILO</th>
-                    <th>Analista</th>
-                    <th>Pruebas Pendientes</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((req) => (
-                    <tr key={req.id}>
-                      <td>{req.folio}</td>
-                      <td>{req.fechaIngreso}</td>
-                      <td>{req.fechaSalida}</td>
-                      <td>
-                        <span
-                          className="badge bg-light text-muted border rounded-pill"
-                          style={{ fontSize: '12px' }}
-                        >
-                          {req.sku}
-                        </span>
-                      </td>
-                      <td>
-                        {(!req.analista || req.analista.length === 0) ? (
-                          <span className="text-muted">--</span>
-                        ) : (
-                          <div className="d-flex align-items-center gap-1">
-                            {req.analista.map((name: string, index: number) => {
-                              const parts = name.trim().split(' ');
-                              const first = parts[0] ?? '';
-                              const last = parts.length > 1 ? parts[parts.length - 1] : '';
-                              const initials = `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
-
-                              return (
-                                <div
-                                  key={index}
-                                  className="rounded-circle d-flex align-items-center justify-content-center"
-                                  style={{
-                                    width: 28,
-                                    height: 28,
-                                    backgroundColor: '#0d6efd20',
-                                    border: '1px solid #0d6efd55',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600,
-                                    textTransform: 'uppercase',
-                                    cursor: 'default',
-                                  }}
-                                  title={name}
-                                >
-                                  {initials || '?'}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </td>
-                      <td>
-                        {(!req.totalPruebas || req.totalPruebas === 0) ? (
-                          <span className="text-muted">--</span>
-                        ) : (
-                          <span
-                            className={[
-                              'badge rounded-pill',
-                              req.pruebasPendientes > 0
-                                ? 'bg-warning-subtle text-warning-emphasis'
-                                : 'bg-success-subtle text-success-emphasis'
-                            ].join(' ')}
-                            style={{ fontSize: '0.8rem' }}
-                          >
-                            {req.pruebasPendientes}/{req.totalPruebas}
-                          </span>
-                        )}
-                      </td>
-                      <td>
-                        <Link href={route('test-results.detail', { test: req.id })}>
-                            <Button
-                                variant="soft-primary"
-                                size="sm"
-                                className="btn-icon rounded-circle me-2"
-                            >
-                                <IconifyIcon icon="tabler:eye" className="fs-16" />
-                            </Button>
-                        </Link>
-                        {req.pruebasPendientes === 0 && req.totalPruebas > 0 && (
-                          <Button
-                            type="button"
-                            variant="soft-success"
-                            size="sm"
-                            className="btn-icon rounded-circle"
-                            title="Enviar a revisión"
-                            onClick={() =>
-                              setConfirmModal({
-                                show: true,
-                                testId: req.id,
-                              })
-                            }
-                          >
-                            <IconifyIcon icon="tabler:send" className="fs-16" />
-                          </Button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <CommitteeTable rows={rows}/>
             <CardFooter>
               <div className="d-flex align-items-center justify-content-between gap-3">
                 {/* Selector de filas */}
