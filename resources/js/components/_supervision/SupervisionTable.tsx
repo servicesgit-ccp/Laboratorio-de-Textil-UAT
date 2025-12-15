@@ -4,7 +4,6 @@ import {
     Badge,
     Button,
     Collapse,
-    Modal,
     OverlayTrigger,
     Tooltip,
 } from 'react-bootstrap';
@@ -17,34 +16,10 @@ type Props = {
 
 const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
     const [openRowId, setOpenRowId] = useState<number | null>(null);
-    const [showModal, setShowModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
 
     const toggleRow = (rowId: number) => {
         setOpenRowId((prev) => (prev === rowId ? null : rowId));
-    };
-
-    const handleOpenModal = (item: any) => {
-        setSelectedRequest(item);
-        setShowModal(true);
-    };
-
-    const handleCloseModal = () => {
-        setShowModal(false);
-        setSelectedRequest(null);
-    };
-
-    const handleSendRequest = () => {
-        if (!selectedRequest) return;
-
-        router.post(
-            route('supervision.send', selectedRequest.id),
-            {},
-            {
-                onFinish: () => setShowModal(false),
-                preserveScroll: true,
-            }
-        );
     };
 
     const getStatusBadge = (status: number | string) => {
@@ -160,28 +135,6 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
 
                                         <td className="pe-3 text-center">
                                             <div className="hstack gap-1 justify-content-center">
-                                                {(item.status == 3 || item.status == 4 || item.status == 5 ) && (
-                                                    <OverlayTrigger
-                                                        placement="top"
-                                                        overlay={renderTooltip(
-                                                            `tooltip-send-${rowId}`,
-                                                            'Enviar solicitud a comité'
-                                                        )}
-                                                    >
-                                                        <Button
-                                                            variant={item.in_committee == 0 ? "soft-success" : "primary"}
-                                                            size="sm"
-                                                            disabled={item.in_committee == 1}
-                                                            className="btn-icon rounded-circle"
-                                                            onClick={() => handleOpenModal(item)}
-                                                        >
-                                                            <IconifyIcon
-                                                                icon="tabler:send"
-                                                                className="fs-16"
-                                                            />
-                                                        </Button>
-                                                    </OverlayTrigger>
-                                                )}
 
                                                 <OverlayTrigger
                                                     placement="top"
@@ -250,44 +203,6 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                 </table>
 
             </div>
-
-            {/* MODAL RESUMEN */}
-            {selectedRequest && (
-                <Modal show={showModal} onHide={handleCloseModal} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>
-                            Enviar a Comité de Análisis
-                        </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <div className="mb-2">
-                            ¿Está seguro que desea enviar la muestra <strong> #{selectedRequest.number} </strong> al Comité de Análisis? Esta acción moverá la muestra al módulo de Comité para su evaluación final.
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button
-                            variant="soft-danger"
-                            onClick={handleCloseModal}
-                        >
-                            <IconifyIcon
-                                icon="tabler:x"
-                                className="me-1"
-                            />
-                            Cerrar
-                        </Button>
-                        <Button
-                            variant="soft-success"
-                            onClick={handleSendRequest}
-                        >
-                            <IconifyIcon
-                                icon="tabler:send"
-                                className="me-1"
-                            />
-                            Enviar a comité
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-            )}
         </>
     );
 };
