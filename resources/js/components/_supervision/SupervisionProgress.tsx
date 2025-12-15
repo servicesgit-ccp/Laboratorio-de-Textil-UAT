@@ -11,7 +11,7 @@ const SupervisionProgress: React.FC<Props> = ({ testRequest }) => {
 
     const total = groups.length;
     const completed = groups.filter(
-        (key) => tests[key]?.status === 2 // 2 = aprobado
+        (key) => tests[key]?.status_review === 2 // 2 = aprobado
     ).length;
 
     const percent = total > 0 ? (completed / total) * 100 : 0;

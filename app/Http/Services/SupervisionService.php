@@ -131,7 +131,7 @@ class SupervisionService
 
     public function getTestById($id)
     {
-        return $this->mTestRequest::with(['test', 'test.results', 'style', 'style.provider', 'style.department'])->findOrFail($id);
+        return $this->mTestRequest::with(['analyst','test', 'test.results', 'style', 'style.provider', 'style.department'])->findOrFail($id);
     }
 
     public function rejectTest($request)
@@ -178,7 +178,7 @@ class SupervisionService
 
         // Marcar test como rechazado
         $content[$testName]['approved'] = false;
-        $content[$testName]['status'] = 2;
+        $content[$testName]['status_review'] = 2;
 
         $result->content = $content;
         $result->save();
@@ -205,7 +205,7 @@ class SupervisionService
         $testName = $request->test_name;
 
         $content[$testName]['approved'] = true;
-        $content[$testName]['status'] = 2;
+        $content[$testName]['status_review'] = 2;
 
         $result->content = $content;
         $result->save();
