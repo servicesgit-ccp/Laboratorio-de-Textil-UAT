@@ -2,6 +2,8 @@ services:
   oracle19c:
     image: oracle/database:19.3.0-ee
     container_name: oracle-19c
+    networks:
+      - textile-network
     environment:
       ORACLE_SID: TEXTILAB
       ORACLE_PDB: TEXTILABPDB
@@ -17,3 +19,7 @@ services:
 
 volumes:
   oracle-data:
+
+networks:
+  textile-network:
+    external: true

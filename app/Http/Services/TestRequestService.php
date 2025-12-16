@@ -45,7 +45,7 @@ class TestRequestService
         ?string $dateRange = null
     ) {
         $query = $this->mTestRequest
-            ->with(['test', 'test.results', 'style', 'style.provider', 'style.department']);
+            ->with(['test', 'test.results', 'style', 'style.provider', 'style.department', 'technician']);
 
         if ($search) {
             $query->where(function ($qq) use ($search) {
@@ -143,7 +143,6 @@ class TestRequestService
                 $content[$groupKey]['status'] = 0;
                 $content[$groupKey]['user_id'] = null;
                 $content[$groupKey]['approved'] = null;
-
             }
 
             $this->mTestResult->create([

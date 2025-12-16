@@ -45,6 +45,11 @@ class TestRequest extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function technician()
+    {
+        return $this->belongsTo(User::class, 'assignated_to');
+    }
+
     public function style()
     {
         return $this->belongsTo(Style::class);

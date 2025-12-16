@@ -118,6 +118,7 @@ return [
             'port'          => env('DB_PORT', '1521'),
             'database'      => env('DB_DATABASE', 'XEPDB1'),
             'service_name'  => env('DB_SERVICE_NAME', 'XEPDB1'),
+            'tns'           => env('DB_TNS'),
             'username'      => env('DB_USERNAME', 'app'),
             'password'      => env('DB_PASSWORD', 'app123'),
             'charset'       => 'AL32UTF8',
