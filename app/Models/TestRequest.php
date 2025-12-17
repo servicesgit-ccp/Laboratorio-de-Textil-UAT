@@ -20,7 +20,8 @@ class TestRequest extends Model
         'is_development',
         'is_informative',
         'assignated_to',
-        'cancelation_notes'
+        'cancelation_notes',
+        'reviewed_by',
     ];
 
     public const STATUS = [

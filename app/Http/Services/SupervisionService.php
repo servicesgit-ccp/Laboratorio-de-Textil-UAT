@@ -206,6 +206,8 @@ class SupervisionService
 
         $content[$testName]['approved'] = true;
         $content[$testName]['status'] = 2;
+        $content[$testName]['reviewed_by'] = Auth::user()->name;
+
 
         $result->content = $content;
         $result->save();
@@ -215,6 +217,7 @@ class SupervisionService
     {
         $testRequest = $this->mTestRequest->findOrFail($request->test_id);
         $testRequest->status = $this->mTestRequest::STATUS['APPROVED'];
+        $testRequest->reviewed_by = Auth::id();
         $testRequest->save();
     }
 

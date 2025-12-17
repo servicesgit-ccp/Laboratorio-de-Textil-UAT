@@ -56,4 +56,11 @@ class CommitteeService
             'rejected' => $rejected,
         ];
     }
+
+    public function getTestRequestDetail($id)
+    {
+        return $this->mTestRequest->where('id', $id)
+            ->with(['test', 'test.results', 'style', 'style.provider', 'style.department'])
+            ->first();
+    }
 }

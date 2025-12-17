@@ -29,13 +29,13 @@ export default function CommitteeTable({rows}: { rows: Row[] })
               <th>Folio</th>
               <th>Estilo</th>
               <th>Cliente</th>
-              <th>Votos</th>
               <th>Fecha Ingreso</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((req) => (
+              
               <tr key={req.id}>
                 <td>{req.number}</td>
                 <td>
@@ -60,7 +60,6 @@ export default function CommitteeTable({rows}: { rows: Row[] })
                     )}
                 </td>
                 <td>{req.provider}</td>
-                <td>{req.votes}</td>
                 <td>{req.fechaIngreso}</td>
                 <td>
                   <Link href={route("committee.detail", { committee: req.id })}>

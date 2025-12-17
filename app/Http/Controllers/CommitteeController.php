@@ -38,4 +38,12 @@ class CommitteeController extends Controller
             ]
         ]);
     }
+
+    public function detail($committee)
+    {
+        $testResult = $this->sCommittee->getTestRequestDetail($committee);
+        return Inertia::render('committee/detail', [
+            'testResult' => $testResult,
+        ]);
+    }
 }
