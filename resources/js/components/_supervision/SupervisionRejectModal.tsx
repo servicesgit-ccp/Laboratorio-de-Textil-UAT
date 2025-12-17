@@ -18,6 +18,7 @@ const SupervisionRejectModal = ({ show, onHide, testData, testRequest }) => {
                 notes,
             },
             {
+                preserveScroll: true,
                 onFinish: () => setLoading(false),
             }
         );
@@ -26,12 +27,12 @@ const SupervisionRejectModal = ({ show, onHide, testData, testRequest }) => {
     return (
         <Modal show={show} onHide={onHide} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Rechazar prueba</Modal.Title>
+                <Modal.Title>Rechazar solicitud</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
                 <p className="mb-2">
-                    ¿Por qué deseas rechazar la prueba?
+                    ¿Por qué deseas rechazar la solicitud?
                 </p>
 
                 <strong>{testData.testName}</strong>

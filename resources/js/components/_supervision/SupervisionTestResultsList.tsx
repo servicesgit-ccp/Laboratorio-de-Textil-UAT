@@ -74,7 +74,7 @@ const SupervisionTestResultsList = ({ testRequest }) => {
                         const test = Object.entries(result.content || {});
 
                         return test.map(([testName, testData], i) => {
-                            const status = testData?.status ?? 0;
+                            const status = testData?.status_review ?? 0;
                             const approved = testData?.approved ?? null; // true/false/null
 
                             const s = statusLabels[status] || {};

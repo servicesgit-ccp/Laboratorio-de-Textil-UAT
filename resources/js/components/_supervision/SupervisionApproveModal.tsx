@@ -23,18 +23,18 @@ const SupervisionApproveModal = ({ show, onHide, testData, testRequest }) => {
     return (
         <Modal show={show} onHide={onHide} centered>
             <Modal.Header closeButton>
-                <Modal.Title>Aprobar prueba</Modal.Title>
+                <Modal.Title>Aprobar solicitud</Modal.Title>
             </Modal.Header>
 
             <Modal.Body>
                 <p className="mb-2">
-                    ¿Estás seguro que deseas aprobar la muestra?
+                    ¿Estás seguro que deseas aprobar la solicitud?
                 </p>
                 <strong>{testData.testName}</strong>
             </Modal.Body>
 
             <Modal.Footer>
-                <Button variant="secondary" onClick={onHide}>
+                <Button variant="danger" onClick={onHide}>
                     Cancelar
                 </Button>
 

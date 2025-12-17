@@ -59,4 +59,10 @@ class TestRequest extends Model
     {
         return $this->style->image;
     }
+
+    public function analyst()
+    {
+        return $this->belongsTo(User::class, 'assignated_to');
+    }
+
 }

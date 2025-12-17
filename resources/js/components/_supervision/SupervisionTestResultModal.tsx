@@ -11,7 +11,8 @@ const SupervisionTestResultModal = ({ show, testResult, onClose }) => {
     const testName = testResult.testName;
     const testData = testResult.testData ?? {};
 
-    const excluded = ["img", "status", "user_id", "user_name", "approved", "REJECTED"];
+    const excluded = ["img", "status", "user_id", "user_name", "approved", "REJECTED", "status_review"];
+    const STORAGE_URL = "/storage/";
 
     const handleApprove = async () => {
         setLoading(true);
@@ -117,26 +118,29 @@ const SupervisionTestResultModal = ({ show, testResult, onClose }) => {
                 </div>
 
                 {/* IMÁGENES */}
-                {Array.isArray(testData.img) && testData.img.length > 0 && (
+                {Array.isArray(testData?.img) && testData.img.length > 0 && (
                     <div className="mt-3">
                         <h5 className="fw-bold">Imágenes</h5>
+
                         <div className="d-flex gap-2 flex-wrap">
-                            {testData.img.map((imgUrl, i) => (
+                            {testData.img.map((img: any, i: number) => (
                                 <img
                                     key={i}
-                                    src={imgUrl}
-                                    alt="evidencia"
+                                    src={`${STORAGE_URL}${img.path}`}
+                                    alt={`evidencia-${i}`}
                                     style={{
                                         width: 120,
                                         height: 120,
                                         objectFit: "cover",
                                         borderRadius: 8,
+                                        border: "1px solid #e5e7eb",
                                     }}
                                 />
                             ))}
                         </div>
                     </div>
                 )}
+
 
                 {/* COMENTARIOS */}
                 <Form.Group className="mt-4">
