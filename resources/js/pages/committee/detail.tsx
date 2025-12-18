@@ -61,6 +61,8 @@ export default function Detail({ testResult }: Props) {
         return { text: "Aprobada", className: "bg-info-subtle text-info-emphasis border" };
       case 8:
         return { text: "Rechazada", className: "bg-success-subtle text-success-emphasis border" };
+      case 9:
+        return { text: "Reingreso", className: "bg-warning-subtle text-success-emphasis border" };
       default:
         return { text: "Pendiente", className: "bg-warning-subtle text-warning-emphasis border" };
     }
@@ -120,9 +122,12 @@ const handleApprove = (comment: string) => {
         <div className="border rounded-3 py-2 text-center fw-semibold">
           Pruebas Realizadas
         </div>
-        
+
         <TableDetail rows={summaryRows} />
+
         <CommitteeActions
+          initialComment={testResult?.comment_committee ?? ""}
+          status={Number(testResult?.status)}
           onReject={handleReject}
           onApprove={handleApprove}
         />

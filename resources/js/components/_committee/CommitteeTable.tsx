@@ -1,7 +1,9 @@
+import { useState } from "react";
 // components
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import { Link, router } from "@inertiajs/react";
 import { Button, CardFooter } from "react-bootstrap";
+import ConfirmModal from "@/components/_general/ConfirmModal";
 
 export type Row = {
   id: number;
@@ -23,7 +25,29 @@ export type Row = {
 
 export default function CommitteeTable({rows}: { rows: Row[] }) 
 {
-  console.log(rows);
+  const [showReEntryModal, setShowReEntryModal] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [processing, setProcessing] = useState(false);
+
+  const openReEntryConfirm = (id: number) => {
+    setSelectedId(id);
+    setShowReEntryModal(true);
+  };
+
+  const handleConfirmReEntry = () => {
+    if (!selectedId) return;
+
+    setProcessing(true);
+
+    router.post(route("committee.re-entry", { committee: selectedId }), {}, {
+      onFinish: () => {
+        setProcessing(false);
+        setShowReEntryModal(false);
+        setSelectedId(null);
+      },
+    });
+  };
+
   return (
     <>
       <div className="table-responsive mt-3">
@@ -115,9 +139,7 @@ export default function CommitteeTable({rows}: { rows: Row[] })
                       size="sm"
                       className="btn-icon rounded-circle"
                       title="Enviar a reingreso"
-                      onClick={() =>
-                        router.post(route("committee.re-entry", { committee: req.id }))
-                      }
+                      onClick={() => openReEntryConfirm(req.id)}
                     >
                       <IconifyIcon icon="tabler:arrow-back-up" className="fs-16" />
                     </Button>
@@ -127,7 +149,17 @@ export default function CommitteeTable({rows}: { rows: Row[] })
             ))}
           </tbody>
         </table>
-      </div>        
+      </div>       
+      <ConfirmModal
+        show={showReEntryModal}
+        loading={processing}
+        title="Enviar a Reingreso"
+        body="Se enviará a reingreso la solicitud. Se creará una nueva prueba conservando el historial actual. ¿Deseas continuar?"
+        confirmText="Sí, enviar a reingreso"
+        confirmVariant="danger"
+        onConfirm={handleConfirmReEntry}
+        onClose={() => setShowReEntryModal(false)}
+      /> 
     </>
   );
 }
