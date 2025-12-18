@@ -67,7 +67,7 @@ class CommitteeService
         $total = $this->mTestRequest->where('in_committee', 1)->count();
         $totalPending = $this->mTestRequest->where('in_committee', 1)->where('status', TestRequest::STATUS['REJECTED'])->count();
         $totalApproved = $this->mTestRequest->where('in_committee', 1)->where('status', TestRequest::STATUS['APPROVED_COMMITTEE'])->count();
-        $rejected = $this->mTestRequest->where('in_committee', 1)->where('status', $this->mTestRequest::STATUS['REJECTED_COMMITTEE'])->count();
+        $rejected = $this->mTestRequest->where('in_committee', 1)->whereIn('status', [$this->mTestRequest::STATUS['REJECTED_COMMITTEE'], TestRequest::STATUS['RE-ENTRY']])->count();
         
         return [
             'total' => $total,
