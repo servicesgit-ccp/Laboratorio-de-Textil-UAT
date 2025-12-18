@@ -16,7 +16,6 @@ RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoload
 
 # Stage 3: final image
 FROM php:8.2-fpm
-ARG TARGETARCH
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
@@ -50,14 +49,9 @@ COPY docker/instantclient/ /tmp/instantclient/
 
 RUN set -eux; \
     if ls /tmp/instantclient/*.zip >/dev/null 2>&1; then \
-        ic_pattern=''; \
-        case "$TARGETARCH" in \
-            amd64) ic_pattern="*linux.x64*.zip" ;; \
-            arm64) ic_pattern="*linux.arm64*.zip" ;; \
-            *) echo "TARGETARCH ${TARGETARCH} not supported for Oracle Instant Client" >&2; exit 1 ;; \
-        esac; \
+        ic_pattern="*linux.arm64*.zip"; \
         if ! ls /tmp/instantclient/${ic_pattern} >/dev/null 2>&1; then \
-            echo "Missing Oracle Instant Client archives matching ${ic_pattern} for TARGETARCH ${TARGETARCH}" >&2; \
+            echo "Missing Oracle Instant Client archives matching ${ic_pattern}. Please include ARM archives only." >&2; \
             exit 1; \
         fi; \
         apt-get update && apt-get install -y --no-install-recommends libaio-dev libnsl-dev build-essential pkg-config unzip; \
