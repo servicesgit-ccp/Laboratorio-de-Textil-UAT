@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Events\TestRequestAssigned;
 use App\Models\Style;
 use App\Models\Terminology;
 use App\Models\Test;
@@ -342,5 +343,12 @@ class TestRequestService
         $test->status = $this->mTestRequest::STATUS['IN_PROGRESS'];
         $test->assignated_to = $assignated_to;
         $test->save();
+        $test->loadMissing('technician');
+
+        event(new TestRequestAssigned(
+            test: $test,
+            message: sprintf('Solicitud #%s asignada', $test->number ?? $test->id),
+            userId: $assignated_to ? (int) $assignated_to : null,
+        ));
     }
 }

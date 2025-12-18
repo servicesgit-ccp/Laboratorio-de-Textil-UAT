@@ -37,9 +37,9 @@ const TopNavigationBarPage = () => {
                             <IconifyIcon icon="tabler:search" className="fs-22" />
                         </button>
                     </div>
-                    {/* <Suspense fallback={<FallbackLoading />}>
+                    <Suspense fallback={<FallbackLoading />}>
                         <Notifications />
-                    </Suspense> */}
+                    </Suspense>
                     <ThemeCustomizerToggle />
                     <ThemeModeToggle />
                     <ProfileDropdown />

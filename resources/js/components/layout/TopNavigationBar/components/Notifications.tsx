@@ -4,18 +4,123 @@ import { Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from '
 import { notificationData, NotificationType } from '../data';
 
 import { timeSince } from '@/utils/date';
-import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import echo from '@/lib/echo';
+import { useNotificationContext } from '@/context/useNotificationContext';
+
+type TestRequestAssignedEvent = {
+    test_request_id?: number;
+    reference?: string;
+    assigned_to?: string;
+    summary?: string;
+    message?: string;
+};
+
+type SharedChannel = {
+    name: string;
+    cleanup: () => void;
+};
 
 const Notifications = () => {
     const [notifications, setNotifications] = useState<NotificationType[]>(notificationData);
+    const [hasRealtimeActivity, setHasRealtimeActivity] = useState(false);
+    const { showNotification } = useNotificationContext();
+    const { auth } = usePage().props as {
+        auth?: {
+            user?: {
+                id?: number;
+                name?: string;
+            };
+        };
+    };
+    const userId = auth?.user?.id;
 
     const dismissNotification = (id: number) => {
         setNotifications((prev) => prev.filter((notification) => notification.id !== id));
     };
+
+    useEffect(() => {
+        if (!echo) {
+            return;
+        }
+
+        const eventName = '.TestRequestAssigned';
+        const subscriptions: SharedChannel[] = [];
+
+        const handleIncoming = (event: TestRequestAssignedEvent) => {
+            const requestId = event.test_request_id ?? Date.now();
+            const label = event.summary || event.message || 'Nuevo test request asignado';
+            const title = (
+                <>
+                    <span className="fw-medium text-body">Solicitud #{requestId}</span> asignada
+                    {event.assigned_to ? (
+                        <>
+                            {' '}
+                            a <span className="fw-medium text-body">{event.assigned_to}</span>
+                        </>
+                    ) : null}
+                    .
+                </>
+            );
+
+            setNotifications((prev) => [
+                {
+                    id: Number(new Date()),
+                    title,
+                    icon: {
+                        icon: 'tabler:flask',
+                        variant: 'primary',
+                    },
+                    time: new Date(),
+                },
+                ...prev,
+            ]);
+
+            setHasRealtimeActivity(true);
+            showNotification({
+                title: 'Nuevo test request',
+                message: label,
+                variant: 'primary',
+                delay: 4000,
+            });
+        };
+
+        const mountChannel = (name: string, channelFactory: () => any) => {
+            const channelInstance = channelFactory();
+            if (!channelInstance) {
+                return;
+            }
+
+            channelInstance.listen(eventName, handleIncoming);
+            subscriptions.push({
+                name,
+                cleanup: () => {
+                    channelInstance.stopListening(eventName, handleIncoming);
+                    echo.leaveChannel(name);
+                },
+            });
+        };
+
+        mountChannel('public-channel', () => echo.channel('public-channel'));
+
+        if (userId) {
+            mountChannel(`test-requests.${userId}`, () => echo.private(`test-requests.${userId}`));
+        }
+
+        return () => {
+            subscriptions.forEach(({ cleanup }) => cleanup());
+        };
+    }, [showNotification, userId]);
+
     return (
         <div className="topbar-item">
-            <Dropdown align={'end'}>
+            <Dropdown
+                align={'end'}
+                onToggle={(show) => {
+                    if (show) setHasRealtimeActivity(false);
+                }}
+            >
                 <DropdownToggle
                     as={'a'}
                     className="topbar-link drop-arrow-none"
@@ -26,7 +131,7 @@ const Notifications = () => {
                     aria-expanded="false"
                 >
                     <IconifyIcon icon="tabler:bell" className="animate-ring fs-22" />
-                    <span className="noti-icon-badge" />
+                    {hasRealtimeActivity ? <span className="noti-icon-badge" /> : null}
                 </DropdownToggle>
                 <DropdownMenu className="p-0 dropdown-menu-start dropdown-menu-lg" style={{ minHeight: 300 }}>
                     <div className="p-3 border-bottom border-dashed">
