@@ -1,30 +1,45 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Button, Card, Form } from "react-bootstrap";
 import { Link } from "@inertiajs/react";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 
 type Props = {
   initialComment?: string;
-  onSendComment?: (comment: string) => void;
   onReject?: (comment: string) => void;
   onApprove?: (comment: string) => void;
-
-  // opcional: para deshabilitar botones si estás cargando
   loading?: boolean;
 };
 
 export default function CommitteeActions({
   initialComment = "",
-  onSendComment,
   onReject,
   onApprove,
   loading = false,
 }: Props) {
   const [comment, setComment] = useState(initialComment);
+  const [touched, setTouched] = useState(false);
 
-  const handleSend = () => onSendComment?.(comment.trim());
-  const handleReject = () => onReject?.(comment.trim());
-  const handleApprove = () => onApprove?.(comment.trim());
+  const trimmed = useMemo(() => comment.trim(), [comment]);
+  const isValid = trimmed.length > 0;
+  const showError = touched && !isValid;
+
+  const requireCommentOrMark = () => {
+    if (!isValid) {
+      setTouched(true);
+      return false;
+    }
+    return true;
+  };
+
+  const handleReject = () => {
+    if (!requireCommentOrMark()) return;
+    onReject?.(trimmed);
+  };
+
+  const handleApprove = () => {
+    if (!requireCommentOrMark()) return;
+    onApprove?.(trimmed);
+  };
 
   return (
     <div className="d-flex flex-column gap-3">
@@ -38,6 +53,7 @@ export default function CommitteeActions({
 
           <div className="text-muted" style={{ fontSize: 13 }}>
             Agrega observaciones o comentarios adicionales sobre esta muestra que serán incluidos en la decisión final.
+            <span className="ms-1 text-danger fw-semibold">*</span>
           </div>
 
           <Form.Group className="mt-3">
@@ -46,30 +62,21 @@ export default function CommitteeActions({
               rows={5}
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Escribe comentarios adicionales sobre la muestra, observaciones especiales, recomendaciones, etc..."
+              onBlur={() => setTouched(true)}
+              placeholder="Escribe comentarios sobre la muestra, observaciones especiales, recomendaciones, etc..."
+              isInvalid={showError}
               style={{
                 background: "#f5f6f7",
                 border: "1px solid #eef0f2",
                 resize: "none",
               }}
             />
+            {showError && (
+              <div className="invalid-feedback d-block">
+                El comentario es obligatorio para aprobar o rechazar.
+              </div>
+            )}
           </Form.Group>
-
-          <div className="d-flex align-items-center justify-content-between mt-3 flex-wrap gap-2">
-            <Button
-              type="button"
-              disabled={loading || !comment.trim()}
-              onClick={handleSend}
-              className="rounded-pill px-3"
-              style={{
-                background: "#8aa4ff",
-                borderColor: "#8aa4ff",
-              }}
-            >
-              <IconifyIcon icon="tabler:send" className="me-2" />
-              Enviar Comentario
-            </Button>
-          </div>
         </Card.Body>
       </Card>
 
@@ -84,8 +91,9 @@ export default function CommitteeActions({
         <Button
           variant="outline-danger"
           className="rounded-pill px-4"
-          disabled={loading}
+          disabled={loading || !isValid}
           onClick={handleReject}
+          title={!isValid ? "Agrega un comentario para continuar" : undefined}
         >
           <IconifyIcon icon="tabler:x" className="me-2" />
           Rechazar
@@ -94,8 +102,9 @@ export default function CommitteeActions({
         <Button
           variant="success"
           className="rounded-pill px-4"
-          disabled={loading}
+          disabled={loading || !isValid}
           onClick={handleApprove}
+          title={!isValid ? "Agrega un comentario para continuar" : undefined}
         >
           <IconifyIcon icon="tabler:check" className="me-2" />
           Aprobar

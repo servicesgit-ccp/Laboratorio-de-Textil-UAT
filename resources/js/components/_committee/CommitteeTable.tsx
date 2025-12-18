@@ -1,6 +1,6 @@
 // components
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { Button, CardFooter } from "react-bootstrap";
 
 export type Row = {
@@ -13,13 +13,17 @@ export type Row = {
     id: number;
     description: string;
   } | null;
+  analyst?: string | '--';
+  supervisor?: string | '--';
   provider?: string | null;
   votes?: string | '--';
   fechaIngreso: string;
+  status: number;
 };
 
 export default function CommitteeTable({rows}: { rows: Row[] }) 
 {
+  console.log(rows);
   return (
     <>
       <div className="table-responsive mt-3">
@@ -28,7 +32,10 @@ export default function CommitteeTable({rows}: { rows: Row[] })
             <tr>
               <th>Folio</th>
               <th>Estilo</th>
-              <th>Cliente</th>
+              <th>Analista</th>
+              <th>Supervisor</th>
+              <th>Estado</th>
+              <th>Proveedor</th>
               <th>Fecha Ingreso</th>
               <th>Acciones</th>
             </tr>
@@ -59,6 +66,37 @@ export default function CommitteeTable({rows}: { rows: Row[] })
                         </p>
                     )}
                 </td>
+                <td>{req.analyst}</td>
+                <td>{req.supervisor}</td>
+                <td>
+                  {req.status === 5 && (
+                    <span className="badge rounded-pill bg-warning-subtle text-warning-emphasis border d-inline-flex align-items-center gap-1">
+                      <IconifyIcon icon="tabler:clock" className="fs-6" />
+                      Pendiente Revisión
+                    </span>
+                  )}
+
+                  {req.status === 7 && (
+                    <span className="badge rounded-pill bg-success-subtle text-success-emphasis border d-inline-flex align-items-center gap-1">
+                      <IconifyIcon icon="tabler:circle-check" className="fs-6" />
+                      Aprobada
+                    </span>
+                  )}
+
+                  {req.status === 8 && (
+                    <span className="badge rounded-pill bg-danger-subtle text-danger-emphasis border d-inline-flex align-items-center gap-1">
+                      <IconifyIcon icon="tabler:circle-x" className="fs-6" />
+                      Rechazada
+                    </span>
+                  )}
+                  {req.status === 9 && (
+                    <span className="badge rounded-pill bg-danger-subtle text-danger-emphasis border d-inline-flex align-items-center gap-1">
+                      <IconifyIcon icon="tabler:arrow-back-up" className="fs-6" />
+                      Reingreso
+                    </span>
+                  )}
+                </td>
+
                 <td>{req.provider}</td>
                 <td>{req.fechaIngreso}</td>
                 <td>
@@ -71,6 +109,19 @@ export default function CommitteeTable({rows}: { rows: Row[] })
                       <IconifyIcon icon="tabler:eye" className="fs-16" />
                     </Button>
                   </Link>
+                  {req.status === 8 && (
+                    <Button
+                      variant="soft-danger"
+                      size="sm"
+                      className="btn-icon rounded-circle"
+                      title="Enviar a reingreso"
+                      onClick={() =>
+                        router.post(route("committee.re-entry", { committee: req.id }))
+                      }
+                    >
+                      <IconifyIcon icon="tabler:arrow-back-up" className="fs-16" />
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}

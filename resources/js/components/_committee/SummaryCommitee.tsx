@@ -87,7 +87,7 @@ export default function SummaryCommitee({ testResult, summaryRows }: Props) {
                     <IconifyIcon icon="tabler:building-store" className="fs-20" />
                   </div>
                   <div>
-                    <div className="text-muted" style={{ fontSize: 13 }}>Cliente / Analista</div>
+                    <div className="text-muted" style={{ fontSize: 13 }}>Proveedor</div>
                     <div className="fw-semibold">{providerName}</div>
                   </div>
                 </div>

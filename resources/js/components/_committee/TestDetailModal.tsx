@@ -52,7 +52,20 @@ export default function TestDetailModal({ show, onHide, row }: Props) {
         label: v.display_name ?? v.label ?? k,
         value: v.value ?? null,
       }));
+    
   }, [section]);
+  const pairedFields = useMemo(() => {
+    const pairs: Array<[any, any | null]> = [];
+
+    for (let i = 0; i < fields.length; i += 2) {
+      pairs.push([
+        fields[i],
+        fields[i + 1] ?? null,
+      ]);
+    }
+
+    return pairs;
+  }, [fields]);
 
   if (!row) return null;
 
@@ -70,7 +83,6 @@ export default function TestDetailModal({ show, onHide, row }: Props) {
       </Modal.Header>
 
       <Modal.Body>
-        {/* Caja info */}
         <div className="border rounded-4 p-2 mt-1" style={{ background: "#fafafa" }}>
           <div className="d-flex flex-column gap-2">
             <div><span className="fw-semibold">Resultado:  </span> 
@@ -89,7 +101,6 @@ export default function TestDetailModal({ show, onHide, row }: Props) {
           </div>
         </div>
 
-        {/* Datos extra de la prueba (lo que no se ve en tu modal actual) */}
         <div className="mt-4">
           <div className="fw-semibold mb-2">Datos de la Prueba</div>
 
@@ -97,18 +108,34 @@ export default function TestDetailModal({ show, onHide, row }: Props) {
             <div className="text-muted">Sin datos adicionales</div>
           ) : (
             <div className="table-responsive">
-              <table className="table table-sm align-middle">
+              <table className="table table-sm align-middle d-none d-md-table">
                 <thead className="bg-light-subtle">
                   <tr>
-                    <th>Campo</th>
-                    <th>Valor</th>
+                    <th style={{ width: "25%" }}>Campo</th>
+                    <th style={{ width: "25%" }}>Valor</th>
+                    <th style={{ width: "25%" }}>Campo</th>
+                    <th style={{ width: "25%" }}>Valor</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {fields.map((f) => (
-                    <tr key={f.key}>
-                      <td className="text-muted">{f.label}</td>
-                      <td className="fw-semibold">{f.value ?? "—"}</td>
+                  {pairedFields.map(([left, right], idx) => (
+                    <tr key={idx}>
+                      {/* Columna izquierda */}
+                      <td className="text-muted">{left.label}</td>
+                      <td className="fw-semibold">{left.value ?? "—"}</td>
+
+                      {/* Columna derecha */}
+                      {right ? (
+                        <>
+                          <td className="text-muted">{right.label}</td>
+                          <td className="fw-semibold">{right.value ?? "—"}</td>
+                        </>
+                      ) : (
+                        <>
+                          <td></td>
+                          <td></td>
+                        </>
+                      )}
                     </tr>
                   ))}
                 </tbody>

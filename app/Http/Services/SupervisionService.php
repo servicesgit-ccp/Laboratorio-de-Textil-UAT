@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Models\Test;
 use App\Models\TestRequest;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class SupervisionService
 {
@@ -179,7 +180,7 @@ class SupervisionService
         // Marcar test como rechazado
         $content[$testName]['approved'] = false;
         $content[$testName]['status'] = 2;
-
+        $content[$testName]['reviewed_by'] = Auth::user()->name;
         $result->content = $content;
         $result->save();
 
@@ -226,6 +227,7 @@ class SupervisionService
         $testRequest = $this->mTestRequest->findOrFail($request->test_id);
         $testRequest->cancelation_notes = $request->notes;
         $testRequest->status = $this->mTestRequest::STATUS['REJECTED'];
+        $testRequest->reviewed_by = Auth::id();
         $testRequest->save();
     }
 

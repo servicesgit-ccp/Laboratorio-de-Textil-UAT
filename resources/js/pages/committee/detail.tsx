@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { Badge } from "react-bootstrap";
 import MainLayout from "@/layouts/MainLayout";
 import SummaryCommitee from "@/components/_committee/SummaryCommitee";
@@ -42,8 +42,8 @@ export default function Detail({ testResult }: Props) {
           rows.push({
             name: sectionName,
             statusLabel,
-            reviewer: section.user_name ?? "--",
-            date: "-", // o lo que tengas
+            reviewer: section.reviewed_by ?? "--",
+            date: section.finished_at ? formatDate(section.finished_at) : "-", // o lo que tengas
             href: route("test-results.detail", { test: t.id }),
             section, // <--- aquí
           });
@@ -53,37 +53,41 @@ export default function Detail({ testResult }: Props) {
     return rows;
   }, [testResult]);
 
-  // Mapea tu status -> texto/badge (ajusta a tu lógica real)
   const statusLabel = useMemo(() => {
     switch (status) {
-      case 1:
+      case 5:
         return { text: "Pendiente", className: "bg-warning-subtle text-warning-emphasis border" };
-      case 2:
-        return { text: "En revisión", className: "bg-info-subtle text-info-emphasis border" };
-      case 3:
-        return { text: "Aprobada", className: "bg-success-subtle text-success-emphasis border" };
-      case 4:
-        return { text: "Reingreso", className: "bg-danger-subtle text-danger-emphasis border" };
+      case 7:
+        return { text: "Aprobada", className: "bg-info-subtle text-info-emphasis border" };
+      case 8:
+        return { text: "Rechazada", className: "bg-success-subtle text-success-emphasis border" };
       default:
         return { text: "Pendiente", className: "bg-warning-subtle text-warning-emphasis border" };
     }
   }, [status]);
 
-  const handleSendComment = (comment: string) => {
-    console.log("Enviar comentario:", comment);
-    // TODO: router.post(route('committee.comment', {id: testResult.id}), { comment })
-  };
-
   const handleReject = (comment: string) => {
-    console.log("Rechazar con comment:", comment);
-    // TODO: router.post/put route('committee.reject', {id: testResult.id})
-  };
+  router.post(
+    route("committee.reject", { committee: testResult.id }),
+    { comment },
+    {
+      preserveScroll: true,
+      onSuccess: () => router.visit(route("committee.index")),
+    }
+  );
+};
 
-  const handleApprove = (comment: string) => {
-    console.log("Aprobar con comment:", comment);
-    // TODO: router.post/put route('committee.approve', {id: testResult.id})
-  };
-console.log(summaryRows);
+const handleApprove = (comment: string) => {
+  router.post(
+    route("committee.approve", { committee: testResult.id }),
+    { comment },
+    {
+      preserveScroll: true,
+      onSuccess: () => router.visit(route("committee.index")),
+    }
+  );
+};
+
   return (
     <MainLayout>
       <div className="container py-4">
@@ -119,7 +123,6 @@ console.log(summaryRows);
         
         <TableDetail rows={summaryRows} />
         <CommitteeActions
-          onSendComment={handleSendComment}
           onReject={handleReject}
           onApprove={handleApprove}
         />

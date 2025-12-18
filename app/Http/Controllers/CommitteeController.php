@@ -46,4 +46,22 @@ class CommitteeController extends Controller
             'testResult' => $testResult,
         ]);
     }
+
+    public function approveTestRequest(Request $request, $committee)
+    {
+        $this->sCommittee->approveTestRequest($committee, $request);
+        return back()->with('success', 'Solicitud aprobada');
+    }
+    
+    public function rejectTestRequest(Request $request, $committee)
+    {
+        $this->sCommittee->rejectTestRequest($committee, $request);
+        return back()->with('success', 'Solicitud rechazada');
+    }
+
+    public function reEntryTestRequest(Request $request, $committee)
+    {
+        $this->sCommittee->reEntryTestRequest($committee, $request);
+        return back()->with('success', 'Solicitud en reingreso');
+    }
 }
