@@ -116,7 +116,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
                     <tr>
                         <th>Folio</th>
                         <th>Fecha Ingreso</th>
-                        <th>Fecha Salida</th>
+                        <th>Analista</th>
                         <th>SKU / ESTILO</th>
                         <th>Proveedor</th>
                         <th>Pruebas</th>
@@ -132,6 +132,13 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
                             const rowId = item.id ?? idx;
                             const content = item.test?.[0]?.results?.[0]?.content ?? null;
                             const contentKeys = content ? Object.keys(content) : [];
+                            let initials = "";
+                            if (item.technician) {
+                                const parts = item.technician?.name.trim().split(" ");
+                                const first = parts[0] ?? "";
+                                const last = parts.length > 1 ? parts[parts.length - 1] : "";
+                                initials = `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+                            }
 
                             return (
                                 <React.Fragment key={rowId}>
@@ -145,11 +152,22 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
                                         </td>
 
                                         <td>
-                                            {item.test?.[0]?.finished_at
-                                                ? new Date(
-                                                      item.test[0].finished_at
-                                                  ).toLocaleString()
-                                                : 'Sin fecha'}
+                                            { item.technician ? (<div
+                                                key={`ava-${rowId}`}
+                                                className="rounded-circle d-flex align-items-center justify-content-center"
+                                                style={{
+                                                    width: 28,
+                                                    height: 28,
+                                                    backgroundColor: "#0d6efd20",
+                                                    border: "1px solid #0d6efd55",
+                                                    fontSize: "0.75rem",
+                                                    fontWeight: 600,
+                                                    textTransform: "uppercase",
+                                                }}
+                                                title={item.technician?.name}
+                                                >
+                                                    {initials || "?"}
+                                                </div>) : 'Sin asignar' }
                                         </td>
                                         <td>
                                         {(item.new_image || item.image) ? (
@@ -231,26 +249,28 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
                                                 </OverlayTrigger>
 
                                                 {/* Editar */}
-                                                <OverlayTrigger
-                                                    placement="top"
-                                                    overlay={renderTooltip(
-                                                        `tooltip-edit-${rowId}`,
-                                                        'Editar solicitud'
-                                                    )}
-                                                >
-                                                    <Link href={route('test.request.edit', item.id)}>
-                                                        <Button
-                                                            variant="soft-warning"
-                                                            size="sm"
-                                                            className="btn-icon rounded-circle"
-                                                        >
-                                                            <IconifyIcon
-                                                                icon="tabler:edit"
-                                                                className="fs-16"
-                                                            />
-                                                        </Button>
-                                                    </Link>
-                                                </OverlayTrigger>
+                                                {item.status == 0 && (
+                                                    <OverlayTrigger
+                                                        placement="top"
+                                                        overlay={renderTooltip(
+                                                            `tooltip-edit-${rowId}`,
+                                                            'Editar solicitud'
+                                                        )}
+                                                    >
+                                                        <Link href={route('test.request.edit', item.id)}>
+                                                            <Button
+                                                                variant="soft-warning"
+                                                                size="sm"
+                                                                className="btn-icon rounded-circle"
+                                                            >
+                                                                <IconifyIcon
+                                                                    icon="tabler:edit"
+                                                                    className="fs-16"
+                                                                />
+                                                            </Button>
+                                                        </Link>
+                                                    </OverlayTrigger>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

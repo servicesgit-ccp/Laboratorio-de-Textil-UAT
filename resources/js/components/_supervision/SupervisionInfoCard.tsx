@@ -65,10 +65,11 @@ const SupervisionInfoCard: React.FC<Props> = ({ testRequest }) => {
                         <div className="me-3 bg-success bg-opacity-10 p-3 rounded-3">
                             <IconifyIcon icon="tabler:user" className="fs-24 text-success" />
                         </div>
+
                         <div>
                             <small className="text-muted">Analista</small>
                             <div className="fw-semibold">
-                                {testRequest.test?.[0]?.results?.[0]?.user_name ?? "S/D"}
+                                {testRequest.analyst?.name ?? "Sin asignar"}
                             </div>
                         </div>
                     </div>

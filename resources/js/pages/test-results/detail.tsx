@@ -89,7 +89,7 @@ const TestResultDetailPage: React.FC = () => {
       <div className="mb-3 border-bottom pb-3">
         <div className="d-flex justify-content-between align-items-center">
           <p className="mb-0 text-muted">
-            Registra los resultados de las pruebas de laboratorion
+            Registra los resultados de las pruebas de laboratorio
           </p>
           <button
             type="button"

@@ -43,7 +43,8 @@ class SupervisionController
     public function sendTestToCommittee($id)
     {
         $this->sSupervision->sendToCommittee($id);
-        return redirect()->route('supervision.index')->with('success', 'Solicitud enviada a comité correctamente.');
+        return redirect()->route('supervision.index')
+            ->with('success', 'Solicitud enviada a comité correctamente.');
     }
 
     public function showTest($id)
@@ -59,7 +60,7 @@ class SupervisionController
 
         $this->sSupervision->rejectTest($request);
         return redirect()->route('supervision.show', $request->test_id)
-            ->with('danger', 'Test rechazado');
+            ->with('success', 'Test rechazado');
     }
 
     public function approveTest(Request $request)
@@ -72,10 +73,9 @@ class SupervisionController
 
     public function rejectTestRequest(Request $request)
     {
-
         $this->sSupervision->rejectTestRequest($request);
         return redirect()->route('supervision.index')
-            ->with('danger', 'Solicitud de muestra rechazado');
+            ->with('success', 'Solicitud de muestra rechazado');
     }
 
     public function approveTestRequest(Request $request)
