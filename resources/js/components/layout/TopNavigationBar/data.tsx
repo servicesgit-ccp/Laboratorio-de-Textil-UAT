@@ -38,6 +38,7 @@ export type CountryType = {
 export type NotificationType = {
     id: number;
     title: ReactNode;
+    href?: string;
     image?: {
         image: string;
         icon: string;

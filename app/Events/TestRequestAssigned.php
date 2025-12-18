@@ -22,22 +22,29 @@ class TestRequestAssigned implements ShouldBroadcast
 
     public function broadcastOn(): array
     {
-        $channels = [new Channel('public-channel')];
-
         if ($this->userId) {
-            $channels[] = new PrivateChannel("test-requests.{$this->userId}");
+            return [new PrivateChannel("test-requests.{$this->userId}")];
         }
 
-        return $channels;
+        return [new Channel('public-channel')];
     }
 
     public function broadcastWith(): array
     {
+        $latestTest = $this->test->test()->latest('id')->first();
+
         return [
             'test_request_id' => $this->test->id,
+            'test_id' => $latestTest?->id,
             'reference' => $this->test->number,
             'assigned_to' => optional($this->test->technician)->name,
             'summary' => $this->message,
+            'url' => $latestTest ? route('test-results.detail', ['test' => $latestTest->id]) : null,
         ];
+    }
+
+    public function broadcastAs(): string
+    {
+        return 'TestRequestAssigned';
     }
 }
