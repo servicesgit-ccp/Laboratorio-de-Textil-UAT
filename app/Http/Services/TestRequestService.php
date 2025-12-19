@@ -101,6 +101,7 @@ class TestRequestService
                 'is_development' => $data['is_development'] ?? 0,
                 'is_informative' => $data['is_informative'] ?? 0,
             ]);
+            $path = null;
 
             if (isset($data['new_image'])) {
                 $file = $data['new_image'];
