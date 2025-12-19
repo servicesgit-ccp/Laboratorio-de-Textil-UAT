@@ -208,7 +208,7 @@ const CommitteePage = () => {
                       <input
                         type="search"
                         className="form-control border-0 bg-transparent"
-                        placeholder="Buscar Muestra (folio, sku, estilo, cliente)"
+                        placeholder="Buscar Muestra (folio, sku, estilo, proveedor)"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => {
@@ -281,7 +281,7 @@ const CommitteePage = () => {
 
                       <Dropdown.Item onClick={() => setStatusFilter("reEntry")}>
                         <div className="d-flex align-items-center justify-content-between">
-                          <span>Re-ingreso</span>
+                          <span>Reingreso</span>
                           {statusFilter === "reEntry" && <span>✓</span>}
                         </div>
                       </Dropdown.Item>
