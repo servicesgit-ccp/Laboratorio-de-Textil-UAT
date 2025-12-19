@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-import { Row, Col, Card } from 'react-bootstrap';
 import { usePage, router } from '@inertiajs/react';
 import MainLayout from '@/layouts/MainLayout';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
@@ -21,7 +20,6 @@ const formatDate = (iso: string | null) => {
 
 const TestResultDetailPage: React.FC = () => {
   const testResult = usePage().props.testResult as any;
-
   let totalSectionsWithStatus = 0;
   let pendingSections = 0;
 
@@ -76,6 +74,7 @@ const TestResultDetailPage: React.FC = () => {
     pruebasPendientes: totalSectionsWithStatus
       ? `${pendingSections}/${totalSectionsWithStatus}`
       : '--',
+    image: testResult.test_request?.new_image ? testResult.test_request?.new_image : testResult.test_request?.image ?? '',
   };
 
   return (

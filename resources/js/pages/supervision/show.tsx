@@ -59,9 +59,6 @@ const TestShow = () => {
         );
     };
 
-
-
-
     return (
         <MainLayout>
             <Head title={`Solicitud #${testRequest.number}`} />

@@ -162,10 +162,10 @@ const TestResultsPage = () => {
           <Card className="border-0 shadow-sm rounded-4">
             {/* BUSCADOR */}
             <CardHeader className="border-0 pb-0">
-              <div className="d-flex align-items-center justify-content-between">
+              <div className="d-flex align-items-stretch gap-3 flex-wrap">
                 {/* Input grande con ícono */}
-                <div className="flex-grow-1 me-3">
-                  <div className="d-flex align-items-center bg-body-tertiary rounded-4 px-3 py-2">
+                <div style={{ flex: "1 1 320px", minWidth: 200 }}>
+                  <div className="d-flex align-items-center bg-body-tertiary rounded-4 px-2 py-2 h-60">
                     <IconifyIcon icon="tabler:search" className="me-2 text-muted fs-5" />
                     <input
                       type="search"
@@ -183,15 +183,18 @@ const TestResultsPage = () => {
                 </div>
 
                 {/* Botón Buscar */}
-                <Button
-                  type="button"
-                  variant="dark"
-                  className="px-4 d-flex align-items-center rounded-4"
-                  onClick={handleSearch}
-                >
-                  <IconifyIcon icon="tabler:search" className="me-2" />
-                  Buscar
-                </Button>
+                <div style={{ width: 130, minWidth: 120 }}>
+                  <Button
+                    type="button"
+                    variant="dark"
+                    className="w-100 px-3 d-flex align-items-center justify-content-center rounded-4"
+                    style={{ padding: "10px 14px" }}
+                    onClick={handleSearch}
+                  >
+                    <IconifyIcon icon="tabler:search" className="me-2" />
+                    Buscar
+                  </Button>
+                </div>
               </div>
             </CardHeader>
 
@@ -202,7 +205,6 @@ const TestResultsPage = () => {
                   <tr>
                     <th>Folio</th>
                     <th>Fecha Ingreso</th>
-                    <th>Fecha Salida</th>
                     <th>SKU/ ESTILO</th>
                     <th>Analista</th>
                     <th>Pruebas Pendientes</th>
@@ -214,7 +216,6 @@ const TestResultsPage = () => {
                     <tr key={req.id}>
                       <td>{req.folio}</td>
                       <td>{req.fechaIngreso}</td>
-                      <td>{req.fechaSalida}</td>
                       <td>
                         <span
                           className="badge bg-light text-muted border rounded-pill"
