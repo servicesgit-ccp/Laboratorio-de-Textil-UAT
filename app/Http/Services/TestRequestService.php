@@ -47,7 +47,7 @@ class TestRequestService
         $query = $this->mTestRequest
             ->with(['test', 'test.results', 'style', 'style.provider', 'style.department', 'technician']);
 
-         if ($search) {
+        if ($search) {
             $query->where(function ($qq) use ($search) {
                 $qq->where('number', 'like', "%{$search}%")
                 ->orWhere('item', 'like', "%{$search}%")
