@@ -1,11 +1,12 @@
 // resources/js/Pages/test-results/section-form.tsx
 import React from 'react';
-import { usePage, router } from '@inertiajs/react';
+import { usePage, router, Link } from '@inertiajs/react';
 import MainLayout from '@/layouts/MainLayout';
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import GenericSectionForm from '@/components/_test-results/forms/GenericSectionForm';
 import { SectionKey } from '@/components/_test-results/sectionConfig';
+import { Button } from 'react-bootstrap';
 
 type PageProps = {
   test: {
@@ -34,14 +35,11 @@ const SectionFormPage: React.FC = () => {
           <p className="mb-0 text-muted">
             Registra la información de la sección {sectionName}.
           </p>
-          <button
-            type="button"
-            className="btn btn-link p-0 d-inline-flex align-items-center text-decoration-none"
-            onClick={() => router.get(route('test-results.detail', { test: test.id }))}
-          >
-            <IconifyIcon icon="tabler:arrow-left" className="me-1" />
-            <span>Volver al análisis</span>
-          </button>
+          <Link href={route('test-results')}>
+            <Button variant="soft-secondary">
+                <IconifyIcon icon="tabler:arrow-left" className="me-1" /> Regresar
+            </Button>
+           </Link>
         </div>
       </div>
       <GenericSectionForm

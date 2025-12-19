@@ -1,5 +1,5 @@
 // react
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { router, Link, usePage } from '@inertiajs/react';
 import axios from 'axios';
 // bootstrap
@@ -47,18 +47,43 @@ const TestRequestForm = () => {
 
     const isEdit = !!test_request;
 
+    const requiredTestTypeNames = useMemo(() => ['APARIENCIA', 'INICIAL'], []);
+    const requiredNameSet = useMemo(
+        () => new Set(requiredTestTypeNames.map((name) => name.trim().toLowerCase())),
+        [requiredTestTypeNames],
+    );
+
+    const requiredTestTypeIds = useMemo(() => {
+        if (!Array.isArray(test_types)) return [];
+        return test_types
+            .filter((tt) => requiredNameSet.has((tt.name_es ?? '').trim().toLowerCase()))
+            .map((tt) => tt.id);
+    }, [test_types, requiredNameSet]);
+
+    const withRequiredTestTypes = useMemo(
+        () => (ids: number[]) => Array.from(new Set([...ids, ...requiredTestTypeIds])),
+        [requiredTestTypeIds],
+    );
+
+    const isRequiredTestType = useMemo(
+        () => (id: number) => requiredTestTypeIds.includes(id),
+        [requiredTestTypeIds],
+    );
+
     const initialSelectedTestTypeIds = (() => {
-        if (!test_request) return [];
+        if (!test_request) return withRequiredTestTypes([]);
 
         const testNames = test_request.test?.[0]?.results?.[0]?.test_names ?? [];
 
         if (!Array.isArray(testNames) || testNames.length === 0) {
-            return [];
+            return withRequiredTestTypes([]);
         }
 
-        return test_types
+        const selectedIds = test_types
             .filter((tt) => testNames.includes(tt.name_es))
             .map((tt) => tt.id);
+
+        return withRequiredTestTypes(selectedIds);
     })();
 
     const [loading, setLoading] = useState(false);
@@ -109,10 +134,15 @@ const TestRequestForm = () => {
 
     const handleCheckboxChange = (id: number) => {
         setForm((prev) => {
+            if (isRequiredTestType(id)) {
+                return prev.test_type_ids.includes(id)
+                    ? prev
+                    : { ...prev, test_type_ids: withRequiredTestTypes(prev.test_type_ids) };
+            }
             const selected = prev.test_type_ids.includes(id)
                 ? prev.test_type_ids.filter((typeId) => typeId !== id)
                 : [...prev.test_type_ids, id];
-            return { ...prev, test_type_ids: selected };
+            return { ...prev, test_type_ids: withRequiredTestTypes(selected) };
         });
     };
 
@@ -128,7 +158,9 @@ const TestRequestForm = () => {
         data.append('is_development', form.is_development ? '1' : '0');
         data.append('is_informative', form.is_informative ? '1' : '0');
 
-        form.test_type_ids.forEach((id, idx) => {
+        const finalTestTypeIds = withRequiredTestTypes(form.test_type_ids);
+
+        finalTestTypeIds.forEach((id, idx) => {
             data.append(`test_type_ids[${idx}]`, String(id));
         });
 
@@ -257,170 +289,188 @@ const TestRequestForm = () => {
 
                             <Row>
                                 <Col lg={8}>
-                                    <Row className="g-3">
-                                        <Col md={12}>
-                                            <Form.Group>
-                                                <Form.Label>Tipo de solicitud</Form.Label>
-                                                <div className="d-flex flex-wrap gap-4 mt-2">
-                                                    <Form.Check
-                                                        type="checkbox"
-                                                        id="flag-desarrollo"
-                                                        label="Desarrollo"
-                                                        checked={form.is_development}
-                                                        onChange={(e) =>
-                                                            handleFlagChange(
-                                                                'is_development',
-                                                                e.target.checked
-                                                            )
-                                                        }
-                                                    />
-                                                    <Form.Check
-                                                        type="checkbox"
-                                                        id="flag-informativo"
-                                                        label="Informativo"
-                                                        checked={form.is_informative}
-                                                        onChange={(e) =>
-                                                            handleFlagChange(
-                                                                'is_informative',
-                                                                e.target.checked
-                                                            )
-                                                        }
-                                                    />
-                                                </div>
-                                            </Form.Group>
-                                        </Col>
-
-                                        <Col md={6}>
-                                            <Form.Group>
-                                                <Form.Label>SKU o estilo</Form.Label>
-                                                <Form.Control
-                                                    type="text"
-                                                    name="item"
-                                                    value={form.item}
-                                                    onChange={handleChange}
-                                                    onKeyDown={handleItemKeyDown}
-                                                    placeholder="Ej. 100577957"
-                                                    required
-                                                />
-                                            </Form.Group>
-                                        </Col>
-                                        {!(form.is_development || form.is_informative) && (
-                                        <>
-                                            <Col md={6}>
+                                    <div className="mb-4 pb-3 border-bottom">
+                                        <h6 className="text-uppercase text-muted mb-3">Tipo de solicitud</h6>
+                                        <Row className="g-3">
+                                            <Col md={12}>
                                                 <Form.Group>
-                                                    <Form.Label>Nombre</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        disabled
-                                                        placeholder=""
-                                                        value={
-                                                            itemLoading
-                                                                ? 'Buscando...'
-                                                                : form.item_name
-                                                        }
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Departamento</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        disabled
-                                                        placeholder=""
-                                                        value={form.department_name}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-
-                                            <Col md={6}>
-                                                <Form.Group>
-                                                    <Form.Label>Proveedor</Form.Label>
-                                                    <Form.Control
-                                                        type="text"
-                                                        disabled
-                                                        placeholder=""
-                                                        value={form.provider_name}
-                                                    />
-                                                </Form.Group>
-                                            </Col>
-                                        </>
-                                        )}
-                                        <Col md={12}>
-                                            <Form.Group>
-                                                <Form.Label>Tipos de prueba</Form.Label>
-                                                <div className="d-flex flex-wrap gap-3 mt-2">
-                                                    {test_types?.map((type) => (
+                                                    <div className="d-flex flex-wrap gap-4 mt-2">
                                                         <Form.Check
-                                                            key={type.id}
                                                             type="checkbox"
-                                                            id={`test-type-${type.id}`}
-                                                            label={type.name_es}
-                                                            checked={form.test_type_ids.includes(
-                                                                type.id
-                                                            )}
-                                                            onChange={() =>
-                                                                handleCheckboxChange(type.id)
+                                                            id="flag-desarrollo"
+                                                            label="Desarrollo"
+                                                            checked={form.is_development}
+                                                            onChange={(e) =>
+                                                                handleFlagChange(
+                                                                    'is_development',
+                                                                    e.target.checked
+                                                                )
                                                             }
                                                         />
-                                                    ))}
-                                                </div>
-                                            </Form.Group>
-                                        </Col>
+                                                        <Form.Check
+                                                            type="checkbox"
+                                                            id="flag-informativo"
+                                                            label="Informativo"
+                                                            checked={form.is_informative}
+                                                            onChange={(e) =>
+                                                                handleFlagChange(
+                                                                    'is_informative',
+                                                                    e.target.checked
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                    </div>
 
-                                        <Col md={12}>
-                                            <Form.Group>
-                                                <Form.Label>Notas adicionales</Form.Label>
-                                                <Form.Control
-                                                    as="textarea"
-                                                    name="notes"
-                                                    rows={4}
-                                                    value={form.notes}
-                                                    onChange={handleChange}
-                                                    placeholder="Información adicional sobre la muestra o solicitud..."
-                                                />
-                                            </Form.Group>
-                                        </Col>
+                                    <div className="mb-4 pb-3 border-bottom">
+                                        <h6 className="text-uppercase text-muted mb-3">Datos de la muestra</h6>
+                                        <Row className="g-3">
+                                            <Col md={6}>
+                                                <Form.Group>
+                                                    <Form.Label>SKU o estilo</Form.Label>
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="item"
+                                                        value={form.item}
+                                                        onChange={handleChange}
+                                                        onKeyDown={handleItemKeyDown}
+                                                        placeholder="Ej. 100577957"
+                                                        required
+                                                    />
+                                                    <Form.Text className="text-muted">
+                                                        Presiona Enter para buscar el SKU o ESTILO.
+                                                    </Form.Text>
+                                                </Form.Group>
+                                            </Col>
+                                            {!(form.is_development || form.is_informative) && (
+                                            <>
+                                                <Col md={6}>
+                                                    <Form.Group>
+                                                        <Form.Label>Nombre</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            disabled
+                                                            placeholder=""
+                                                            value={
+                                                                itemLoading
+                                                                    ? 'Buscando...'
+                                                                    : form.item_name
+                                                            }
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col md={6}>
+                                                    <Form.Group>
+                                                        <Form.Label>Departamento</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            disabled
+                                                            placeholder=""
+                                                            value={form.department_name}
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
 
-                                        <Col
-                                            xs={12}
-                                            className="d-flex justify-content-end mt-4"
+                                                <Col md={6}>
+                                                    <Form.Group>
+                                                        <Form.Label>Proveedor</Form.Label>
+                                                        <Form.Control
+                                                            type="text"
+                                                            disabled
+                                                            placeholder=""
+                                                            value={form.provider_name}
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+                                            </>
+                                            )}
+                                        </Row>
+                                    </div>
+
+                                    <div className="mb-4 pb-3 border-bottom">
+                                        <h6 className="text-uppercase text-muted mb-3">Tipos de prueba</h6>
+                                        <Row className="g-3">
+                                            <Col md={12}>
+                                                <Form.Group>
+                                                    <Row className="g-2">
+                                                        {test_types?.map((type) => (
+                                                            <Col key={type.id} xs={12} sm={6} lg={4}>
+                                                                <Form.Check
+                                                                    type="checkbox"
+                                                                    id={`test-type-${type.id}`}
+                                                                    label={type.name_es}
+                                                                    checked={form.test_type_ids.includes(
+                                                                        type.id
+                                                                    )}
+                                                                    disabled={isRequiredTestType(type.id)}
+                                                                    onChange={() =>
+                                                                        handleCheckboxChange(type.id)
+                                                                    }
+                                                                />
+                                                            </Col>
+                                                        ))}
+                                                    </Row>
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <Row className="g-3">
+                                            <Col md={12}>
+                                                <Form.Group>
+                                                    <Form.Label>Notas adicionales</Form.Label>
+                                                    <Form.Control
+                                                        as="textarea"
+                                                        name="notes"
+                                                        rows={4}
+                                                        value={form.notes}
+                                                        onChange={handleChange}
+                                                        placeholder="Información adicional sobre la muestra o solicitud..."
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                        </Row>
+                                    </div>
+
+                                    <div className="d-flex justify-content-end mt-4 border-top pt-3">
+                                        <Button
+                                            type="submit"
+                                            variant="success"
+                                            className="bg-gradient"
+                                            disabled={loading}
                                         >
-                                            <Button
-                                                type="submit"
-                                                variant="success"
-                                                className="bg-gradient"
-                                                disabled={loading}
-                                            >
-                                                {loading ? (
-                                                    <>
-                                                        <IconifyIcon
-                                                            icon="tabler:loader"
-                                                            className="me-2 spinner-border spinner-border-sm"
-                                                        />
-                                                        {isEdit
-                                                            ? 'Actualizando...'
-                                                            : 'Guardando...'}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <IconifyIcon
-                                                            icon="tabler:device-floppy"
-                                                            className="me-2"
-                                                        />
-                                                        {isEdit
-                                                            ? 'Actualizar solicitud'
-                                                            : 'Guardar solicitud'}
-                                                    </>
-                                                )}
-                                            </Button>
-                                        </Col>
-                                    </Row>
+                                            {loading ? (
+                                                <>
+                                                    <IconifyIcon
+                                                        icon="tabler:loader"
+                                                        className="me-2 spinner-border spinner-border-sm"
+                                                    />
+                                                    {isEdit
+                                                        ? 'Actualizando...'
+                                                        : 'Guardando...'}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <IconifyIcon
+                                                        icon="tabler:device-floppy"
+                                                        className="me-2"
+                                                    />
+                                                    {isEdit
+                                                        ? 'Actualizar solicitud'
+                                                        : 'Guardar solicitud'}
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
                                 </Col>
 
                                 {/* Columna derecha: recuadro de imagen / captura */}
                                <Col lg={4} className="mt-3 mt-lg-0">
-                                    <div className="border rounded p-3 h-100 d-flex flex-column align-items-center justify-content-center">
+                                    <div className="border rounded p-3 h-100 d-flex flex-column align-items-center justify-content-center bg-light-subtle">
                                         {!(form.is_development || form.is_informative) && imageUrl && !imageLoadError ? (
                                             <>
                                                 <Form.Label>Imagen de la muestra</Form.Label>

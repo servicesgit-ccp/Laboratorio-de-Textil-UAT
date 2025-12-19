@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { usePage, router } from '@inertiajs/react';
+import { usePage, router, Link } from '@inertiajs/react';
 import MainLayout from '@/layouts/MainLayout';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import PageTitle from '@/components/PageTitle';
@@ -8,6 +8,7 @@ import TestStatusChips from '@/components/_test-results/TestStatusChips';
 import TestSectionTabs from '@/components/_test-results/TestSectionTabs';
 import GenericSectionContent from '@/components/_test-results/contents/GenericSectionContent';
 import { SectionKey } from '@/components/_test-results/sectionConfig';
+import { Button } from 'react-bootstrap';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -90,14 +91,11 @@ const TestResultDetailPage: React.FC = () => {
           <p className="mb-0 text-muted">
             Registra los resultados de las pruebas de laboratorio
           </p>
-          <button
-            type="button"
-            className="btn btn-link p-0 d-inline-flex align-items-center text-decoration-none"
-            onClick={() => router.get('/test-results')}
-          >
-            <IconifyIcon icon="tabler:arrow-left" className="me-1" />
-            <span>Volver al Listado</span>
-          </button>
+          <Link href={route('test-results')}>
+            <Button variant="soft-secondary">
+                <IconifyIcon icon="tabler:arrow-left" className="me-1" /> Regresar
+            </Button>
+           </Link>
         </div>
       </div>
 

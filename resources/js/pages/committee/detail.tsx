@@ -1,13 +1,15 @@
 import React, { useMemo } from "react";
 import { Link, router } from "@inertiajs/react";
-import { Badge } from "react-bootstrap";
+import { Badge, Button } from "react-bootstrap";
 import MainLayout from "@/layouts/MainLayout";
 import SummaryCommitee from "@/components/_committee/SummaryCommitee";
 import TableDetail, { SummaryRow } from "@/components/_committee/TableDetail";
 import CommitteeActions from "@/components/_committee/CommitteeActions";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import PageTitle from "@/components/PageTitle";
 
 type Props = {
-  testResult: any; // tipa después si quieres
+  testResult: any;
 };
 
 function formatDate(value?: string | null) {
@@ -21,8 +23,7 @@ function formatDate(value?: string | null) {
 }
 
 export default function Detail({ testResult }: Props) {
-  console.log(testResult);
-  const folio = testResult?.number ?? "REQ-????-???";
+  const folio = testResult?.number ?? "CCP0????-???";
   const status = Number(testResult?.status ?? 0);
 
   const summaryRows: SummaryRow[] = useMemo(() => {
@@ -92,33 +93,34 @@ const handleApprove = (comment: string) => {
 
   return (
     <MainLayout>
-      <div className="container py-4">
-        {/* Volver */}
-        <div className="mb-3">
-          <Link href={route("committee.index")} className="text-decoration-none">
-            ← Volver al listado
-          </Link>
-        </div>
+      <PageTitle
+        title={`Revisión de Comité - ${folio}`}
+        subTitle="Comité"
+      />
 
-        {/* Header */}
-        <div className="mb-4">
+      {/* Header */}
+      <div className="mb-3 border-bottom pb-3">
+        <div className="d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center gap-2 flex-wrap">
-            <h2 className="m-0 fw-semibold">
-              Revisión de Comité - {folio}
-            </h2>
-
+            <p className="mb-0 text-muted">
+              Revisa los resultados de las pruebas y toma una decisión
+            </p>
             <Badge pill className={statusLabel.className} style={{ fontSize: 12 }}>
               {statusLabel.text}
             </Badge>
           </div>
-
-          <div className="text-muted mt-1">
-            Revisa los resultados de las pruebas y toma una decisión
-          </div>
+          <Link href={route("committee.index")}>
+            <Button variant="soft-secondary">
+              <IconifyIcon icon="tabler:arrow-left" className="me-1" /> Regresar
+            </Button>
+          </Link>
         </div>
+      </div>
+
+      <div className="container py-4">
 
         {/* Resumen + tabla */}
-        <SummaryCommitee testResult={testResult} summaryRows={summaryRows} />  
+        <SummaryCommitee testResult={testResult} summaryRows={summaryRows} />
         <div className="border rounded-3 py-2 text-center fw-semibold">
           Pruebas Realizadas
         </div>
@@ -133,6 +135,6 @@ const handleApprove = (comment: string) => {
         />
       </div>
     </MainLayout>
-    
+
   );
 }
