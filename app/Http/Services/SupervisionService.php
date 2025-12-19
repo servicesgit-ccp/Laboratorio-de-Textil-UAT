@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Models\Test;
 use App\Models\TestRequest;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class SupervisionService
 {
@@ -31,7 +32,16 @@ class SupervisionService
 
         if ($search) {
             $query->where(function ($qq) use ($search) {
-                $qq->where('number', 'like', "%{$search}%");
+                $qq->where('number', 'like', "%{$search}%")
+                ->orWhere('item', 'like', "%{$search}%")
+                ->orWhereHas('style', function ($s) use ($search) {
+                    $s->where('number', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                })
+                ->orWhereHas('style.provider', function ($p) use ($search) {
+                    $p->where('name', 'like', "%{$search}%")
+                        ->orWhere('number', 'like', "%{$search}%");
+                });
             });
         }
 
@@ -179,7 +189,7 @@ class SupervisionService
         // Marcar test como rechazado
         $content[$testName]['approved'] = false;
         $content[$testName]['status_review'] = 2;
-
+        $content[$testName]['reviewed_by'] = Auth::user()->name;
         $result->content = $content;
         $result->save();
 
@@ -206,6 +216,8 @@ class SupervisionService
 
         $content[$testName]['approved'] = true;
         $content[$testName]['status_review'] = 2;
+        $content[$testName]['reviewed_by'] = Auth::user()->name;
+
 
         $result->content = $content;
         $result->save();
@@ -215,6 +227,7 @@ class SupervisionService
     {
         $testRequest = $this->mTestRequest->findOrFail($request->test_id);
         $testRequest->status = $this->mTestRequest::STATUS['APPROVED'];
+        $testRequest->reviewed_by = Auth::id();
         $testRequest->save();
     }
 
@@ -223,6 +236,7 @@ class SupervisionService
         $testRequest = $this->mTestRequest->findOrFail($request->test_id);
         $testRequest->cancelation_notes = $request->notes;
         $testRequest->status = $this->mTestRequest::STATUS['REJECTED'];
+        $testRequest->reviewed_by = Auth::id();
         $testRequest->save();
     }
 

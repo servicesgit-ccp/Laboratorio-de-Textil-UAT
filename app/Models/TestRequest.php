@@ -20,7 +20,10 @@ class TestRequest extends Model
         'is_development',
         'is_informative',
         'assignated_to',
-        'cancelation_notes'
+        'cancelation_notes',
+        'reviewed_by',
+        'comment_committee',
+        'is_re_entry',
     ];
 
     public const STATUS = [
@@ -31,6 +34,9 @@ class TestRequest extends Model
         'APPROVED'    => 4,
         'REJECTED' => 5,
         'ALL'  => 6,
+        'APPROVED_COMMITTEE' => 7,
+        'REJECTED_COMMITTEE' => 8,
+        'RE-ENTRY' => 9,
     ];
 
     protected $appends = ['image'];
@@ -65,4 +71,9 @@ class TestRequest extends Model
         return $this->belongsTo(User::class, 'assignated_to');
     }
 
+
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
 }

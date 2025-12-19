@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 
 class TestResultService
 {
@@ -241,6 +242,7 @@ class TestResultService
         $content[$section]['status']    = 2;
         $content[$section]['user_id']   = $user->id;
         $content[$section]['user_name'] = $user->name;
+        $content[$section]['finished_at'] = Carbon::now()->format('Y-m-d H:i:s');
 
         $result->content = $content;
         $result->save();

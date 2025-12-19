@@ -8,151 +8,129 @@ import {Button, Card, Col, Nav, Row, Tab} from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 const TestRequestShow = () => {
-    const { testRequest } = usePage().props as { testRequest: any };
+  const { testRequest } = usePage().props as { testRequest: any };
 
-    const [activeKey, setActiveKey] = useState(
-        testRequest.test?.length ? `test-${testRequest.test[0].id}` : ''
-    );
+  const imageUrl = testRequest.new_image
+  ? testRequest.new_image
+  : testRequest.image;
 
-    return (
-        <MainLayout>
-            <Head title={`Solicitud #${testRequest.number}`} />
+  const createdAt = (() => {
+    try {
+      return new Date(testRequest.created_at).toLocaleString('es-MX');
+    } catch {
+      return '--';
+    }
+  })();
 
-            <PageTitle
-                title={`Solicitud de Prueba`}
-                subTitle="Detalle de pruebas asociadas"
-            />
+  return (
+    <MainLayout>
+      <Head title={`Solicitud #${testRequest.number}`} />
 
-            <Row className="mt-3">
-                <Col xs={12}>
-                    <div className="d-flex justify-content-end mb-3">
-                        <Link href={route('test.request.index')}>
-                            <Button variant="soft-secondary">
-                                <IconifyIcon icon="tabler:arrow-left" className="me-1" /> Regresar
-                            </Button>
-                        </Link>
-                    </div>
-                    <TestRequestShowDetail
-                        title={`Solicitud #${testRequest.number}`}
-                        description={
-                            <>
-                                <span className="d-block">
-                                    {console.log(testRequest)}
-                                    {testRequest.style?.number.length > 0 ? (
-                                        <>
-                                            <strong>Estilo:</strong> {testRequest.style.number}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <strong>SKU:</strong> {testRequest.item}
-                                        </>
-                                    )}
-                                </span>
-                                <span className="d-block">
-                                    <strong>Departamento:</strong> {testRequest.style?.department.description ?? ''}
-                                </span>
+      <PageTitle
+          title={`Solicitud de Prueba`}
+          subTitle="Detalle de pruebas asociadas"
+      />
 
-                                <span className="d-block">
-                                    <strong>Creado:</strong>{' '}
-                                    {new Date(testRequest.created_at).toLocaleString()}
-                                </span>
-                            </>
-                        }
+      <Row className="mt-3">
+        <Col xs={12}>
+          <TestRequestShowDetail
+            title={`Solicitud #${testRequest.number}`}
+            image={imageUrl}
+            description={
+              <div className="row g-4">
+                {/* Estilo */}
+                <div className="col-12 col-md-4">
+                  <div className="d-flex align-items-start gap-3">
+                    <div
+                      className="rounded-3 d-flex align-items-center justify-content-center"
+                      style={{ width: 40, height: 40, background: '#f3ecff' }}
                     >
-                        {testRequest.test?.length ? (
-                            <Tab.Container
-                                activeKey={activeKey}
-                                onSelect={(k) => k && setActiveKey(k)}
-                            >
-                                <Nav variant="tabs" className="mb-3">
-                                    {testRequest.test.map((t: any) => (
-                                        <Nav.Item key={t.id}>
-                                            <Nav.Link eventKey={`test-${t.id}`}>
-                                                <IconifyIcon
-                                                    icon="tabler:flask"
-                                                    className="me-1"
-                                                />
-                                                Test #{t.id}
-                                            </Nav.Link>
-                                        </Nav.Item>
-                                    ))}
-                                </Nav>
+                      <IconifyIcon icon="tabler:tag" className="fs-20" />
+                    </div>
+                    <div>
+                      <div className="text-muted" style={{ fontSize: 13 }}>
+                        Estilo
+                      </div>
+                      <div className="fw-semibold">
+                        {testRequest.style?.number ?? '--'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                                <Tab.Content>
-                                    {testRequest.test.map((t: any) => (
-                                        <Tab.Pane eventKey={`test-${t.id}`} key={t.id}>
-                                            <Card className="border shadow-sm rounded-3">
-                                                <Card.Body>
-                                                    <h5 className="fw-semibold mb-3">
-                                                        <IconifyIcon
-                                                            icon="tabler:microscope"
-                                                            className="me-1"
-                                                        />
-                                                        Detalles del Test
-                                                    </h5>
+                {/* Departamento */}
+                <div className="col-12 col-md-4">
+                  <div className="d-flex align-items-start gap-3">
+                    <div
+                      className="rounded-3 d-flex align-items-center justify-content-center"
+                      style={{ width: 40, height: 40, background: '#e6fbf6' }}
+                    >
+                      <IconifyIcon icon="tabler:building" className="fs-20" />
+                    </div>
+                    <div>
+                      <div className="text-muted" style={{ fontSize: 13 }}>
+                        Departamento
+                      </div>
+                      <div className="fw-semibold">
+                        {testRequest.style?.department?.description ?? '--'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-                                                    <Row className="gy-2">
-                                                        <Col md={4}>
-                                                            <strong>Inicio:</strong>{' '}
-                                                            {t.started_at
-                                                                ? new Date(
-                                                                    t.started_at
-                                                                ).toLocaleString()
-                                                                : 'Sin iniciar'}
-                                                        </Col>
-                                                        <Col md={4}>
-                                                            <strong>Fin:</strong>{' '}
-                                                            {t.finished_at
-                                                                ? new Date(
-                                                                    t.finished_at
-                                                                ).toLocaleString()
-                                                                : 'No finalizado'}
-                                                        </Col>
-                                                    </Row>
-
-                                                    <hr />
-
-                                                    <h6 className="fw-semibold mb-3">
-                                                        <IconifyIcon
-                                                            icon="tabler:report-analytics"
-                                                            className="me-1"
-                                                        />
-                                                        Resultados
-                                                    </h6>
-
-                                                    {t.results?.length ? (
-                                                        <div className="bg-light p-3 rounded-3">
-                                                            {t.results.map((r: any) => (
-                                                                <div
-                                                                    key={r.id}
-                                                                    className="mb-3 border-bottom pb-2"
-                                                                >
-                                                                    <strong>
-                                                                        Resultado #{r.id}
-                                                                    </strong>
-                                                                    <TestRequestShowDetailContent result={r} />
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    ) : (
-                                                        <div className="text-muted">
-                                                            No hay resultados para este test.
-                                                        </div>
-                                                    )}
-                                                </Card.Body>
-                                            </Card>
-                                        </Tab.Pane>
-                                    ))}
-                                </Tab.Content>
-                            </Tab.Container>
-                        ) : (
-                            <div className="text-muted">No hay pruebas asociadas.</div>
-                        )}
-                    </TestRequestShowDetail>
-                </Col>
-            </Row>
-        </MainLayout>
-    );
+                {/* Creado */}
+                <div className="col-12 col-md-4">
+                  <div className="d-flex align-items-start gap-3">
+                    <div
+                      className="rounded-3 d-flex align-items-center justify-content-center"
+                      style={{ width: 40, height: 40, background: '#fff2d9' }}
+                    >
+                      <IconifyIcon icon="tabler:calendar" className="fs-20" />
+                    </div>
+                    <div>
+                      <div className="text-muted" style={{ fontSize: 13 }}>
+                        Creado
+                      </div>
+                      <div className="fw-semibold">
+                        {createdAt}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          >
+            {testRequest.test?.length ? (
+              <>
+                {testRequest.test.map((t: any) => (
+                  <React.Fragment key={t.id}>
+                    {t.results?.length ? (
+                      <>
+                        {t.results.map((r: any) => (
+                          <div
+                            key={r.id}
+                            className="mb-3 border-bottom pb-2"
+                          >
+                            <TestRequestShowDetailContent result={r} />
+                          </div>
+                        ))}
+                      </>
+                    ) : (
+                      <div className="text-muted">
+                        No hay resultados para este test.
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+              </>
+            ) : (
+              <div className="text-muted">No hay pruebas asociadas.</div>
+            )}
+          </TestRequestShowDetail>
+        </Col>
+      </Row>
+    </MainLayout>
+  );
 };
 
 export default TestRequestShow;
