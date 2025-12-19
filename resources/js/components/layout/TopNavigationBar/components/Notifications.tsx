@@ -1,21 +1,134 @@
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import SimpleBar from 'simplebar-react';
 import { Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap';
-import { notificationData, NotificationType } from '../data';
+import { NotificationType } from '../data';
 
 import { timeSince } from '@/utils/date';
-import { Link } from '@inertiajs/react';
-import { useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import echo from '@/lib/echo';
+import { useNotificationContext } from '@/context/useNotificationContext';
+
+type TestRequestAssignedEvent = {
+    test_request_id?: number;
+    test_id?: number;
+    reference?: string;
+    assigned_to?: string;
+    summary?: string;
+    message?: string;
+    url?: string;
+};
+
+type SharedChannel = {
+    name: string;
+    cleanup: () => void;
+};
 
 const Notifications = () => {
-    const [notifications, setNotifications] = useState<NotificationType[]>(notificationData);
+    const [notifications, setNotifications] = useState<NotificationType[]>([]);
+    const [hasRealtimeActivity, setHasRealtimeActivity] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const { showNotification } = useNotificationContext();
+    const { auth } = usePage().props as {
+        auth?: {
+            user?: {
+                id?: number;
+                name?: string;
+            };
+        };
+    };
+    const userId = auth?.user?.id;
 
     const dismissNotification = (id: number) => {
         setNotifications((prev) => prev.filter((notification) => notification.id !== id));
     };
+
+    useEffect(() => {
+        if (!echo) {
+            return;
+        }
+
+        const eventName = '.TestRequestAssigned';
+        const subscriptions: SharedChannel[] = [];
+
+        const handleIncoming = (event: TestRequestAssignedEvent) => {
+            const requestId = event.test_request_id ?? Date.now();
+            const label = event.summary || event.message || 'Nuevo test request asignado';
+            const title = (
+                <>
+                    <span className="fw-medium text-body">Solicitud #{requestId}</span> asignada
+                    {event.assigned_to ? (
+                        <>
+                            {' '}
+                            a <span className="fw-medium text-body">{event.assigned_to}</span>
+                        </>
+                    ) : null}
+                    .
+                </>
+            );
+
+            setNotifications((prev) => [
+                {
+                    id: Number(new Date()),
+                    title,
+                    icon: {
+                        icon: 'tabler:flask',
+                        variant: 'primary',
+                    },
+                    time: new Date(),
+                    href: event.url,
+                },
+                ...prev,
+            ]);
+
+            setHasRealtimeActivity(true);
+            setUnreadCount((prev) => prev + 1);
+            showNotification({
+                title: 'Nuevo test request',
+                message: label,
+                variant: 'primary',
+                delay: 4000,
+            });
+        };
+
+        const mountChannel = (name: string, channelFactory: () => any) => {
+            const channelInstance = channelFactory();
+            if (!channelInstance) {
+                return;
+            }
+
+            channelInstance.listen(eventName, handleIncoming);
+            subscriptions.push({
+                name,
+                cleanup: () => {
+                    channelInstance.stopListening(eventName, handleIncoming);
+                    echo.leaveChannel(name);
+                },
+            });
+        };
+
+        mountChannel('public-channel', () => echo.channel('public-channel'));
+
+        if (userId) {
+            mountChannel(`test-requests.${userId}`, () => echo.private(`test-requests.${userId}`));
+        }
+
+        return () => {
+            subscriptions.forEach(({ cleanup }) => cleanup());
+        };
+    }, [showNotification, userId]);
+
     return (
         <div className="topbar-item">
-            <Dropdown align={'end'}>
+            <Dropdown
+                align={'end'}
+                onToggle={(show) => {
+                    if (show) {
+                        setHasRealtimeActivity(false);
+                        setUnreadCount(0);
+                    }
+                }}
+            >
                 <DropdownToggle
                     as={'a'}
                     className="topbar-link drop-arrow-none"
@@ -25,14 +138,18 @@ const Notifications = () => {
                     aria-haspopup="false"
                     aria-expanded="false"
                 >
-                    <IconifyIcon icon="tabler:bell" className="animate-ring fs-22" />
-                    <span className="noti-icon-badge" />
+                    <IconifyIcon icon="tabler:bell" className={`${unreadCount > 0 ? 'animate-ring' : ''} fs-22`} />
+                    {unreadCount > 0 && (
+                        <span className="noti-icon-badge d-flex align-items-center justify-content-center">
+                            <small>{unreadCount}</small>
+                        </span>
+                    )}
                 </DropdownToggle>
                 <DropdownMenu className="p-0 dropdown-menu-start dropdown-menu-lg" style={{ minHeight: 300 }}>
                     <div className="p-3 border-bottom border-dashed">
                         <Row className="align-items-center">
                             <Col>
-                                <h6 className="m-0 fs-16 fw-semibold"> Notifications</h6>
+                                <h6 className="m-0 fs-16 fw-semibold"> Notificaciones</h6>
                             </Col>
                             <Col xs={'auto'}>
                                 <Dropdown>
@@ -46,10 +163,10 @@ const Notifications = () => {
                                         <IconifyIcon icon="tabler:settings" className="fs-22 align-middle" />
                                     </DropdownToggle>
                                     <DropdownMenu className="dropdown-menu-end">
-                                        <DropdownItem>Mark as Read</DropdownItem>
-                                        <DropdownItem>Delete All</DropdownItem>
-                                        <DropdownItem>Do not Disturb</DropdownItem>
-                                        <DropdownItem>Other Settings</DropdownItem>
+                                        <DropdownItem>Marcar como leidas</DropdownItem>
+                                        <DropdownItem>Borrar todas</DropdownItem>
+                                        <DropdownItem>No molestar</DropdownItem>
+                                        <DropdownItem>Otras opciones</DropdownItem>
                                     </DropdownMenu>
                                 </Dropdown>
                             </Col>
@@ -78,7 +195,13 @@ const Notifications = () => {
                                     )}
 
                                     <span className="flex-grow-1 text-muted">
-                                        {item.title}
+                                        {item.href ? (
+                                            <Link href={item.href} className="text-reset text-decoration-none">
+                                                {item.title}
+                                            </Link>
+                                        ) : (
+                                            item.title
+                                        )}
                                         <br />
                                         <span className="fs-12">{timeSince(item.time)}</span>
                                     </span>
@@ -95,24 +218,19 @@ const Notifications = () => {
                             </div>
                         ))}
                     </SimpleBar>
-                    <div
-                        style={{ height: 300 }}
-                        className="d-flex align-items-center justify-content-center text-center position-absolute top-0 bottom-0 start-0 end-0 z-1"
-                    >
-                        <div>
-                            <IconifyIcon icon="line-md:bell-twotone-alert-loop" className="fs-80 text-secondary mt-2" />
-                            <h4 className="fw-semibold mb-0 fst-italic lh-base mt-3">
-                                Hey! 👋 <br />
-                                You have no any notifications
-                            </h4>
+                    {!notifications.length && (
+                        <div
+                            style={{ height: 300 }}
+                            className="d-flex align-items-center justify-content-center text-center position-absolute top-0 bottom-0 start-0 end-0 z-1"
+                        >
+                            <div>
+                                <IconifyIcon icon="line-md:bell-twotone-alert-loop" className="fs-80 text-secondary mt-2" />
+                                <h4 className="fw-semibold mb-0 fst-italic lh-base mt-3">
+                                    Sin notificaciones nuevas <br />
+                                </h4>
+                            </div>
                         </div>
-                    </div>
-                    <Link
-                        href=""
-                        className="dropdown-item notification-item position-fixed z-2 bottom-0 text-center text-reset text-decoration-underline link-offset-2 fw-bold notify-item border-top border-light py-2"
-                    >
-                        View All
-                    </Link>
+                    )}
                 </DropdownMenu>
             </Dropdown>
         </div>

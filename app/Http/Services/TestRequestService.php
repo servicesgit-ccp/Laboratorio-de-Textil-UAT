@@ -2,6 +2,7 @@
 
 namespace App\Http\Services;
 
+use App\Events\TestRequestAssigned;
 use App\Models\Style;
 use App\Models\Terminology;
 use App\Models\Test;
@@ -9,6 +10,7 @@ use App\Models\TestRequest;
 use App\Models\TestResult;
 use App\Models\TestType;
 use Carbon\Carbon;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -342,5 +344,15 @@ class TestRequestService
         $test->status = $this->mTestRequest::STATUS['IN_PROGRESS'];
         $test->assignated_to = $assignated_to;
         $test->save();
+        $test->loadMissing(['technician', 'test']);
+
+        try {
+            event(new TestRequestAssigned(
+                test: $test,
+                message: sprintf('Solicitud #%s asignada', $test->number ?? $test->id),
+                userId: $assignated_to ? (int) $assignated_to : null,
+            ));
+        } catch (BroadcastException $e) {
+        }
     }
 }

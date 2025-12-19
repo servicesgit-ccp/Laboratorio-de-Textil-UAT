@@ -1,4 +1,5 @@
 import '@/scss/app.scss';
+import '@/lib/echo';
 
 import AppProvidersWrapper from '@/components/wrappers/AppProvidersWrapper';
 import { createInertiaApp } from '@inertiajs/react';

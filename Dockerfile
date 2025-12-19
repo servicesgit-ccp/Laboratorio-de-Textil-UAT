@@ -3,9 +3,23 @@
 # Stage 1: build frontend
 FROM node:18 AS node_builder
 WORKDIR /app
+
+ARG VITE_REVERB_APP_KEY=local-app-key
+ARG VITE_REVERB_HOST=localhost
+ARG VITE_REVERB_PORT=6001
+ARG VITE_REVERB_SCHEME=http
+ARG VITE_REVERB_CLUSTER=mt1
+
+ENV VITE_REVERB_APP_KEY=${VITE_REVERB_APP_KEY}
+ENV VITE_REVERB_HOST=${VITE_REVERB_HOST}
+ENV VITE_REVERB_PORT=${VITE_REVERB_PORT}
+ENV VITE_REVERB_SCHEME=${VITE_REVERB_SCHEME}
+ENV VITE_REVERB_CLUSTER=${VITE_REVERB_CLUSTER}
+
 COPY package*.json ./
 RUN npm ci --silent
 COPY . .
+RUN rm -rf public/build
 RUN npm run build
 
 # Stage 2: composer dependencies
@@ -83,12 +97,12 @@ COPY docker/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Set permissions
+# Set permissions and required storage directories
 RUN set -eux; \
-    mkdir -p storage bootstrap/cache; \
+    mkdir -p storage/app storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache; \
     chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/vendor || true;
 
-EXPOSE 80
+EXPOSE 80 6001
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD curl -f http://localhost/ || exit 1
 

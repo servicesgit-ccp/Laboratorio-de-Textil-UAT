@@ -5,6 +5,9 @@ vendor
 .env.*
 /.vscode
 /.idea
+storage/app
+storage/framework
+storage/logs
 storage/debugbar
 public/hot
 public/storage

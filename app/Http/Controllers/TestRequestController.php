@@ -30,7 +30,7 @@ class TestRequestController extends Controller
         $status = $request->input('status', null);
         $search  = $request->input('q');
         $dateRange = $request->input('date_range');
-        $analysts = User::role('lab_technician')->get();
+        $analysts = User::all();
         $stats = $this->sTestRequest->getTestRequestStats();
         $testRequests = $this->sTestRequest->getAllTestRequest(
             $perPage,
