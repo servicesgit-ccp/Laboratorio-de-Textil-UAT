@@ -4,12 +4,13 @@ import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import { Link, router } from "@inertiajs/react";
 import { Button, CardFooter } from "react-bootstrap";
 import ConfirmModal from "@/components/_general/ConfirmModal";
+import { getImageUrl } from "@/utils/image";
 
 export type Row = {
   id: number;
   number: string;
   item: string;
-  new_image?: string | null;
+  image_id?: number | string | null;
   image?: string | null;
   style?: {
     id: number;
@@ -21,6 +22,12 @@ export type Row = {
   votes?: string | '--';
   fechaIngreso: string;
   status: number;
+};
+
+const truncateText = (value: string, max = 30) => {
+  if (!value) return value;
+  if (value.length <= max) return value;
+  return `${value.slice(0, max - 3)}...`;
 };
 
 export default function CommitteeTable({rows}: { rows: Row[] }) 
@@ -70,11 +77,11 @@ export default function CommitteeTable({rows}: { rows: Row[] })
               <tr key={req.id}>
                 <td>{req.number}</td>
                 <td>
-                {(req.new_image || req.image) ? (
+                {(getImageUrl(req.image_id) || req.image) ? (
                     <div className="d-flex justify-content-start align-items-center gap-3">
                         <div className="avatar-md">
                             <img
-                                src={req.new_image || req.image}
+                                src={getImageUrl(req.image_id) ?? req.image ?? ''}
                                 alt=" "
                                 className="img-fluid rounded-2"
                             />
@@ -86,7 +93,9 @@ export default function CommitteeTable({rows}: { rows: Row[] })
                     )}
                     {req.style?.description && (
                         <p className="mb-0">
-                            <span className="text-muted">{(req.style?.id !== 1 && req.style?.description) ?? req.notes}</span>
+                            <span className="text-muted">
+                              {truncateText((req.style?.id !== 1 && req.style?.description) ?? req.notes ?? "")}
+                            </span>
                         </p>
                     )}
                 </td>
@@ -121,7 +130,7 @@ export default function CommitteeTable({rows}: { rows: Row[] })
                   )}
                 </td>
 
-                <td>{req.provider}</td>
+                <td>{req.provider ? truncateText(req.provider) : 'S/N'}</td>
                 <td>{req.fechaIngreso}</td>
                 <td>
                   <Link href={route("committee.detail", { committee: req.id })}>

@@ -21,8 +21,10 @@ type Props = {
 };
 
 type SavedImage = {
-  path: string;
-  uploaded_at: string;
+  id?: number | string;
+  url?: string;
+  path?: string;
+  uploaded_at?: string;
 };
 
 type FormDataType = {
@@ -60,11 +62,11 @@ const GenericSectionForm: React.FC<Props> = ({ testId, sectionName, sectionData 
   );
 
   const handleDeleteSavedImage = (img: SavedImage) => {
-    const path = img.path;
-    if (!path) return;
-    if (data.deleted_images.includes(path)) return;
+    const identifier = img.id ? String(img.id) : img.path;
+    if (!identifier) return;
+    if (data.deleted_images.includes(identifier)) return;
 
-    setData('deleted_images', [...data.deleted_images, path]);
+    setData('deleted_images', [...data.deleted_images, identifier]);
   };
 
   const initialData: Record<string, string> = {};

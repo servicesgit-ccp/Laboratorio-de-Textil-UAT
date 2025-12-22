@@ -129,8 +129,8 @@ class CommitteeService
                 'is_re_entry'     => 1
             ]);
 
-            if (!empty($original->new_image)) {
-                $newTestRequest->new_image = $original->new_image;
+            if (!empty($original->image_id)) {
+                $newTestRequest->image_id = $original->image_id;
             }
 
             $newTestRequest->save();

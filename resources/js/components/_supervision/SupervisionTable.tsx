@@ -8,10 +8,17 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getImageUrl } from '@/utils/image';
 
 type Props = {
   test_requests: any;
   test_results: any;
+};
+
+const truncateText = (value: string, max = 30) => {
+  if (!value) return value;
+  if (value.length <= max) return value;
+  return `${value.slice(0, max - 3)}...`;
 };
 
 const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
@@ -80,8 +87,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
             <tr>
               <th>Folio</th>
               <th>Fecha Ingreso</th>
-              <th>SKU</th>
-              <th>Descripción</th>
+              <th>SKU / ESTILO</th>
               <th>Proveedor</th>
               <th>Pruebas Completadas</th>
               <th>Estado</th>
@@ -97,6 +103,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                 const rowId = item.id ?? idx;
                 const content = item.test?.[0]?.results?.[0]?.content ?? null;
                 const contentKeys = content ? Object.keys(content) : [];
+                const styleDescription = (item.style?.id !== 1 && item.style?.description) ?? item.notes ?? '';
 
                 return (
                   <React.Fragment key={rowId}>
@@ -111,14 +118,29 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                           : 'Sin fecha'}
                       </td>
 
-                      {item.style?.number?.length > 0 ? (
-                        <td>{item.style.number}</td>
-                      ) : (
-                        <td>{item.item}</td>
+                      <td>
+                        {(getImageUrl(item.image_id) || item.image) ? (
+                          <div className="d-flex justify-content-start align-items-center gap-3">
+                            <div className="avatar-md">
+                              <img
+                                src={getImageUrl(item.image_id) ?? item.image ?? ''}
+                                alt=" "
+                                className="img-fluid rounded-2"
+                              />
+                            </div>
+                            {item.item}
+                          </div>
+                        ) : (
+                          item.item
                       )}
+                      {item.style?.description && (
+                        <p className="mb-0">
+                          <span className="text-muted">{truncateText(styleDescription)}</span>
+                        </p>
+                      )}
+                    </td>
 
-                      <td>{item.style?.description ?? 'S/N'}</td>
-                      <td>{item.style?.provider?.name ?? 'S/N'}</td>
+                      <td>{item.style?.provider?.name ? truncateText(item.style?.provider?.name) : 'S/N'}</td>
 
                       <td>{item.completed_tests}/{item.total_tests}</td>
                       <td>{getStatusBadge(item.status)}</td>
@@ -153,7 +175,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
                     </tr>
 
                     <tr>
-                      <td colSpan={9} className="bg-light-subtle p-0">
+                      <td colSpan={8} className="bg-light-subtle p-0">
                         <Collapse in={openRowId === rowId}>
                           <div className="p-2">
                             {contentKeys.length > 0 ? (
@@ -185,7 +207,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests }) => {
               })
             ) : (
               <tr>
-                <td colSpan={9} className="text-center text-muted py-4">
+                <td colSpan={8} className="text-center text-muted py-4">
                   No hay solicitudes registradas
                 </td>
               </tr>

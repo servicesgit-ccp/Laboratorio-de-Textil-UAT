@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, Badge } from "react-bootstrap";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { getImageUrl } from "@/utils/image";
 
 const statusLabels: Record<number, { label: string; variant: string }> = {
   0: { label: "Creado", variant: "primary" },
@@ -18,19 +19,9 @@ interface Props {
 const SupervisionInfoCard: React.FC<Props> = ({ testRequest }) => {
   const status = Number(testRequest.status);
 
-  const resolveImg = (path?: string | null) => {
-    if (!path) return "";
-    if (path.startsWith("http://") || path.startsWith("https://")) return path;
-    if (path.startsWith("test-requests/")) return `/storage/${path}`;
-    if (path.startsWith("/")) return path;
-    return `/storage/${path}`;
-  };
-
-  const preferredImage = testRequest?.new_image ?? "";
-  const secondaryImage = testRequest?.image ?? "";
   const src = useMemo(
-    () => resolveImg(preferredImage || secondaryImage),
-    [preferredImage, secondaryImage]
+    () => getImageUrl(testRequest?.image_id) ?? testRequest?.image ?? "",
+    [testRequest?.image_id, testRequest?.image]
   );
 
   const ingreso = (() => {

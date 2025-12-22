@@ -6,13 +6,12 @@ import TestRequestShowDetail from '@/components/_test/TestRequestShowDetail';
 import TestRequestShowDetailContent from '@/components/_test/TestRequestShowDetailContent';
 import {Button, Card, Col, Nav, Row, Tab} from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getImageUrl } from '@/utils/image';
 
 const TestRequestShow = () => {
   const { testRequest } = usePage().props as { testRequest: any };
 
-  const imageUrl = testRequest.new_image
-  ? testRequest.new_image
-  : testRequest.image;
+  const imageUrl = getImageUrl(testRequest.image_id) ?? testRequest.image;
 
   const createdAt = (() => {
     try {

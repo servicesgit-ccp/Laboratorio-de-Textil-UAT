@@ -7,7 +7,6 @@ use App\Models\TestRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
 
 class TestResultService
@@ -27,24 +26,62 @@ class TestResultService
     public function getAllTest($request)
     {
         $perPage = $request->input('per_page', 10);
+        $status = $request->input('status');
+        $search = $request->input('q');
+        $dateRange = $request->input('date_range');
+
+        if ($status === null || $status === '') {
+            $status = $this->mTestRequest::STATUS['IN_PROGRESS'];
+        }
+        if ((int) $status === $this->mTestRequest::STATUS['ALL']) {
+            $status = null;
+        } else {
+            $status = (int) $status;
+        }
+
         $query = $this->mTest
-            ->whereHas('testRequest', function ($q) {
-                $q->where('status', $this->mTestRequest::STATUS['IN_PROGRESS']);
+            ->whereHas('testRequest', function ($q) use ($status, $search, $dateRange) {
+                if ($status !== null) {
+                    $q->where('status', $status);
+                }
+
+                if ($search) {
+                    $q->where(function ($qq) use ($search) {
+                        $qq->where('number', 'like', "%{$search}%")
+                            ->orWhere('item', 'like', "%{$search}%")
+                            ->orWhereHas('style', function ($s) use ($search) {
+                                $s->where('number', 'like', "%{$search}%")
+                                    ->orWhere('description', 'like', "%{$search}%");
+                            })
+                            ->orWhereHas('style.provider', function ($p) use ($search) {
+                                $p->where('name', 'like', "%{$search}%")
+                                    ->orWhere('number', 'like', "%{$search}%");
+                            });
+                    });
+                }
+
+                if ($dateRange) {
+                    $parts = explode(' a ', $dateRange);
+
+                    if (count($parts) === 2) {
+                        [$fromStr, $toStr] = $parts;
+
+                        try {
+                            $from = Carbon::createFromFormat('d/m/Y', trim($fromStr))->startOfDay();
+                            $to   = Carbon::createFromFormat('d/m/Y', trim($toStr))->endOfDay();
+                            $q->whereBetween('created_at', [$from, $to]);
+                        } catch (\Throwable $e) {
+                        }
+                    }
+                }
             })
             ->with([
-                'testRequest' => function ($q) {
-                    $q->where('status', $this->mTestRequest::STATUS['IN_PROGRESS']);
-                },
                 'testRequest.user',
+                'testRequest.technician',
+                'testRequest.style',
+                'testRequest.style.provider',
                 'results'
             ]);
-        if ($request->filled('q')) {
-            $q = $request->input('q');
-
-            $query->whereHas('testRequest', function ($sub) use ($q) {
-                $sub->where('number', 'like', "%{$q}%");
-            });
-        }
 
         return $query->orderByDesc('created_at')
             ->paginate($perPage)
@@ -140,8 +177,8 @@ class TestResultService
         int $testId,
         string $sectionKey,
         array $fields,
-        array $newImagePaths = [],
-        array $deletedImagePaths = []
+        array $newImages = [],
+        array $deletedImageIds = []
     ) {
         $testResult = $this->mTest
             ->with('results')
@@ -172,25 +209,31 @@ class TestResultService
             $content[$sectionKey]['img'] = [];
         }
 
-        if (!empty($deletedImagePaths)) {
+        if (!empty($deletedImageIds)) {
             $content[$sectionKey]['img'] = array_values(array_filter(
                 $content[$sectionKey]['img'],
-                function ($img) use ($deletedImagePaths) {
-                    return !in_array($img['path'] ?? '', $deletedImagePaths, true);
+                function ($img) use ($deletedImageIds) {
+                    if (isset($img['id'])) {
+                        return !in_array((string) $img['id'], $deletedImageIds, true);
+                    }
+                    return !in_array($img['path'] ?? '', $deletedImageIds, true);
                 }
             ));
 
-            foreach ($deletedImagePaths as $path) {
-                if ($path) {
-                    Storage::disk('public')->delete($path);
-                }
-            }
+            DB::table('images')
+                ->where('test_result_id', $testId)
+                ->where('test_type', $sectionKey)
+                ->whereIn('id', array_filter($deletedImageIds))
+                ->delete();
         }
 
-        foreach ($newImagePaths as $path) {
+        foreach ($newImages as $image) {
+            if (!is_array($image) || !isset($image['id'])) {
+                continue;
+            }
             $content[$sectionKey]['img'][] = [
-                'path'        => $path,
-                'uploaded_at' => now()->toISOString(),
+                'id'          => $image['id'],
+                'uploaded_at' => $image['uploaded_at'] ?? now()->toISOString(),
             ];
         }
 

@@ -16,7 +16,7 @@ class TestRequest extends Model
         'item',
         'status',
         'notes',
-        'new_image',
+        'image_id',
         'is_development',
         'is_informative',
         'assignated_to',

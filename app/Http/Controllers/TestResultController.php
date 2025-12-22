@@ -4,10 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Str;
 use App\Http\Services\TestResultService;
 use App\Models\Test;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Intervention\Image\Laravel\Facades\Image;
 
 class TestResultController extends Controller
@@ -29,7 +28,7 @@ class TestResultController extends Controller
         return Inertia::render('test-results/index', [
             'testResults' => $testResults,
             'stats'       => $stats,
-            'filters'     => $request->only('q', 'per_page'),
+            'filters'     => $request->only('q', 'per_page', 'status', 'date_range'),
         ]);
     }
 
@@ -52,14 +51,24 @@ class TestResultController extends Controller
         $content    = $result?->content ?? [];
         $sectionData = $content[$section] ?? [];
 
-        $savedImages = [];
-        if (isset($sectionData['img']) && is_array($sectionData['img'])) {
-            $savedImages = collect($sectionData['img'])
-                ->pluck('url')
-                ->filter()
-                ->values()
-                ->all();
-        }
+        $sectionImages = DB::table('images')
+            ->select('id', 'created_at')
+            ->where('test_result_id', $testId)
+            ->where('test_type', $section)
+            ->orderBy('id')
+            ->get()
+            ->map(function ($image) {
+                return [
+                    'id'          => $image->id,
+                    'url'         => route('test-results.images.show', ['image' => $image->id]),
+                    'uploaded_at' => $image->created_at
+                        ? \Illuminate\Support\Carbon::parse($image->created_at)->toISOString()
+                        : null,
+                ];
+            })
+            ->all();
+
+        $sectionData['img'] = $sectionImages;
 
         return Inertia::render('test-results/section-form', [
             'test' => [
@@ -69,7 +78,6 @@ class TestResultController extends Controller
                 'notes'        => $testResult->testRequest->notes,
                 'requested_by' => $testResult->testRequest->user->name,
             ],
-            'savedImages' => $savedImages,
             'sectionName' => $section,
             'sectionData' => $sectionData,
         ]);
@@ -86,24 +94,29 @@ class TestResultController extends Controller
             'deleted_images.*' => ['string'],
         ]);
 
-        $imagePaths = [];
-        $deletedImagePaths = $validated['deleted_images'] ?? [];
+        $newImages = [];
+        $deletedImageIds = $validated['deleted_images'] ?? [];
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $file) {
-                $sectionSlug = Str::slug($sectionKey);
-                $dir = "test-results/{$testId}/{$sectionSlug}";
-
-                $filename = Str::random(40) . '.jpg';
-                $path = "{$dir}/{$filename}";
-
                 $image = Image::read($file->getRealPath());
                 $image->scaleDown(1600);
                 $encoded = $image->encodeByMediaType('image/jpeg', 70);
 
-                Storage::disk('public')->put($path, (string) $encoded);
+                $now = now();
+                $imageId = DB::table('images')->insertLob([
+                    'test_result_id' => (int) $testId,
+                    'test_type'      => (string) $sectionKey,
+                    'created_at'     => $now,
+                    'updated_at'     => $now,
+                ], [
+                    'image' => (string) $encoded,
+                ], 'id');
 
-                $imagePaths[] = $path;
+                $newImages[] = [
+                    'id'          => $imageId,
+                    'uploaded_at' => $now->toISOString(),
+                ];
             }
         }
 
@@ -111,8 +124,8 @@ class TestResultController extends Controller
             (int) $testId,
             (string) $sectionKey,
             $validated['fields'],
-            $imagePaths,
-            $deletedImagePaths
+            $newImages,
+            $deletedImageIds
         );
 
         return redirect()
@@ -144,5 +157,22 @@ class TestResultController extends Controller
     {
         $this->sTestResult->submitReview($id);
         return back()->with('success', 'Enviado a revisión');
+    }
+
+    public function showImage(int $imageId)
+    {
+        $image = DB::table('images')
+            ->select('image')
+            ->where('id', $imageId)
+            ->first();
+
+        if (! $image || ! $image->image) {
+            abort(404);
+        }
+
+        return response($image->image, 200, [
+            'Content-Type' => 'image/jpeg',
+            'Cache-Control' => 'public, max-age=604800',
+        ]);
     }
 }

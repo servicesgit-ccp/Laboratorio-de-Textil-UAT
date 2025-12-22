@@ -7,6 +7,7 @@ import { Button, Card, CardBody, CardHeader, Col, Form, Row } from 'react-bootst
 // components
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import CameraCapture from '../_test-results/CameraCapture';
+import { getImageUrl } from '@/utils/image';
 
 type TestType = { id: number; name_es: string };
 
@@ -23,7 +24,7 @@ type TestRequest = {
     tests?: { test_type_id: number }[];
     is_development?: boolean;
     is_informative?: boolean;
-    new_image: string | null;
+    image_id?: number | string | null;
     image?: string | null;
 };
 
@@ -90,7 +91,9 @@ const TestRequestForm = () => {
     const [itemLoading, setItemLoading] = useState(false);
 
     // 👇 estado extra para manejar imagen remota y posible nueva imagen
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(
+        getImageUrl(test_request?.image_id) ?? test_request?.image ?? null
+    );
     const [imageLoadError, setImageLoadError] = useState(false);
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
 
@@ -213,6 +216,7 @@ const TestRequestForm = () => {
                 departmentName = data.style.department?.description ?? '';
                 providerName = data.style.provider?.name ?? '';
             } else {
+                styleId = data.id ?? '';
                 itemName = data.description;
                 departmentName = data.department?.description ?? '';
                 providerName = data.provider?.name ?? '';
@@ -471,7 +475,7 @@ const TestRequestForm = () => {
                                 {/* Columna derecha: recuadro de imagen / captura */}
                                <Col lg={4} className="mt-3 mt-lg-0">
                                     <div className="border rounded p-3 h-100 d-flex flex-column align-items-center justify-content-center bg-light-subtle">
-                                        {!(form.is_development || form.is_informative) && imageUrl && !imageLoadError ? (
+                                        {!(form.is_development || form.is_informative) && imageUrl && !imageLoadError && (
                                             <>
                                                 <Form.Label>Imagen de la muestra</Form.Label>
                                                 <img
@@ -482,9 +486,11 @@ const TestRequestForm = () => {
                                                     onError={handleImageError}
                                                 />
                                             </>
-                                        ) : (
+                                        )}
+
+                                        {!(form.is_development || form.is_informative) && (
                                             <>
-                                                <Form.Label className="mb-2">
+                                                <Form.Label className="mb-2 mt-3">
                                                     Capturar / subir imagen
                                                 </Form.Label>
 

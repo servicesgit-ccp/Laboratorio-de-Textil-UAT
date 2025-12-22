@@ -3,8 +3,10 @@ import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { formatIsoToSpanish } from '@/utils/formatDate';
 
 type SavedImage = {
-  path: string;
-  uploaded_at: string;
+  id?: number | string;
+  url?: string;
+  path?: string;
+  uploaded_at?: string;
 };
 
 type CameraCaptureProps = {
@@ -144,8 +146,12 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
             <div className="w-100 mt-3">
                 <div className="mb-2 fw-semibold small">Fotos guardadas</div>
                 <div className="row g-2">
-                {savedImages.map((img, idx) => (
-                    <div className="col-4 col-md-2" key={img.path}>
+                {savedImages.map((img, idx) => {
+                  const imageUrl = img.url ?? (img.path ? `/storage/${img.path}` : '');
+                  const imageKey = img.id ?? img.path ?? idx;
+
+                  return (
+                    <div className="col-4 col-md-2" key={imageKey}>
                     <div className="border rounded-4 overflow-hidden position-relative">
                         <button
                         type="button"
@@ -160,10 +166,10 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
                         <button
                         type="button"
                         className="p-0 border-0 bg-transparent w-100"
-                        onClick={() => setSelectedImage(`/storage/${img.path}`)}
+                        onClick={() => imageUrl && setSelectedImage(imageUrl)}
                         >
                         <img
-                            src={`/storage/${img.path}`}
+                            src={imageUrl}
                             alt={`saved-${idx}`}
                             className="img-fluid"
                             style={{ objectFit: 'cover', aspectRatio: '1 / 1' }}
@@ -175,7 +181,8 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({
                         </div>
                     </div>
                     </div>
-                ))}
+                  );
+                })}
                 </div>
             </div>
             )}

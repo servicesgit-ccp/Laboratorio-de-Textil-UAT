@@ -107,7 +107,7 @@ const CommitteePage = () => {
     number: item.number ?? "",
     item: item.item ?? "DESCONOCIDO",
     notes: item.notes ?? null,
-    new_image: item.new_image ?? null,
+    image_id: item.image_id ?? null,
     image: item.image ?? null,
     style: item.style
       ? { id: Number(item.style.id), description: item.style.description ?? "" }

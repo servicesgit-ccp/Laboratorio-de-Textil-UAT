@@ -2,14 +2,15 @@
 import { useState } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 // bootstrap
-import { Button, Card, CardFooter, CardHeader, Col, Row, Tooltip } from 'react-bootstrap';
+import { Button, Card, CardFooter, Col, Row } from 'react-bootstrap';
 // components
 import PageTitle from '@/components/PageTitle';
 import MainLayout from '@/layouts/MainLayout';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import TestResultsSummary from '@/components/_test-results/TestResultsSummary';
 import ConfirmModal from '@/components/_general/ConfirmModal';
-import TestResultsTable from "@/components/_test-results/TestResultsTable";
+import TestRequestFilters from "@/components/_test/TestRequestFilters";
+import { getImageUrl } from '@/utils/image';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -18,6 +19,12 @@ const formatDate = (iso: string | null) => {
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const year = d.getFullYear();
   return `${day}/${month}/${year}`;
+};
+
+const truncateText = (value: string, max = 30) => {
+  if (!value) return value;
+  if (value.length <= max) return value;
+  return `${value.slice(0, max - 3)}...`;
 };
 
 const TestResultsPage = () => {
@@ -45,6 +52,8 @@ const TestResultsPage = () => {
     filters?: {
       q?: string;
       per_page?: number | string;
+      status?: number | string;
+      date_range?: string;
     };
     stats: {
       inAnalysis: number;
@@ -54,9 +63,9 @@ const TestResultsPage = () => {
     };
   };
 
-
-  const [search, setSearch] = useState(filters?.q ?? '');
-  const perPage = Number(filters?.per_page ?? 10);
+  const [searchTerm, setSearchTerm] = useState(filters?.q ?? "");
+  const [statusFilter, setStatusFilter] = useState(filters?.status ?? 1);
+  const [dateRange, setDateRange] = useState(filters?.date_range ?? "");
   const [confirmModal, setConfirmModal] = useState<{ show: boolean; testId: number | null }>({
     show: false,
     testId: null,
@@ -65,6 +74,7 @@ const TestResultsPage = () => {
 
   const rows = (testResults.data ?? []).map((item: any) => {
     const analystSet = new Set<string>();
+    const technicianName = item.test_request?.technician?.name ?? '';
     let totalSectionsWithStatus = 0;
     let pendingSections = 0;
     (item.results ?? []).forEach((result: any) => {
@@ -85,48 +95,23 @@ const TestResultsPage = () => {
         }
       });
     });
-    const analystNames = Array.from(analystSet);
+    const analystNames = technicianName ? [technicianName] : Array.from(analystSet);
     return {
       id: item.id,
       folio: item.test_request?.number ?? '',
       fechaIngreso: formatDate(item.created_at),
       fechaSalida: item.finished_at ? formatDate(item.finished_at) : '--',
       sku: item.test_request?.item ?? 'DESCONOCIDO',
-      analista: analystNames,
+      image_id: item.test_request?.image_id ?? null,
+      image: item.test_request?.image ?? null,
+      styleDescription: item.test_request?.style?.description ?? '',
+      styleId: item.test_request?.style?.id ?? null,
+      notes: item.test_request?.notes ?? '',
+      technician: analystNames,
       pruebasPendientes: pendingSections,
       totalPruebas: totalSectionsWithStatus
     };
   });
-
-  const handleSearch = () => {
-    router.get(
-      route('test-results'),
-      {
-        q: search,
-        per_page: perPage,
-        page: 1,
-      },
-      {
-        preserveState: true,
-        preserveScroll: true,
-      },
-    );
-  };
-
-  const handlePerPageChange = (value: string) => {
-    router.get(
-      route('test-results'),
-      {
-        q: search,
-        per_page: value,
-        page: 1,
-      },
-      {
-        preserveState: true,
-        preserveScroll: true,
-      },
-    );
-  };
 
   const handleSendToReview = () => {
     if (!confirmModal.testId) return;
@@ -160,43 +145,18 @@ const TestResultsPage = () => {
       <Row className="mt-4">
         <Col xs={12}>
           <Card className="border-0 shadow-sm rounded-4">
-            {/* BUSCADOR */}
-            <CardHeader className="border-0 pb-0">
-              <div className="d-flex align-items-stretch gap-3 flex-wrap">
-                {/* Input grande con ícono */}
-                <div style={{ flex: "1 1 320px", minWidth: 200 }}>
-                  <div className="d-flex align-items-center bg-body-tertiary rounded-4 px-2 py-2 h-60">
-                    <IconifyIcon icon="tabler:search" className="me-2 text-muted fs-5" />
-                    <input
-                      type="search"
-                      className="form-control border-0 bg-transparent"
-                      placeholder="Buscar Muestra (folio)"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          handleSearch();
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
-
-                {/* Botón Buscar */}
-                <div style={{ width: 130, minWidth: 120 }}>
-                  <Button
-                    type="button"
-                    variant="dark"
-                    className="w-100 px-3 d-flex align-items-center justify-content-center rounded-4"
-                    style={{ padding: "10px 14px" }}
-                    onClick={handleSearch}
-                  >
-                    <IconifyIcon icon="tabler:search" className="me-2" />
-                    Buscar
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
+            <TestRequestFilters
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              filters={filters}
+              routeName="test-results"
+              showCreate={false}
+              searchPlaceholder="Buscar muestra (folio, sku, estilo, proveedor)"
+            />
 
             {/* TABLA */}
             <div className="table-responsive mt-3">
@@ -217,19 +177,39 @@ const TestResultsPage = () => {
                       <td>{req.folio}</td>
                       <td>{req.fechaIngreso}</td>
                       <td>
-                        <span
-                          className="badge bg-light text-muted border rounded-pill"
-                          style={{ fontSize: '12px' }}
-                        >
-                          {req.sku}
-                        </span>
+                        {(() => {
+                          const imageUrl = getImageUrl(req.image_id) ?? req.image;
+                          if (!imageUrl) {
+                            return req.sku;
+                          }
+
+                          return (
+                          <div className="d-flex justify-content-start align-items-center gap-3">
+                            <div className="avatar-md">
+                              <img
+                                src={imageUrl}
+                                alt=" "
+                                className="img-fluid rounded-2"
+                              />
+                            </div>
+                            {req.sku}
+                          </div>
+                          );
+                        })()}
+                        {req.styleDescription && (
+                          <p className="mb-0">
+                            <span className="text-muted">
+                              {truncateText((req.styleId !== 1 && req.styleDescription) ?? req.notes)}
+                            </span>
+                          </p>
+                        )}
                       </td>
                       <td>
-                        {(!req.analista || req.analista.length === 0) ? (
-                          <span className="text-muted">--</span>
+                        {(!req.technician || req.technician.length === 0) ? (
+                          <span className="text-muted">Sin asignar</span>
                         ) : (
                           <div className="d-flex align-items-center gap-1">
-                            {req.analista.map((name: string, index: number) => {
+                            {req.technician.map((name: string, index: number) => {
                               const parts = name.trim().split(' ');
                               const first = parts[0] ?? '';
                               const last = parts.length > 1 ? parts[parts.length - 1] : '';
@@ -314,8 +294,21 @@ const TestResultsPage = () => {
                 <div className="d-flex align-items-center gap-2">
                   <span>Filas:</span>
                   <select
-                    value={perPage}
-                    onChange={(e) => handlePerPageChange(e.target.value)}
+                    value={filters?.per_page ?? 10}
+                    onChange={(e) =>
+                      router.get(
+                        route("test-results"),
+                        {
+                          ...filters,
+                          per_page: e.target.value,
+                          q: searchTerm,
+                          status: statusFilter,
+                          date_range: dateRange,
+                          page: 1,
+                        },
+                        { preserveState: true, preserveScroll: true }
+                      )
+                    }
                     className="form-select form-select-sm"
                     style={{ width: 80 }}
                   >

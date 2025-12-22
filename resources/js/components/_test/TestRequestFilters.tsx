@@ -13,11 +13,15 @@ const TestRequestFilters = ({
   dateRange,
   setDateRange,
   filters,
+  routeName = "test.request.index",
+  createRouteName = "test.request.create",
+  showCreate = true,
+  searchPlaceholder = "Buscar solicitud (folio, sku, estilo, proveedor)",
 }) => {
   const handleSearchKeyDown = (e) => {
     if (e.key === "Enter") {
       router.get(
-        route("test.request.index"),
+        route(routeName),
         {
           ...filters,
           q: searchTerm,
@@ -32,7 +36,7 @@ const TestRequestFilters = ({
 
   const applyFilters = (next = {}) => {
     router.get(
-      route("test.request.index"),
+      route(routeName),
       {
         ...filters,
         q: searchTerm,
@@ -65,7 +69,7 @@ const TestRequestFilters = ({
     setDateRange("");
 
     router.get(
-      route("test.request.index"),
+      route(routeName),
       {
         q: "",
         status: 6,
@@ -110,7 +114,7 @@ const TestRequestFilters = ({
             <input
               type="search"
               className="form-control border-0 bg-transparent"
-              placeholder="Buscar solicitud (folio, sku, estilo, proveedor)"
+              placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={(e) => {
@@ -246,22 +250,24 @@ const TestRequestFilters = ({
         </div>
 
         {/* Nueva */}
-        <div style={{ width: 140, minWidth: 120 }}>
-          <div className="text-muted mb-1" style={{ fontSize: 10 }}>
-            &nbsp;
-          </div>
+        {showCreate && (
+          <div style={{ width: 140, minWidth: 120 }}>
+            <div className="text-muted mb-1" style={{ fontSize: 10 }}>
+              &nbsp;
+            </div>
 
-          <Link href={route("test.request.create")} className="w-100 d-block">
-            <Button
-              variant="success"
-              className="w-100 d-flex align-items-center justify-content-center rounded-4"
-              style={{ padding: "10px 14px" }}
-            >
-              <IconifyIcon icon="tabler:plus" className="me-2" />
-              Nueva
-            </Button>
-          </Link>
-        </div>
+            <Link href={route(createRouteName)} className="w-100 d-block">
+              <Button
+                variant="success"
+                className="w-100 d-flex align-items-center justify-content-center rounded-4"
+                style={{ padding: "10px 14px" }}
+              >
+                <IconifyIcon icon="tabler:plus" className="me-2" />
+                Nueva
+              </Button>
+            </Link>
+          </div>
+        )}
       </div>
     </CardHeader>
 

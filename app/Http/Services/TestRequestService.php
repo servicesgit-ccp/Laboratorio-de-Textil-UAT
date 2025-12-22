@@ -11,9 +11,7 @@ use App\Models\TestResult;
 use App\Models\TestType;
 use Carbon\Carbon;
 use Illuminate\Broadcasting\BroadcastException;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -110,23 +108,14 @@ class TestRequestService
                 'is_development' => $data['is_development'] ?? 0,
                 'is_informative' => $data['is_informative'] ?? 0,
             ]);
-            $path = null;
-
+            $imageBlob = null;
             if (isset($data['new_image'])) {
                 $file = $data['new_image'];
-                $dir = "test-requests/{$testRequest->id}";
-                $filename = Str::random(40) . '.jpg';
-                $path = "{$dir}/{$filename}";
-
                 $image = Image::read($file->getRealPath());
                 $image->scaleDown(1600);
                 $encoded = $image->encodeByMediaType('image/jpeg', 70);
-
-                Storage::disk('public')->put($path, (string) $encoded);
+                $imageBlob = (string) $encoded;
             }
-
-            $testRequest->new_image = $path;
-            $testRequest->save();
 
             $test = $this->mTest->create([
                 'test_request_id' => $testRequest->id,
@@ -158,10 +147,25 @@ class TestRequestService
                 $content[$groupKey]['status_review'] = 0;
             }
 
-            $this->mTestResult->create([
+            $testResult = $this->mTestResult->create([
                 'test_id' => $test->id,
                 'content' => $content,
             ]);
+
+            if ($imageBlob) {
+                $now = now();
+                $imageId = DB::table('images')->insertLob([
+                    'test_result_id' => $testResult->id,
+                    'test_type'      => 'test_request',
+                    'created_at'     => $now,
+                    'updated_at'     => $now,
+                ], [
+                    'image' => $imageBlob,
+                ], 'id');
+
+                $testRequest->image_id = $imageId;
+                $testRequest->save();
+            }
 
             DB::commit();
 
@@ -188,30 +192,19 @@ class TestRequestService
             $testRequest = $this->mTestRequest
                 ->with(['test.results'])
                 ->findOrFail($id);
-            $path = null;
-
+            $imageBlob = null;
             if (isset($data['new_image'])) {
-                if ($testRequest->new_image) {
-                    Storage::disk('public')->delete($testRequest->new_image);
-                }
-
                 $file = $data['new_image'];
-                $dir = "test-requests/{$testRequest->id}";
-                $filename = Str::random(40) . '.jpg';
-                $path = "{$dir}/{$filename}";
-
                 $image = Image::read($file->getRealPath());
                 $image->scaleDown(1600);
                 $encoded = $image->encodeByMediaType('image/jpeg', 70);
-
-                Storage::disk('public')->put($path, (string) $encoded);
+                $imageBlob = (string) $encoded;
             }
 
             $testRequest->update([
                 'style_id' => $data['style_id'] ?? 0,
                 'item'     => $data['item'],
                 'notes'    => $data['notes'] ?? null,
-                'new_image' => $path ?? null,
                 'is_informative' => $data['is_informative'] ?? 0,
                 'is_development' => $data['is_development'] ?? 0
             ]);
@@ -259,11 +252,31 @@ class TestRequestService
                 $existingResult->update([
                     'content' => $content,
                 ]);
+                $testResult = $existingResult;
             } else {
-                $this->mTestResult->create([
+                $testResult = $this->mTestResult->create([
                     'test_id' => $test->id,
                     'content' => $content,
                 ]);
+            }
+
+            if ($imageBlob) {
+                if ($testRequest->image_id) {
+                    DB::table('images')->where('id', $testRequest->image_id)->delete();
+                }
+
+                $now = now();
+                $imageId = DB::table('images')->insertLob([
+                    'test_result_id' => $testResult->id,
+                    'test_type'      => 'test_request',
+                    'created_at'     => $now,
+                    'updated_at'     => $now,
+                ], [
+                    'image' => $imageBlob,
+                ], 'id');
+
+                $testRequest->image_id = $imageId;
+                $testRequest->save();
             }
 
             DB::commit();

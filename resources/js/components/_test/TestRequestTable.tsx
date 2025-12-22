@@ -9,11 +9,18 @@ import {
   Tooltip,
 } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getImageUrl } from '@/utils/image';
 
 type Props = {
   test_requests: any;
   test_results: any;
   analysts: any;
+};
+
+const truncateText = (value: string, max = 30) => {
+  if (!value) return value;
+  if (value.length <= max) return value;
+  return `${value.slice(0, max - 3)}...`;
 };
 
 const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analysts }) => {
@@ -28,11 +35,9 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
     setOpenRowId((prev) => (prev === rowId ? null : rowId));
   };
 
-  console.log(test_requests);
-
   const handleOpenModal = (item: any) => {
     setSelectedRequest(item);
-    setImageUrl(item.new_image || item.image);
+    setImageUrl(getImageUrl(item.image_id) ?? item.image ?? undefined);
     setImageLoadError(false);
     setShowModal(true);
   };
@@ -145,6 +150,7 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
               const rowId = item.id ?? idx;
               const content = item.test?.[0]?.results?.[0]?.content ?? null;
               const contentKeys = content ? Object.keys(content) : [];
+              const styleDescription = (item.style?.id !== 1 && item.style?.description) ?? item.notes ?? '';
               let initials = "";
               if (item.technician) {
                 const parts = item.technician?.name.trim().split(" ");
@@ -183,11 +189,11 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
                       </div>) : 'Sin asignar'}
                     </td>
                     <td>
-                      {(item.new_image || item.image) ? (
+                      {(getImageUrl(item.image_id) || item.image) ? (
                         <div className="d-flex justify-content-start align-items-center gap-3">
                           <div className="avatar-md">
                             <img
-                              src={item.new_image || item.image}
+                              src={getImageUrl(item.image_id) ?? item.image ?? ''}
                               alt=" "
                               className="img-fluid rounded-2"
                             />
@@ -199,11 +205,11 @@ const TestRequestsTable: React.FC<Props> = ({ test_requests, test_results, analy
                       )}
                       {item.style?.description && (
                         <p className="mb-0">
-                          <span className="text-muted">{(item.style?.id !== 1 && item.style?.description) ?? item.notes}</span>
+                          <span className="text-muted">{truncateText(styleDescription)}</span>
                         </p>
                       )}
                     </td>
-                    <td>{item.style?.provider?.name ?? 'S/N'}</td>
+                    <td>{item.style?.provider?.name ? truncateText(item.style?.provider?.name) : 'S/N'}</td>
 
                     <td>
                       {item.test?.[0]?.results?.[0]?.content

@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Card, Badge } from "react-bootstrap";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import { SummaryRow } from "@/components/_committee/TableDetail";
+import { getImageUrl } from "@/utils/image";
 
 type Props = {
   testResult: any;
@@ -23,17 +24,7 @@ export default function SummaryCommitee({ testResult, summaryRows }: Props) {
   const styleDesc = testResult?.style?.description ?? "--";
   const providerName = testResult?.style?.provider?.name ?? "--";
   const ingreso = formatDate(testResult?.created_at);
-  const preferredImage = testResult?.new_image ?? "";
-  const secondaryImage = testResult?.image ?? "";
-
-  const resolveImg = (path?: string | null) => {
-    if (!path) return "";
-    if (path.startsWith("http://") || path.startsWith("https://")) return path;
-    if (path.startsWith("test-requests/")) return `/storage/${path}`;
-    if (path.startsWith("/")) return path;
-    return `/storage/${path}`;
-  };
-  const src = resolveImg(preferredImage || secondaryImage);
+  const src = getImageUrl(testResult?.image_id) ?? testResult?.image ?? "";
 
 
   const progress = useMemo(() => {

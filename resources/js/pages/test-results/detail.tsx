@@ -9,6 +9,7 @@ import TestSectionTabs from '@/components/_test-results/TestSectionTabs';
 import GenericSectionContent from '@/components/_test-results/contents/GenericSectionContent';
 import { SectionKey } from '@/components/_test-results/sectionConfig';
 import { Button } from 'react-bootstrap';
+import { getImageUrl } from '@/utils/image';
 
 const formatDate = (iso: string | null) => {
   if (!iso) return '';
@@ -75,7 +76,7 @@ const TestResultDetailPage: React.FC = () => {
     pruebasPendientes: totalSectionsWithStatus
       ? `${pendingSections}/${totalSectionsWithStatus}`
       : '--',
-    image: testResult.test_request?.new_image ? testResult.test_request?.new_image : testResult.test_request?.image ?? '',
+    image: getImageUrl(testResult.test_request?.image_id) ?? testResult.test_request?.image ?? '',
   };
 
   return (
